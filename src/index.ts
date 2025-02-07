@@ -1,13 +1,41 @@
-export * from "./lib/espace";
-export * from "./lib/ESpaceScannerWrapper";
-export * from "./lib/types";
+// Core functionality
+export { ESpaceApi, ESpaceScanner } from "./core";
 
-// Re-export commonly used types
-export type { ConfluxTarget } from "./lib/espace";
-export type {
-  TokenData,
+// Wrapper with formatting
+export { ESpaceScannerWrapper } from "./wrapper";
+
+// Types
+export {
+  ApiConfig,
+  ApiResponse,
+  ESpaceApiResponse,
+  FormattedResponse,
+  ConfluxTarget,
+} from "./types/api";
+
+export {
+  ContractABIData,
+  ContractSourceData,
   ContractABIResponse,
   ContractSourceResponse,
-  ESpaceStatsParams,
-  StatsPeriod,
-} from "./lib/types"; 
+  TokenData,
+  TokenListResponse,
+  StatItem,
+  ContractStatItem,
+  TransferStatItem,
+  TpsStatItem,
+  TopGasItem,
+  TopValueItem,
+  ESpaceStatItem,
+  ESpaceStatsResponse,
+  ESpaceTopStatsResponse,
+  ListResponse,
+} from "./types/responses";
+
+export { StatsParams, ESpaceStatsParams, StatsPeriod, TokenType } from "./types/params";
+
+// Formatters
+export { NumberFormatter, DateFormatter, ResponseFormatter } from "./formatters";
+
+// Utils
+export { AddressValidator } from "./utils";

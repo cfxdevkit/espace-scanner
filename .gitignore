@@ -1,3 +1,5 @@
+junk/
+
 # Dependencies
 node_modules/
 .pnp/
@@ -6,7 +8,6 @@ node_modules/
 # Build output
 dist/
 build/
-lib/
 *.tsbuildinfo
 
 # Testing
@@ -25,6 +26,11 @@ coverage/
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Examples
+examples/.env
+examples/output/
+examples/logs/
 
 # Logs
 logs/
