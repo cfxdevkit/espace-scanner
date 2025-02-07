@@ -53,10 +53,7 @@ describe("ESpaceApi", () => {
 
       await (api as unknown as TestableESpaceApi).fetchApi(endpoint);
 
-      expect(mockFetch).toHaveBeenCalledWith(
-        "https://evmapi.confluxscan.io/test",
-        { headers: {} }
-      );
+      expect(mockFetch).toHaveBeenCalledWith("https://evmapi.confluxscan.io/test", { headers: {} });
     });
 
     it("should handle query parameters", async () => {

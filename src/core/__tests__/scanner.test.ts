@@ -201,7 +201,9 @@ describe("ESpaceScanner", () => {
         const result = await scanner.getActiveAccountStats();
         expect(result).toEqual(mockStatsResponse);
         expect(mockFetch).toHaveBeenCalledWith(
-          expect.stringMatching(/^https:\/\/evmapi\.confluxscan\.io\/statistics\/account\/active\?/),
+          expect.stringMatching(
+            /^https:\/\/evmapi\.confluxscan\.io\/statistics\/account\/active\?/
+          ),
           { headers: {} }
         );
       });
@@ -210,7 +212,9 @@ describe("ESpaceScanner", () => {
         const result = await scanner.getCfxHolderStats();
         expect(result).toEqual(mockStatsResponse);
         expect(mockFetch).toHaveBeenCalledWith(
-          expect.stringMatching(/^https:\/\/evmapi\.confluxscan\.io\/statistics\/account\/cfx\/holder\?/),
+          expect.stringMatching(
+            /^https:\/\/evmapi\.confluxscan\.io\/statistics\/account\/cfx\/holder\?/
+          ),
           { headers: {} }
         );
       });
@@ -330,7 +334,9 @@ describe("ESpaceScanner", () => {
         const result = await scanner.getTokenUniqueReceiverStats(validAddress);
         expect(result).toEqual(mockStatsResponse);
         expect(mockFetch).toHaveBeenCalledWith(
-          expect.stringMatching(/^https:\/\/evmapi\.confluxscan\.io\/statistics\/token\/unique\/receiver\?/),
+          expect.stringMatching(
+            /^https:\/\/evmapi\.confluxscan\.io\/statistics\/token\/unique\/receiver\?/
+          ),
           { headers: {} }
         );
       });
@@ -339,7 +345,9 @@ describe("ESpaceScanner", () => {
         const result = await scanner.getTokenUniqueParticipantStats(validAddress);
         expect(result).toEqual(mockStatsResponse);
         expect(mockFetch).toHaveBeenCalledWith(
-          expect.stringMatching(/^https:\/\/evmapi\.confluxscan\.io\/statistics\/token\/unique\/participant\?/),
+          expect.stringMatching(
+            /^https:\/\/evmapi\.confluxscan\.io\/statistics\/token\/unique\/participant\?/
+          ),
           { headers: {} }
         );
       });
@@ -350,7 +358,9 @@ describe("ESpaceScanner", () => {
         const result = await scanner.getBlockBaseFeeStats();
         expect(result).toEqual(mockStatsResponse);
         expect(mockFetch).toHaveBeenCalledWith(
-          expect.stringMatching(/^https:\/\/evmapi\.confluxscan\.io\/statistics\/block\/base-fee\?/),
+          expect.stringMatching(
+            /^https:\/\/evmapi\.confluxscan\.io\/statistics\/block\/base-fee\?/
+          ),
           { headers: {} }
         );
       });
@@ -359,7 +369,9 @@ describe("ESpaceScanner", () => {
         const result = await scanner.getBlockGasUsedStats();
         expect(result).toEqual(mockStatsResponse);
         expect(mockFetch).toHaveBeenCalledWith(
-          expect.stringMatching(/^https:\/\/evmapi\.confluxscan\.io\/statistics\/block\/gas-used\?/),
+          expect.stringMatching(
+            /^https:\/\/evmapi\.confluxscan\.io\/statistics\/block\/gas-used\?/
+          ),
           { headers: {} }
         );
       });
@@ -368,7 +380,9 @@ describe("ESpaceScanner", () => {
         const result = await scanner.getBlockAvgPriorityFeeStats();
         expect(result).toEqual(mockStatsResponse);
         expect(mockFetch).toHaveBeenCalledWith(
-          expect.stringMatching(/^https:\/\/evmapi\.confluxscan\.io\/statistics\/block\/avg-priority-fee\?/),
+          expect.stringMatching(
+            /^https:\/\/evmapi\.confluxscan\.io\/statistics\/block\/avg-priority-fee\?/
+          ),
           { headers: {} }
         );
       });
@@ -377,7 +391,9 @@ describe("ESpaceScanner", () => {
         const result = await scanner.getBlockTxsByTypeStats();
         expect(result).toEqual(mockStatsResponse);
         expect(mockFetch).toHaveBeenCalledWith(
-          expect.stringMatching(/^https:\/\/evmapi\.confluxscan\.io\/statistics\/block\/txs-by-type\?/),
+          expect.stringMatching(
+            /^https:\/\/evmapi\.confluxscan\.io\/statistics\/block\/txs-by-type\?/
+          ),
           { headers: {} }
         );
       });
