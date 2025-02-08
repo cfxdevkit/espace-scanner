@@ -3,13 +3,6 @@ import { createLogger } from "../src/utils/logger";
 
 const logger = createLogger("Usage");
 
-const _inspect = <T>(obj: T): string =>
-  util.inspect(obj, {
-    depth: null,
-    colors: true,
-    maxArrayLength: null,
-  });
-
 async function demonstrateESpaceScannerWrapperUsage(): Promise<void> {
   // Initialize scanners for different networks
   const mainnetScanner = new ESpaceScannerWrapper({ target: "mainnet" });

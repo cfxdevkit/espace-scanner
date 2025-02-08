@@ -30,6 +30,7 @@ export {
   ESpaceStatsResponse,
   ESpaceTopStatsResponse,
   ListResponse,
+  TopStatsItem,
 } from "./types/responses";
 
 export { StatsParams, ESpaceStatsParams, StatsPeriod, TokenType } from "./types/params";

@@ -77,7 +77,11 @@
     "node": ">=16.0.0"
   },
   "lint-staged": {
-    "*.{js,ts}": [
+    "src/**/*.{js,ts}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "examples/**/*.{js,ts}": [
       "eslint --fix",
       "prettier --write"
     ]
