@@ -1,4 +1,7 @@
 import { formatEther, formatUnits } from "viem";
+import { createLogger } from "../utils/logger";
+
+const logger = createLogger("NumberFormatter");
 
 /**
  * Utility class for formatting numbers in various formats used throughout the application.
@@ -7,19 +10,38 @@ import { formatEther, formatUnits } from "viem";
 export class NumberFormatter {
   /**
    * Formats a number with comma separators and up to 4 decimal places.
-   * @param num - The number to format (can be string or number)
+   * @param value - The number to format (can be string or number)
    * @returns Formatted string with comma separators and optional decimals
    * @example
    * formatNumber(1234.5678) // returns "1,234.5678"
    * formatNumber(1000000) // returns "1,000,000"
    */
-  static formatNumber(num: string | number): string {
-    if (!num) return "0";
-    const numStr = Number(num).toString();
-    if (numStr === "NaN") return "0";
-    const [integerPart, decimalPart] = numStr.split(".");
-    const formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    return decimalPart ? `${formattedInteger}.${decimalPart.slice(0, 4)}` : formattedInteger;
+  static formatNumber(value: string | number | undefined): string {
+    if (value === undefined || value === null || value === "") return "0";
+    try {
+      const num = typeof value === "string" ? parseFloat(value) : value;
+      if (isNaN(num)) {
+        logger.warn({ value }, "Invalid number value, returning 0");
+        return "0";
+      }
+
+      // Handle decimal truncation manually to ensure exact 4 decimal places
+      const parts = num.toString().split(".");
+      if (parts.length === 1) return parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+      let decimals = parts[1];
+      if (decimals.length > 4) {
+        decimals = decimals.substring(0, 4);
+      }
+
+      return parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",") + "." + decimals;
+    } catch (error) {
+      logger.error(
+        { value, error: error instanceof Error ? error.message : String(error) },
+        "Error formatting number"
+      );
+      return "0";
+    }
   }
 
   /**
@@ -48,8 +70,27 @@ export class NumberFormatter {
    * @example
    * formatGas(1000000000) // returns "1"
    */
-  static formatGas(value: string | number): string {
-    return this.formatNumber(Number(value) / 1e9);
+  static formatGas(value: string | number | undefined): string {
+    if (value === undefined || value === null || value === "" || value === 0 || value === "0") {
+      logger.debug("Empty or zero gas value provided, returning 0");
+      return "0";
+    }
+    try {
+      const gasValue =
+        typeof value === "string" ? BigInt(value) : BigInt(Math.floor(Number(value)));
+      const formatted = formatUnits(gasValue, 0);
+      logger.debug({ originalValue: value, formatted }, "Successfully formatted gas value");
+      return this.formatNumber(formatted);
+    } catch (error) {
+      logger.error(
+        {
+          value,
+          error: error instanceof Error ? error.message : String(error),
+        },
+        "Error formatting gas value"
+      );
+      return "0";
+    }
   }
 
   /**
@@ -73,9 +114,19 @@ export class NumberFormatter {
           ? value.toLocaleString("fullwide", { useGrouping: false })
           : value;
       const valueInCFX = formatEther(BigInt(normalizedValue));
+      logger.debug(
+        { originalValue: value, normalizedValue, valueInCFX },
+        "Successfully formatted CFX value"
+      );
       return `${this.formatNumber(valueInCFX)} CFX`;
     } catch (error) {
-      console.error(`Error formatting CFX value: ${value}`, error);
+      logger.error(
+        {
+          value,
+          error: error instanceof Error ? error.message : String(error),
+        },
+        "Error formatting CFX value"
+      );
       return "0 CFX";
     }
   }
@@ -96,7 +147,10 @@ export class NumberFormatter {
     decimals: number = 18,
     isCFX: boolean = false
   ): string {
-    if (!amount) return isCFX ? "0 CFX" : "0";
+    if (!amount) {
+      logger.debug("Empty amount provided, returning 0");
+      return isCFX ? "0 CFX" : "0";
+    }
     try {
       let formatted: string;
       if (isCFX) {
@@ -104,12 +158,36 @@ export class NumberFormatter {
         const bigAmount =
           typeof amount === "string" ? BigInt(amount) : BigInt(Math.floor(Number(amount)));
         formatted = formatEther(bigAmount);
+        logger.debug(
+          {
+            originalAmount: amount,
+            bigAmount: bigAmount.toString(),
+            formatted,
+          },
+          "Successfully formatted CFX token amount"
+        );
         return `${this.formatNumber(formatted)} CFX`;
       }
       formatted = formatUnits(BigInt(amount), decimals);
+      logger.debug(
+        {
+          originalAmount: amount,
+          decimals,
+          formatted,
+        },
+        "Successfully formatted token amount"
+      );
       return this.formatNumber(formatted);
     } catch (error) {
-      console.error(`Error formatting token amount: ${amount}`, error);
+      logger.error(
+        {
+          amount,
+          decimals,
+          isCFX,
+          error: error instanceof Error ? error.message : String(error),
+        },
+        "Error formatting token amount"
+      );
       return isCFX ? "0 CFX" : "0";
     }
   }

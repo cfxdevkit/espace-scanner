@@ -1,5 +1,6 @@
 import { ESpaceApi } from "./api";
 import { AddressValidator } from "../utils";
+import { createLogger } from "../utils/logger";
 import {
   ContractABIResponse,
   ContractSourceResponse,
@@ -13,10 +14,13 @@ import {
 } from "../types";
 
 export class ESpaceScanner extends ESpaceApi {
+  protected logger = createLogger("ESpaceScanner");
+
   // Contract methods
   async getContractABI(address: string): Promise<ContractABIResponse> {
-    console.debug(`Getting contract ABI for ${address}`);
+    this.logger.debug({ address }, "Getting contract ABI");
     if (!AddressValidator.validateAddress(address)) {
+      this.logger.error({ address }, "Invalid address provided for contract ABI");
       throw new Error(`Invalid address: ${address}`);
     }
     const response = await this.fetchApi<string>("/api", {
@@ -25,14 +29,17 @@ export class ESpaceScanner extends ESpaceApi {
       address,
     });
     if (!response.result) {
+      this.logger.error({ address }, "Contract ABI not available");
       throw new Error(`Contract ${address} not verified or ABI not available`);
     }
+    this.logger.debug({ address }, "Successfully retrieved contract ABI");
     return JSON.parse(response.result);
   }
 
   async getContractSourceCode(address: string): Promise<ContractSourceResponse> {
-    console.debug(`Getting contract source code for ${address}`);
+    this.logger.debug({ address }, "Getting contract source code");
     if (!AddressValidator.validateAddress(address)) {
+      this.logger.error({ address }, "Invalid address provided for contract source");
       throw new Error(`Invalid address: ${address}`);
     }
     const response = await this.fetchApi<ContractSourceResponse[]>("/api", {
@@ -41,8 +48,10 @@ export class ESpaceScanner extends ESpaceApi {
       address,
     });
     if (!response.result?.[0]) {
+      this.logger.error({ address }, "Contract source code not available");
       throw new Error(`Contract ${address} not verified or source code not available`);
     }
+    this.logger.debug({ address }, "Successfully retrieved contract source code");
     return response.result[0];
   }
 
@@ -53,8 +62,9 @@ export class ESpaceScanner extends ESpaceApi {
     skip = 0,
     limit = 10
   ): Promise<TokenData[]> {
-    console.debug(`Getting ${tokenType} tokens for ${address}`);
+    this.logger.debug({ address, tokenType, skip, limit }, "Getting account tokens");
     if (!AddressValidator.validateAddress(address)) {
+      this.logger.error({ address }, "Invalid address provided for account tokens");
       throw new Error(`Invalid address: ${address}`);
     }
     const response = await this.fetchApi<{ list: TokenData[] }>("/account/tokens", {
@@ -63,11 +73,17 @@ export class ESpaceScanner extends ESpaceApi {
       skip: String(skip),
       limit: String(limit),
     });
+    this.logger.debug(
+      {
+        address,
+        tokenCount: response.result.list.length,
+      },
+      "Successfully retrieved account tokens"
+    );
     return response.result.list;
   }
 
   async getTokenInfos(contracts: string[]): Promise<TokenData[]> {
-    console.debug("Getting token infos");
     if (!AddressValidator.validateAddresses(contracts)) {
       throw new Error("Invalid contract addresses provided");
     }
@@ -79,8 +95,7 @@ export class ESpaceScanner extends ESpaceApi {
 
   // Statistics methods
   protected async getBasicStats<T>(endpoint: string, params: ESpaceStatsParams = {}): Promise<T> {
-    console.debug(`Fetching basic stats for endpoint: ${endpoint}`, params);
-
+    this.logger.debug({ endpoint, params }, "Getting basic stats");
     const fetchParams = {
       minTimestamp: params.minTimestamp || this.get24HoursAgo(),
       maxTimestamp: params.maxTimestamp || this.getCurrentTimestamp(),
@@ -92,18 +107,21 @@ export class ESpaceScanner extends ESpaceApi {
 
     const response = await this.fetchApi<T>(endpoint, fetchParams);
     if (!response.result) {
+      this.logger.error({ endpoint }, "No result returned for stats");
       throw new Error(`No result returned for ${endpoint}`);
     }
+    this.logger.debug({ endpoint }, "Successfully retrieved basic stats");
     return response.result;
   }
 
   protected async getTopStats<T>(endpoint: string, spanType: StatsPeriod = "24h"): Promise<T> {
-    console.debug(`Fetching top stats for endpoint: ${endpoint}, spanType: ${spanType}`);
-
+    this.logger.debug({ endpoint, spanType }, "Getting top stats");
     const response = await this.fetchApi<T>(endpoint, { spanType });
     if (!response.result) {
+      this.logger.error({ endpoint }, "No result returned for top stats");
       throw new Error(`No result returned for ${endpoint}`);
     }
+    this.logger.debug({ endpoint }, "Successfully retrieved top stats");
     return response.result;
   }
 

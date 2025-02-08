@@ -1,3 +1,7 @@
+import { createLogger } from "../utils/logger";
+
+const logger = createLogger("DateFormatter");
+
 /**
  * Utility class for handling date and timestamp formatting and calculations.
  * All timestamps are handled in UTC to ensure consistency across different timezones.
@@ -14,14 +18,27 @@ export class DateFormatter {
   static formatTimestamp(timestamp: number | string): string {
     try {
       const date = typeof timestamp === "string" ? new Date(timestamp) : new Date(timestamp * 1000);
+      if (isNaN(date.getTime())) {
+        logger.warn({ timestamp }, "Invalid timestamp provided");
+        return "N/A";
+      }
       const year = date.getUTCFullYear();
       const month = String(date.getUTCMonth() + 1).padStart(2, "0");
       const day = String(date.getUTCDate()).padStart(2, "0");
       const hours = String(date.getUTCHours()).padStart(2, "0");
       const minutes = String(date.getUTCMinutes()).padStart(2, "0");
       const seconds = String(date.getUTCSeconds()).padStart(2, "0");
-      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-    } catch {
+      const formatted = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+      logger.debug({ timestamp, formatted }, "Successfully formatted timestamp");
+      return formatted;
+    } catch (error) {
+      logger.error(
+        {
+          timestamp,
+          error: error instanceof Error ? error.message : String(error),
+        },
+        "Error formatting timestamp"
+      );
       return "N/A";
     }
   }
@@ -31,7 +48,9 @@ export class DateFormatter {
    * @returns Current Unix timestamp
    */
   static getCurrentTimestamp(): number {
-    return Math.floor(Date.now() / 1000);
+    const timestamp = Math.floor(Date.now() / 1000);
+    logger.debug({ timestamp }, "Getting current timestamp");
+    return timestamp;
   }
 
   /**
@@ -39,7 +58,9 @@ export class DateFormatter {
    * @returns Unix timestamp from 24 hours ago
    */
   static get24HoursAgo(): number {
-    return this.getCurrentTimestamp() - 24 * 60 * 60;
+    const timestamp = this.getCurrentTimestamp() - 24 * 60 * 60;
+    logger.debug({ timestamp }, "Getting timestamp from 24 hours ago");
+    return timestamp;
   }
 
   /**
@@ -51,6 +72,8 @@ export class DateFormatter {
    * getTimeAgo(0.5) // returns timestamp from 12 hours ago
    */
   static getTimeAgo(days: number): number {
-    return this.getCurrentTimestamp() - days * 24 * 60 * 60;
+    const timestamp = this.getCurrentTimestamp() - days * 24 * 60 * 60;
+    logger.debug({ days, timestamp }, "Getting timestamp from specified days ago");
+    return timestamp;
   }
 }
