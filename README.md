@@ -151,7 +151,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [GitHub Repository](https://github.com/cfxdevkit/espace-scanner)
 - [Issue Tracker](https://github.com/cfxdevkit/espace-scanner/issues)
-- [Documentation](https://github.com/cfxdevkit/espace-scanner#readme)
+- [Documentation](https://cfxdevkit.github.io/espace-scanner)
 
 ## Support
 
