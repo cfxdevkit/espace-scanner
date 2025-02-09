@@ -26,20 +26,24 @@ yarn add @cfxdevkit/confluxscan-espace
 ```typescript
 import { ESpaceScanner, ESpaceScannerWrapper } from "@cfxdevkit/confluxscan-espace";
 
+const scanner = new ESpaceScanner({
+    target: "mainnet", 
+});
+
 // Initialize scanner with configuration
-const scanner = new ESpaceScannerWrapper({ 
+const scannerWrapper = new ESpaceScannerWrapper({ 
     target: "mainnet", 
     apiKey: "YOUR_API_KEY" // optional
 });
 
 // Get contract ABI with formatted output
-const { formatted, raw } = await scanner.getContractABI("0x1234...");
-console.log(formatted); // Pretty printed output
-console.log(raw); // Raw data
+const { formatted, raw } = await scannerWrapper.getContractABI("0x1234...");
+console.log(formatted); // human readable string output
+console.log(raw); // raw data output
 
-// Get token statistics
+// Get token statistics with raw output
 const stats = await scanner.getTokenHolderStats("0x1234...");
-
+console.log(stats); // raw data output
 // Use formatters directly
 import { NumberFormatter, DateFormatter } from "@cfxdevkit/confluxscan-espace";
 
@@ -48,7 +52,9 @@ console.log(NumberFormatter.formatCFX("1000000000000000000")); // "1 CFX"
 
 // Format timestamps
 console.log(DateFormatter.formatTimestamp(1707307200)); // "2024-02-07 12:00:00"
+
 ```
+For more comprehensive examples including error handling, statistics, and token operations, check out the [examples/usage.ts](examples/usage.ts) file.
 
 ## Project Structure
 
