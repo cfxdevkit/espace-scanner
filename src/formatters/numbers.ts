@@ -68,28 +68,16 @@ export class NumberFormatter {
    * @param value - The gas value to format
    * @returns Formatted gas value string
    * @example
-   * formatGas(1000000000) // returns "1"
+   * formatGas(1000000000) // returns "1.0 Gwei"
    */
   static formatGas(value: string | number | undefined): string {
-    if (value === undefined || value === null || value === "" || value === 0 || value === "0") {
-      logger.debug("Empty or zero gas value provided, returning 0");
-      return "0";
-    }
+    if (!value) return "0 Gwei";
     try {
-      const gasValue =
-        typeof value === "string" ? BigInt(value) : BigInt(Math.floor(Number(value)));
-      const formatted = formatUnits(gasValue, 0);
-      logger.debug({ originalValue: value, formatted }, "Successfully formatted gas value");
-      return this.formatNumber(formatted);
+      const formatted = formatUnits(BigInt(value), 9);
+      return `${this.formatNumber(formatted)} Gwei`;
     } catch (error) {
-      logger.error(
-        {
-          value,
-          error: error instanceof Error ? error.message : String(error),
-        },
-        "Error formatting gas value"
-      );
-      return "0";
+      console.error("Error formatting gas value", { module: "NumberFormatter", value, error });
+      return "0 Gwei";
     }
   }
 
@@ -103,30 +91,12 @@ export class NumberFormatter {
    * formatCFX(1.5e18) // returns "1.5 CFX"
    */
   static formatCFX(value: string | number | undefined): string {
-    if (value === undefined || value === null || value === "") return "0 CFX";
+    if (!value) return "0 CFX";
     try {
-      // Special case for zero
-      if (value === 0 || value === "0") return "0 CFX";
-
-      // Handle scientific notation by converting to a regular number string first
-      const normalizedValue =
-        typeof value === "number"
-          ? value.toLocaleString("fullwide", { useGrouping: false })
-          : value;
-      const valueInCFX = formatEther(BigInt(normalizedValue));
-      logger.debug(
-        { originalValue: value, normalizedValue, valueInCFX },
-        "Successfully formatted CFX value"
-      );
-      return `${this.formatNumber(valueInCFX)} CFX`;
+      const formatted = formatEther(BigInt(value));
+      return `${formatted} CFX`;
     } catch (error) {
-      logger.error(
-        {
-          value,
-          error: error instanceof Error ? error.message : String(error),
-        },
-        "Error formatting CFX value"
-      );
+      console.error("Error formatting CFX value", { module: "NumberFormatter", value, error });
       return "0 CFX";
     }
   }

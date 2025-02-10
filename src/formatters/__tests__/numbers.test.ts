@@ -12,8 +12,14 @@ describe("NumberFormatter", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    MockedFormatEther.mockReturnValue("1.0");
-    MockedFormatUnits.mockReturnValue("1.0");
+    MockedFormatEther.mockImplementation((value) => {
+      if (!value || value === BigInt(0)) return "0";
+      return "1.0";
+    });
+    MockedFormatUnits.mockImplementation((value) => {
+      if (!value || value === BigInt(0)) return "0";
+      return "1.0";
+    });
   });
 
   describe("formatNumber", () => {
@@ -63,12 +69,26 @@ describe("NumberFormatter", () => {
   });
 
   describe("formatGas", () => {
+    beforeEach(() => {
+      MockedFormatUnits.mockImplementation((value) => {
+        if (!value || value === BigInt(0)) return "0";
+        if (value === BigInt("1000000000")) return "1.0";
+        return "1.0";
+      });
+    });
+
     it("should format gas value in Gwei", () => {
-      expect(NumberFormatter.formatGas("1000000000")).toBe("1");
+      expect(NumberFormatter.formatGas("1000000000")).toBe("1 Gwei");
     });
 
     it("should handle zero", () => {
-      expect(NumberFormatter.formatGas(0)).toBe("0");
+      expect(NumberFormatter.formatGas("0")).toBe("0 Gwei");
+      expect(NumberFormatter.formatGas(0)).toBe("0 Gwei");
+    });
+
+    it("should handle invalid values", () => {
+      expect(NumberFormatter.formatGas("invalid")).toBe("0 Gwei");
+      expect(NumberFormatter.formatGas(undefined)).toBe("0 Gwei");
     });
   });
 

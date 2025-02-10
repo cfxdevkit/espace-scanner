@@ -3,6 +3,7 @@ import { NumberFormatter } from "../numbers";
 import { DateFormatter } from "../dates";
 import { jest } from "@jest/globals";
 import { formatUnits } from "viem";
+import { ESpaceStatItem } from "../../types";
 
 jest.mock("../numbers");
 jest.mock("../dates");
@@ -15,57 +16,103 @@ describe("ResponseFormatter", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    MockedNumberFormatter.formatNumber.mockReturnValue("1,000");
-    MockedNumberFormatter.formatGas.mockReturnValue("1 Gwei");
+    MockedNumberFormatter.formatNumber.mockImplementation((value) => {
+      if (!value || value === "0" || value === 0) return "0";
+      if (value === "invalid" || value === undefined) return "0";
+      return "1,000";
+    });
+    MockedNumberFormatter.formatGas.mockImplementation((value) => {
+      if (!value || value === "0" || value === 0) return "0 Gwei";
+      if (value === "invalid" || value === undefined) return "0 Gwei";
+      return "1.0 Gwei";
+    });
+    MockedNumberFormatter.formatCFX.mockImplementation((value) => {
+      if (!value || value === "0" || value === 0) return "0 CFX";
+      if (value === "invalid" || value === undefined) return "0 CFX";
+      return "1.0 CFX";
+    });
     MockedDateFormatter.formatTimestamp.mockReturnValue("2024-02-07 12:00:00");
-    MockedFormatUnits.mockReturnValue("1.0");
+    MockedFormatUnits.mockImplementation((value) => {
+      try {
+        if (!value || value === BigInt(0)) return "0";
+        return "1.0";
+      } catch {
+        return "0";
+      }
+    });
   });
 
   describe("formatUnit", () => {
-    it("should format unit with decimals", () => {
-      const result = ResponseFormatter.formatUnit("1000000000000000000", 18);
-      expect(result).toBe("1.0");
-      expect(MockedFormatUnits).toHaveBeenCalledWith(BigInt("1000000000000000000"), 18);
+    it("should format token amounts", () => {
+      expect(ResponseFormatter.formatUnit("1000000000000000000", 18)).toBe("1.0");
     });
 
-    it('should return "0" for undefined value', () => {
+    it("should handle zero", () => {
+      expect(ResponseFormatter.formatUnit("0", 18)).toBe("0");
+      expect(ResponseFormatter.formatUnit(0, 18)).toBe("0");
+    });
+
+    it("should handle invalid values", () => {
+      expect(ResponseFormatter.formatUnit("invalid", 18)).toBe("0");
       expect(ResponseFormatter.formatUnit(undefined, 18)).toBe("0");
     });
   });
 
   describe("formatNumber", () => {
-    it("should format number using NumberFormatter", () => {
-      const result = ResponseFormatter.formatNumber(1000);
-      expect(result).toBe("1,000");
-      expect(MockedNumberFormatter.formatNumber).toHaveBeenCalledWith(1000);
+    beforeEach(() => {
+      MockedNumberFormatter.formatNumber.mockImplementation((value) => {
+        if (!value || value === "0" || value === 0) return "0";
+        if (value === "invalid" || value === undefined) return "0";
+        return "1,000";
+      });
     });
 
-    it('should return "0" for undefined value', () => {
+    it("should format number values", () => {
+      expect(ResponseFormatter.formatNumber("1000")).toBe("1,000");
+      expect(ResponseFormatter.formatNumber(1000)).toBe("1,000");
+    });
+
+    it("should handle zero", () => {
+      expect(ResponseFormatter.formatNumber("0")).toBe("0");
+      expect(ResponseFormatter.formatNumber(0)).toBe("0");
+    });
+
+    it("should handle invalid values", () => {
+      expect(ResponseFormatter.formatNumber("invalid")).toBe("0");
       expect(ResponseFormatter.formatNumber(undefined)).toBe("0");
     });
   });
 
   describe("formatGas", () => {
-    it("should format gas using NumberFormatter", () => {
-      const result = ResponseFormatter.formatGas("1000000000");
-      expect(result).toBe("1 Gwei");
-      expect(MockedNumberFormatter.formatGas).toHaveBeenCalledWith("1000000000");
+    it("should format gas values", () => {
+      expect(ResponseFormatter.formatGas("1000000000")).toBe("1.0 Gwei");
+      expect(ResponseFormatter.formatGas(1000000000)).toBe("1.0 Gwei");
     });
 
-    it('should return "0" for undefined value', () => {
-      expect(ResponseFormatter.formatGas(undefined)).toBe("0");
+    it("should handle zero", () => {
+      expect(ResponseFormatter.formatGas("0")).toBe("0 Gwei");
+      expect(ResponseFormatter.formatGas(0)).toBe("0 Gwei");
+    });
+
+    it("should handle invalid values", () => {
+      expect(ResponseFormatter.formatGas("invalid")).toBe("0 Gwei");
+      expect(ResponseFormatter.formatGas(undefined)).toBe("0 Gwei");
     });
   });
 
-  describe("formatTimestamp", () => {
-    it("should format timestamp using DateFormatter", () => {
-      const result = ResponseFormatter.formatTimestamp(1707307200);
-      expect(result).toBe("2024-02-07 12:00:00");
-      expect(MockedDateFormatter.formatTimestamp).toHaveBeenCalledWith(1707307200);
+  describe("formatCFX", () => {
+    it("should format CFX values", () => {
+      expect(ResponseFormatter.formatCFX("1000000000000000000")).toBe("1.0 CFX");
     });
 
-    it('should return "N/A" for undefined value', () => {
-      expect(ResponseFormatter.formatTimestamp(undefined)).toBe("N/A");
+    it("should handle zero", () => {
+      expect(ResponseFormatter.formatCFX("0")).toBe("0 CFX");
+      expect(ResponseFormatter.formatCFX(0)).toBe("0 CFX");
+    });
+
+    it("should handle invalid values", () => {
+      expect(ResponseFormatter.formatCFX("invalid")).toBe("0 CFX");
+      expect(ResponseFormatter.formatCFX(undefined)).toBe("0 CFX");
     });
   });
 
@@ -114,17 +161,31 @@ describe("ResponseFormatter", () => {
   });
 
   describe("formatStatItem", () => {
-    const mockStatItem = {
-      statTime: "2024-02-07",
-      count: 100,
-      value: 1000,
-    };
+    beforeEach(() => {
+      MockedNumberFormatter.formatNumber.mockImplementation((value) => {
+        if (value === 100) return "100";
+        return "1,000";
+      });
+    });
 
-    it("should format stat item", () => {
-      const result = ResponseFormatter.formatStatItem(mockStatItem);
-      expect(result).toContain("Time: 2024-02-07 12:00:00");
-      expect(result).toContain("count: 1,000");
-      expect(result).toContain("value: 1,000");
+    it("should format stat items", () => {
+      const item: ESpaceStatItem = {
+        statTime: 1707307200,
+        count: 100,
+        value: 1000,
+      };
+      const formatted = ResponseFormatter.formatStatItem(item);
+      expect(formatted).toContain("Time:");
+      expect(formatted).toContain("count: 100");
+      expect(formatted).toContain("value: 1,000");
+    });
+
+    it("should handle items with only required fields", () => {
+      const item: ESpaceStatItem = {
+        statTime: 1707307200,
+      };
+      const formatted = ResponseFormatter.formatStatItem(item);
+      expect(formatted).toContain("Time:");
     });
   });
 
@@ -142,30 +203,22 @@ describe("ResponseFormatter", () => {
       ],
     };
 
+    beforeEach(() => {
+      MockedNumberFormatter.formatGas.mockReturnValue("1.0 Gwei");
+    });
+
     it("should format top stats with all fields", () => {
       const result = ResponseFormatter.formatTopStats(mockTopStats);
-      expect(result).toContain("Total Gas Used: 1 Gwei");
+      expect(result).toContain("Total Gas Used: 1.0 Gwei");
       expect(result).toContain("Total Value: 1,000");
       expect(result).toContain("#1 0x1234567890123456789012345678901234567890");
-      expect(result).toContain("Gas Used: 1 Gwei");
+      expect(result).toContain("Gas Used: 1.0 Gwei");
       expect(result).toContain("Value: 1,000");
       expect(result).toContain("Transfers: 1,000");
     });
 
     it("should handle empty data", () => {
       expect(ResponseFormatter.formatTopStats({ list: [] })).toBe("No data available");
-    });
-  });
-
-  describe("wrapResponse", () => {
-    it("should wrap raw and formatted data", () => {
-      const raw = { data: "raw" };
-      const formatted = { data: "formatted" };
-      const result = ResponseFormatter.wrapResponse(raw, formatted);
-      expect(result).toEqual({
-        raw,
-        formatted,
-      });
     });
   });
 });

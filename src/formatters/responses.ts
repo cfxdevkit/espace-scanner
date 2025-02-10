@@ -1,27 +1,28 @@
 import { NumberFormatter } from "./numbers";
 import { DateFormatter } from "./dates";
-import { TokenData, ESpaceStatItem, ESpaceTopStatsResponse, FormattedResponse } from "../types";
+import { TokenData, ESpaceStatItem, ESpaceTopStatsResponse } from "../types";
 import { formatUnits } from "viem";
 
 export class ResponseFormatter {
   static formatUnit(value: string | number | undefined, decimals: number): string {
     if (value === undefined) return "0";
-    return formatUnits(BigInt(value), decimals);
+    try {
+      return formatUnits(BigInt(value), decimals);
+    } catch {
+      return "0";
+    }
   }
 
   static formatNumber(value: string | number | undefined): string {
-    if (value === undefined) return "0";
     return NumberFormatter.formatNumber(value);
   }
 
   static formatGas(value: string | number | undefined): string {
-    if (value === undefined) return "0";
     return NumberFormatter.formatGas(value);
   }
 
   static formatCFX(value: string | number | undefined): string {
-    if (value === undefined) return "0";
-    return NumberFormatter.formatNumber(value);
+    return NumberFormatter.formatCFX(value);
   }
 
   static formatTimestamp(value: string | number | undefined): string {
@@ -74,12 +75,5 @@ export class ResponseFormatter {
     });
 
     return lines.join("\n");
-  }
-
-  static wrapResponse<T, F = T>(raw: T, formatted: F): FormattedResponse<T, F> {
-    return {
-      raw,
-      formatted,
-    };
   }
 }

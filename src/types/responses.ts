@@ -98,7 +98,7 @@ export interface ESpaceTopStatsResponse {
 }
 
 export interface ESpaceStatsResponse {
-  total: number;
+  total: string | number;
   list: ESpaceStatItem[];
   intervalType?: string;
 }
