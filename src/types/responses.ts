@@ -77,26 +77,26 @@ export interface TopValueItem {
   value: string | number;
 }
 
-export interface ESpaceStatItem {
+export type ESpaceStatItem = {
   statTime: string | number;
   blockNumber?: string | number;
   timestamp?: string | number;
+  count?: string | number;
+  value?: string | number;
+  gasUsed?: string | number;
+  baseFee?: string | number;
+  avgPriorityFee?: string | number;
   txsInType?: {
     legacy: number;
     cip2930: number;
     cip1559: number;
   };
-  baseFee?: string | number;
-  gasUsed?: string | number;
-  avgPriorityFee?: string | number;
-  count?: string | number;
   holderCount?: string | number;
   uniqueSenderCount?: string | number;
   uniqueReceiverCount?: string | number;
-  normalTxCount?: string | number;
-  internalTxCount?: string | number;
+  uniqueParticipantCount?: string | number;
   tps?: string | number;
-}
+};
 
 export interface TopStatsItem {
   address: string;

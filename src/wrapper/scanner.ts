@@ -418,6 +418,32 @@ export class ESpaceScannerWrapper {
   }
 
   /**
+   * Get token unique participant statistics with optional formatting
+   * @param contract Token contract address
+   * @param params Statistics parameters
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw statistics response
+   */
+  async getTokenUniqueParticipantStats(
+    contract: string,
+    params: ESpaceStatsParams = {},
+    returnRaw: boolean = false
+  ): Promise<
+    | ESpaceStatsResponse
+    | { total: number; list: { statTime: string; uniqueParticipantCount: string }[] }
+  > {
+    const data = await this.scanner.getTokenUniqueParticipantStats(contract, params);
+    if (returnRaw) return data;
+    return {
+      total: data.total,
+      list: data.list.map((item) => ({
+        statTime: ResponseFormatter.formatTimestamp(item.statTime),
+        uniqueParticipantCount: ResponseFormatter.formatNumber(item.uniqueParticipantCount),
+      })),
+    };
+  }
+
+  /**
    * Get block base fee statistics with optional formatting
    * @param params Statistics parameters
    * @param returnRaw Whether to return raw data (default: false)

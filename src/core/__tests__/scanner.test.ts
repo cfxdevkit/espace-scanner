@@ -454,4 +454,153 @@ describe("ESpaceScanner", () => {
       });
     });
   });
+
+  describe("Error Handling", () => {
+    it("should handle invalid address for contract ABI", async () => {
+      await expect(scanner.getContractABI(invalidAddress)).rejects.toThrow("Invalid address");
+    });
+
+    it("should handle invalid address for contract source code", async () => {
+      await expect(scanner.getContractSourceCode(invalidAddress)).rejects.toThrow(
+        "Invalid address"
+      );
+    });
+
+    it("should handle invalid address for account tokens", async () => {
+      await expect(scanner.getAccountTokens(invalidAddress)).rejects.toThrow("Invalid address");
+    });
+
+    it("should handle API errors for active account stats", async () => {
+      mockFetch.mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ status: "0", message: "API Error" }),
+        } as Response)
+      );
+      await expect(scanner.getActiveAccountStats()).rejects.toThrow("API error: API Error");
+    });
+
+    it("should handle missing data in API response for contract stats", async () => {
+      mockFetch.mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ status: "1" }),
+        } as Response)
+      );
+
+      await expect(scanner.getContractStats()).rejects.toThrow("No result returned");
+    });
+
+    it("should handle missing data in API response for transaction stats", async () => {
+      mockFetch.mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ status: "1" }),
+        } as Response)
+      );
+
+      await expect(scanner.getTransactionStats()).rejects.toThrow("No result returned");
+    });
+
+    it("should handle missing data in API response for CFX transfer stats", async () => {
+      mockFetch.mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ status: "1" }),
+        } as Response)
+      );
+
+      await expect(scanner.getCfxTransferStats()).rejects.toThrow("No result returned");
+    });
+
+    it("should handle missing data in API response for token holder stats", async () => {
+      mockFetch.mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ status: "1" }),
+        } as Response)
+      );
+
+      await expect(scanner.getTokenHolderStats(validAddress)).rejects.toThrow("No result returned");
+    });
+
+    it("should handle missing data in API response for token unique sender stats", async () => {
+      mockFetch.mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ status: "1" }),
+        } as Response)
+      );
+
+      await expect(scanner.getTokenUniqueSenderStats(validAddress)).rejects.toThrow(
+        "No result returned"
+      );
+    });
+
+    it("should handle missing data in API response for token unique receiver stats", async () => {
+      mockFetch.mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ status: "1" }),
+        } as Response)
+      );
+
+      await expect(scanner.getTokenUniqueReceiverStats(validAddress)).rejects.toThrow(
+        "No result returned"
+      );
+    });
+
+    it("should handle missing data in API response for token unique participant stats", async () => {
+      mockFetch.mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ status: "1" }),
+        } as Response)
+      );
+
+      await expect(scanner.getTokenUniqueParticipantStats(validAddress)).rejects.toThrow(
+        "No result returned"
+      );
+    });
+
+    it("should handle missing data in API response for top token transfers", async () => {
+      mockFetch.mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ status: "1" }),
+        } as Response)
+      );
+      await expect(scanner.getTopTokenTransfers("24h")).rejects.toThrow("No result returned");
+    });
+
+    it("should handle missing data in API response for top token senders", async () => {
+      mockFetch.mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ status: "1" }),
+        } as Response)
+      );
+      await expect(scanner.getTopTokenSenders("24h")).rejects.toThrow("No result returned");
+    });
+
+    it("should handle missing data in API response for top token receivers", async () => {
+      mockFetch.mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ status: "1" }),
+        } as Response)
+      );
+      await expect(scanner.getTopTokenReceivers("24h")).rejects.toThrow("No result returned");
+    });
+
+    it("should handle missing data in API response for top token participants", async () => {
+      mockFetch.mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ status: "1" }),
+        } as Response)
+      );
+      await expect(scanner.getTopTokenParticipants("24h")).rejects.toThrow("No result returned");
+    });
+  });
 });

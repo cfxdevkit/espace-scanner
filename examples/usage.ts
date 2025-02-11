@@ -13,8 +13,8 @@ import util from "util";
 const inspect = <T>(obj: T): string =>
   util.inspect(obj, {
     depth: 4,
-    colors: false,
-    maxArrayLength: 3,
+    colors: true,
+    maxArrayLength: 2,
   });
 
 /**

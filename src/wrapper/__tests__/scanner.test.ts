@@ -394,6 +394,14 @@ describe("ESpaceScannerWrapper", () => {
         ],
       };
 
+      const mockTokenParticipantStats = {
+        total: 100,
+        list: [
+          { statTime: "2024-02-07", uniqueParticipantCount: 80 },
+          { statTime: "2024-02-06", uniqueParticipantCount: 70 },
+        ],
+      };
+
       beforeEach(() => {
         MockedFormatter.formatNumber.mockImplementation((value) => {
           if (value === 75) return "75";
@@ -469,6 +477,31 @@ describe("ESpaceScannerWrapper", () => {
         const result = await wrapper.getTokenUniqueReceiverStats(validAddress, undefined, true);
         expect(result).toEqual(mockTokenReceiverStats);
         expect(MockedScanner.prototype.getTokenUniqueReceiverStats).toHaveBeenCalledWith(
+          validAddress,
+          {}
+        );
+      });
+
+      it("should return formatted token unique participant stats by default", async () => {
+        MockedScanner.prototype.getTokenUniqueParticipantStats.mockResolvedValue(
+          mockTokenParticipantStats
+        );
+        const result = await wrapper.getTokenUniqueParticipantStats(validAddress);
+        expect(result.total).toBe(mockTokenParticipantStats.total);
+        expect(result.list[0].uniqueParticipantCount).toBe("80");
+        expect(MockedScanner.prototype.getTokenUniqueParticipantStats).toHaveBeenCalledWith(
+          validAddress,
+          {}
+        );
+      });
+
+      it("should return raw token unique participant stats when returnRaw is true", async () => {
+        MockedScanner.prototype.getTokenUniqueParticipantStats.mockResolvedValue(
+          mockTokenParticipantStats
+        );
+        const result = await wrapper.getTokenUniqueParticipantStats(validAddress, undefined, true);
+        expect(result).toEqual(mockTokenParticipantStats);
+        expect(MockedScanner.prototype.getTokenUniqueParticipantStats).toHaveBeenCalledWith(
           validAddress,
           {}
         );
@@ -797,6 +830,97 @@ describe("ESpaceScannerWrapper", () => {
         const result = await wrapper.getTopTokenTransfers("24h", true);
         expect(result).toEqual(mockTopTokenTransfers);
         expect(MockedScanner.prototype.getTopTokenTransfers).toHaveBeenCalledWith("24h");
+      });
+    });
+
+    describe("Top Token Stats Methods", () => {
+      const mockTopTokenSendersResponse = {
+        maxTime: "2024-02-07",
+        list: [
+          { address: validAddress, transferCntr: "100" },
+          { address: "0x2234567890123456789012345678901234567890", transferCntr: "90" },
+        ],
+      };
+
+      const mockTopTokenReceiversResponse = {
+        maxTime: "2024-02-07",
+        list: [
+          { address: validAddress, transferCntr: "80" },
+          { address: "0x2234567890123456789012345678901234567890", transferCntr: "70" },
+        ],
+      };
+
+      const mockTopTokenParticipantsResponse = {
+        maxTime: "2024-02-07",
+        list: [
+          { address: validAddress, transferCntr: "60" },
+          { address: "0x2234567890123456789012345678901234567890", transferCntr: "50" },
+        ],
+      };
+
+      beforeEach(() => {
+        MockedFormatter.formatNumber.mockImplementation((value) => {
+          if (value === "100") return "100";
+          if (value === "90") return "90";
+          if (value === "80") return "80";
+          if (value === "70") return "70";
+          if (value === "60") return "60";
+          if (value === "50") return "50";
+          return "0";
+        });
+      });
+
+      it("should return formatted top token senders by default", async () => {
+        MockedScanner.prototype.getTopTokenSenders.mockResolvedValue(mockTopTokenSendersResponse);
+        const result = await wrapper.getTopTokenSenders("24h");
+        expect(result.list[0].transferCntr).toBe("100");
+        expect(result.list[1].transferCntr).toBe("90");
+        expect(MockedScanner.prototype.getTopTokenSenders).toHaveBeenCalledWith("24h");
+      });
+
+      it("should return raw top token senders when returnRaw is true", async () => {
+        MockedScanner.prototype.getTopTokenSenders.mockResolvedValue(mockTopTokenSendersResponse);
+        const result = await wrapper.getTopTokenSenders("24h", true);
+        expect(result).toEqual(mockTopTokenSendersResponse);
+        expect(MockedScanner.prototype.getTopTokenSenders).toHaveBeenCalledWith("24h");
+      });
+
+      it("should return formatted top token receivers by default", async () => {
+        MockedScanner.prototype.getTopTokenReceivers.mockResolvedValue(
+          mockTopTokenReceiversResponse
+        );
+        const result = await wrapper.getTopTokenReceivers("24h");
+        expect(result.list[0].transferCntr).toBe("80");
+        expect(result.list[1].transferCntr).toBe("70");
+        expect(MockedScanner.prototype.getTopTokenReceivers).toHaveBeenCalledWith("24h");
+      });
+
+      it("should return raw top token receivers when returnRaw is true", async () => {
+        MockedScanner.prototype.getTopTokenReceivers.mockResolvedValue(
+          mockTopTokenReceiversResponse
+        );
+        const result = await wrapper.getTopTokenReceivers("24h", true);
+        expect(result).toEqual(mockTopTokenReceiversResponse);
+        expect(MockedScanner.prototype.getTopTokenReceivers).toHaveBeenCalledWith("24h");
+      });
+
+      it("should return formatted top token participants by default", async () => {
+        MockedScanner.prototype.getTopTokenParticipants.mockResolvedValue(
+          mockTopTokenParticipantsResponse
+        );
+        const result = await wrapper.getTopTokenParticipants("24h");
+        expect(result.list[0].transferCntr).toBe("60");
+        expect(result.list[1].transferCntr).toBe("50");
+        expect(MockedScanner.prototype.getTopTokenParticipants).toHaveBeenCalledWith("24h");
+      });
+
+      it("should return raw top token participants when returnRaw is true", async () => {
+        MockedScanner.prototype.getTopTokenParticipants.mockResolvedValue(
+          mockTopTokenParticipantsResponse
+        );
+        const result = await wrapper.getTopTokenParticipants("24h", true);
+        expect(result).toEqual(mockTopTokenParticipantsResponse);
+        expect(MockedScanner.prototype.getTopTokenParticipants).toHaveBeenCalledWith("24h");
       });
     });
   });

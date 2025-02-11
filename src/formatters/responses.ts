@@ -42,12 +42,17 @@ export class ResponseFormatter {
   }
 
   static formatStatItem(item: ESpaceStatItem): string {
-    const formattedTime = DateFormatter.formatTimestamp(item.statTime);
-    const entries = Object.entries(item)
-      .filter(([key]) => key !== "statTime")
-      .map(([key, value]) => `${key}: ${this.formatNumber(value)}`);
-
-    return [`Time: ${formattedTime}`, ...entries].join("\n");
+    const entries = Object.entries(item).filter(([key]) => key !== "statTime");
+    const formattedEntries = entries.map(([key, value]) => {
+      if (key === "txsInType" && typeof value === "object") {
+        const txTypes = Object.entries(value)
+          .map(([type, count]) => `${type}: ${this.formatNumber(count)}`)
+          .join(", ");
+        return `txsInType: { ${txTypes} }`;
+      }
+      return `${key}: ${this.formatNumber(value as string | number)}`;
+    });
+    return [`Time: ${this.formatTimestamp(item.statTime)}`, ...formattedEntries].join("\n");
   }
 
   static formatTopStats(data: ESpaceTopStatsResponse): string {
