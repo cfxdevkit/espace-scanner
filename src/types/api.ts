@@ -1,21 +1,10 @@
-export interface ApiResponse<T> {
-  code: number;
-  message: string;
-  data: T;
-}
+export type ConfluxTarget = "mainnet" | "testnet";
 
-export interface ESpaceApiResponse<T> {
+export interface ApiResponse<T> {
   status: string;
   message: string;
   result: T;
 }
-
-export interface FormattedResponse<T, F = T> {
-  raw: T;
-  formatted: F;
-}
-
-export type ConfluxTarget = "mainnet" | "testnet";
 
 export interface ApiConfig {
   target?: ConfluxTarget;

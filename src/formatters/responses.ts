@@ -1,6 +1,13 @@
 import { NumberFormatter } from "./numbers";
 import { DateFormatter } from "./dates";
-import { TokenData, ESpaceStatItem, ESpaceTopStatsResponse } from "../types";
+import {
+  TokenData,
+  BasicStatItem,
+  TokenHolderStatItem,
+  TokenUniqueStatItem,
+  BlockStatItem,
+  TopStatsResponse,
+} from "../types";
 import { formatUnits } from "viem";
 
 export class ResponseFormatter {
@@ -41,11 +48,15 @@ export class ResponseFormatter {
     return lines.join("\n");
   }
 
-  static formatStatItem(item: ESpaceStatItem): string {
+  static formatStatItem(
+    item: BasicStatItem | TokenHolderStatItem | TokenUniqueStatItem | BlockStatItem
+  ): string {
     const entries = Object.entries(item).filter(([key]) => key !== "statTime");
     const formattedEntries = entries.map(([key, value]) => {
-      if (key === "txsInType" && typeof value === "object") {
-        const txTypes = Object.entries(value)
+      if (key === "txsInType" && typeof value === "object" && value !== null) {
+        const txTypes = Object.entries(
+          value as { legacy: number; cip2930: number; cip1559: number }
+        )
           .map(([type, count]) => `${type}: ${this.formatNumber(count)}`)
           .join(", ");
         return `txsInType: { ${txTypes} }`;
@@ -55,7 +66,7 @@ export class ResponseFormatter {
     return [`Time: ${this.formatTimestamp(item.statTime)}`, ...formattedEntries].join("\n");
   }
 
-  static formatTopStats(data: ESpaceTopStatsResponse): string {
+  static formatTopStats(data: TopStatsResponse): string {
     if (!data?.list?.length) return "No data available";
 
     const lines = [];

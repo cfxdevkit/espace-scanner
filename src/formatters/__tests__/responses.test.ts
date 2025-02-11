@@ -3,7 +3,12 @@ import { NumberFormatter } from "../numbers";
 import { DateFormatter } from "../dates";
 import { jest } from "@jest/globals";
 import { formatUnits } from "viem";
-import { ESpaceStatItem } from "../../types";
+import {
+  BasicStatItem,
+  BlockStatItem,
+  TokenHolderStatItem,
+  TokenUniqueStatItem,
+} from "../../types";
 
 jest.mock("../numbers");
 jest.mock("../dates");
@@ -168,24 +173,58 @@ describe("ResponseFormatter", () => {
       });
     });
 
-    it("should format stat items", () => {
-      const item: ESpaceStatItem = {
+    it("should format basic stat items", () => {
+      const item: BasicStatItem = {
         statTime: 1707307200,
         count: 100,
-        gasUsed: 1000,
       };
       const formatted = ResponseFormatter.formatStatItem(item);
       expect(formatted).toContain("Time:");
       expect(formatted).toContain("count: 100");
-      expect(formatted).toContain("gasUsed: 1,000");
     });
 
-    it("should handle items with only required fields", () => {
-      const item: ESpaceStatItem = {
+    it("should format block stat items", () => {
+      const item: BlockStatItem = {
         statTime: 1707307200,
+        blockNumber: 1000,
+        timestamp: 1707307200,
+        gasUsed: "1000",
+        baseFee: "1000",
+        txsInType: {
+          legacy: 10,
+          cip2930: 20,
+          cip1559: 30,
+        },
       };
       const formatted = ResponseFormatter.formatStatItem(item);
       expect(formatted).toContain("Time:");
+      expect(formatted).toContain("blockNumber: 1,000");
+      expect(formatted).toContain("gasUsed: 1,000");
+      expect(formatted).toContain("txsInType: { legacy: 1,000, cip2930: 1,000, cip1559: 1,000 }");
+    });
+
+    it("should format token holder stat items", () => {
+      const item: TokenHolderStatItem = {
+        statTime: 1707307200,
+        holderCount: 100,
+      };
+      const formatted = ResponseFormatter.formatStatItem(item);
+      expect(formatted).toContain("Time:");
+      expect(formatted).toContain("holderCount: 100");
+    });
+
+    it("should format token unique stat items", () => {
+      const item: TokenUniqueStatItem = {
+        statTime: 1707307200,
+        uniqueSenderCount: 100,
+        uniqueReceiverCount: 200,
+        uniqueParticipantCount: 300,
+      };
+      const formatted = ResponseFormatter.formatStatItem(item);
+      expect(formatted).toContain("Time:");
+      expect(formatted).toContain("uniqueSenderCount: 100");
+      expect(formatted).toContain("uniqueReceiverCount: 1,000");
+      expect(formatted).toContain("uniqueParticipantCount: 1,000");
     });
   });
 

@@ -1,4 +1,4 @@
-import { ApiConfig, ESpaceApiResponse } from "../types/api";
+import { ApiConfig, ApiResponse } from "../types/api";
 import { createLogger } from "../utils/logger";
 
 export class ESpaceApi {
@@ -18,7 +18,7 @@ export class ESpaceApi {
   protected async fetchApi<T>(
     endpoint: string,
     params: Record<string, string | number | boolean> = {}
-  ): Promise<ESpaceApiResponse<T>> {
+  ): Promise<ApiResponse<T>> {
     try {
       let url: URL;
       if (endpoint === "/api") {

@@ -1,6 +1,6 @@
 import { ESpaceScanner } from "../scanner";
 import { jest } from "@jest/globals";
-import { StatsPeriod } from "../../types/stats";
+import { StatsPeriod } from "../../types/params";
 
 describe("ESpaceScanner", () => {
   let scanner: ESpaceScanner;

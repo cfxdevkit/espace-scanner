@@ -10,11 +10,16 @@ import {
   ContractSourceResponse,
   TokenData,
   TokenListResponse,
-  ESpaceStatsResponse,
-  ESpaceTopStatsResponse,
-  ESpaceStatsParams,
+  StatsResponse,
+  TopStatsResponse,
+  StatsParams,
   StatsPeriod,
   TokenType,
+  BasicStatItem,
+  TokenHolderStatItem,
+  TokenUniqueStatItem,
+  BlockStatItem,
+  TpsStatItem,
 } from "../types";
 
 export class ESpaceScanner extends ESpaceApi {
@@ -123,7 +128,7 @@ export class ESpaceScanner extends ESpaceApi {
    * @returns Generic statistics response
    * @throws Error if no result is returned
    */
-  protected async getBasicStats<T>(endpoint: string, params: ESpaceStatsParams = {}): Promise<T> {
+  protected async getBasicStats<T>(endpoint: string, params: StatsParams = {}): Promise<T> {
     this.logger.debug({ endpoint, params }, "Getting basic stats");
     const fetchParams = {
       minTimestamp: params.minTimestamp || this.get24HoursAgo(),
@@ -160,8 +165,8 @@ export class ESpaceScanner extends ESpaceApi {
    * @param params Statistics parameters
    * @returns Active account statistics
    */
-  async getActiveAccountStats(params: ESpaceStatsParams = {}): Promise<ESpaceStatsResponse> {
-    return this.getBasicStats<ESpaceStatsResponse>("/statistics/account/active", params);
+  async getActiveAccountStats(params: StatsParams = {}): Promise<StatsResponse<BasicStatItem>> {
+    return this.getBasicStats<StatsResponse<BasicStatItem>>("/statistics/account/active", params);
   }
 
   /**
@@ -169,8 +174,11 @@ export class ESpaceScanner extends ESpaceApi {
    * @param params Statistics parameters
    * @returns CFX holder statistics
    */
-  async getCfxHolderStats(params: ESpaceStatsParams = {}): Promise<ESpaceStatsResponse> {
-    return this.getBasicStats<ESpaceStatsResponse>("/statistics/account/cfx/holder", params);
+  async getCfxHolderStats(params: StatsParams = {}): Promise<StatsResponse<BasicStatItem>> {
+    return this.getBasicStats<StatsResponse<BasicStatItem>>(
+      "/statistics/account/cfx/holder",
+      params
+    );
   }
 
   /**
@@ -178,8 +186,8 @@ export class ESpaceScanner extends ESpaceApi {
    * @param params Statistics parameters
    * @returns Account growth statistics
    */
-  async getAccountGrowthStats(params: ESpaceStatsParams = {}): Promise<ESpaceStatsResponse> {
-    return this.getBasicStats<ESpaceStatsResponse>("/statistics/account/growth", params);
+  async getAccountGrowthStats(params: StatsParams = {}): Promise<StatsResponse<BasicStatItem>> {
+    return this.getBasicStats<StatsResponse<BasicStatItem>>("/statistics/account/growth", params);
   }
 
   /**
@@ -187,8 +195,8 @@ export class ESpaceScanner extends ESpaceApi {
    * @param params Statistics parameters
    * @returns Contract statistics
    */
-  async getContractStats(params: ESpaceStatsParams = {}): Promise<ESpaceStatsResponse> {
-    return this.getBasicStats<ESpaceStatsResponse>("/statistics/contract", params);
+  async getContractStats(params: StatsParams = {}): Promise<StatsResponse<BasicStatItem>> {
+    return this.getBasicStats<StatsResponse<BasicStatItem>>("/statistics/contract", params);
   }
 
   /**
@@ -196,8 +204,8 @@ export class ESpaceScanner extends ESpaceApi {
    * @param params Statistics parameters
    * @returns Transaction statistics
    */
-  async getTransactionStats(params: ESpaceStatsParams = {}): Promise<ESpaceStatsResponse> {
-    return this.getBasicStats<ESpaceStatsResponse>("/statistics/transaction", params);
+  async getTransactionStats(params: StatsParams = {}): Promise<StatsResponse<BasicStatItem>> {
+    return this.getBasicStats<StatsResponse<BasicStatItem>>("/statistics/transaction", params);
   }
 
   /**
@@ -205,8 +213,8 @@ export class ESpaceScanner extends ESpaceApi {
    * @param params Statistics parameters
    * @returns CFX transfer statistics
    */
-  async getCfxTransferStats(params: ESpaceStatsParams = {}): Promise<ESpaceStatsResponse> {
-    return this.getBasicStats<ESpaceStatsResponse>("/statistics/cfx/transfer", params);
+  async getCfxTransferStats(params: StatsParams = {}): Promise<StatsResponse<BasicStatItem>> {
+    return this.getBasicStats<StatsResponse<BasicStatItem>>("/statistics/cfx/transfer", params);
   }
 
   /**
@@ -214,8 +222,8 @@ export class ESpaceScanner extends ESpaceApi {
    * @param params Statistics parameters
    * @returns TPS statistics
    */
-  async getTpsStats(params: ESpaceStatsParams = {}): Promise<ESpaceStatsResponse> {
-    return this.getBasicStats<ESpaceStatsResponse>("/statistics/tps", params);
+  async getTpsStats(params: StatsParams = {}): Promise<StatsResponse<TpsStatItem>> {
+    return this.getBasicStats<StatsResponse<TpsStatItem>>("/statistics/tps", params);
   }
 
   // Top statistics methods
@@ -224,8 +232,8 @@ export class ESpaceScanner extends ESpaceApi {
    * @param spanType Time period for statistics
    * @returns Top gas usage statistics
    */
-  async getTopGasUsed(spanType: StatsPeriod): Promise<ESpaceTopStatsResponse> {
-    return this.getTopStats<ESpaceTopStatsResponse>("/statistics/top/gas/used", spanType);
+  async getTopGasUsed(spanType: StatsPeriod): Promise<TopStatsResponse> {
+    return this.getTopStats<TopStatsResponse>("/statistics/top/gas/used", spanType);
   }
 
   /**
@@ -233,8 +241,8 @@ export class ESpaceScanner extends ESpaceApi {
    * @param spanType Time period for statistics
    * @returns Top transaction senders statistics
    */
-  async getTopTransactionSenders(spanType: StatsPeriod): Promise<ESpaceTopStatsResponse> {
-    return this.getTopStats<ESpaceTopStatsResponse>("/statistics/top/transaction/sender", spanType);
+  async getTopTransactionSenders(spanType: StatsPeriod): Promise<TopStatsResponse> {
+    return this.getTopStats<TopStatsResponse>("/statistics/top/transaction/sender", spanType);
   }
 
   /**
@@ -242,11 +250,8 @@ export class ESpaceScanner extends ESpaceApi {
    * @param spanType Time period for statistics
    * @returns Top transaction receivers statistics
    */
-  async getTopTransactionReceivers(spanType: StatsPeriod): Promise<ESpaceTopStatsResponse> {
-    return this.getTopStats<ESpaceTopStatsResponse>(
-      "/statistics/top/transaction/receiver",
-      spanType
-    );
+  async getTopTransactionReceivers(spanType: StatsPeriod): Promise<TopStatsResponse> {
+    return this.getTopStats<TopStatsResponse>("/statistics/top/transaction/receiver", spanType);
   }
 
   /**
@@ -254,8 +259,8 @@ export class ESpaceScanner extends ESpaceApi {
    * @param spanType Time period for statistics
    * @returns Top CFX senders statistics
    */
-  async getTopCfxSenders(spanType: StatsPeriod): Promise<ESpaceTopStatsResponse> {
-    return this.getTopStats<ESpaceTopStatsResponse>("/statistics/top/cfx/sender", spanType);
+  async getTopCfxSenders(spanType: StatsPeriod): Promise<TopStatsResponse> {
+    return this.getTopStats<TopStatsResponse>("/statistics/top/cfx/sender", spanType);
   }
 
   /**
@@ -263,8 +268,8 @@ export class ESpaceScanner extends ESpaceApi {
    * @param spanType Time period for statistics
    * @returns Top CFX receivers statistics
    */
-  async getTopCfxReceivers(spanType: StatsPeriod): Promise<ESpaceTopStatsResponse> {
-    return this.getTopStats<ESpaceTopStatsResponse>("/statistics/top/cfx/receiver", spanType);
+  async getTopCfxReceivers(spanType: StatsPeriod): Promise<TopStatsResponse> {
+    return this.getTopStats<TopStatsResponse>("/statistics/top/cfx/receiver", spanType);
   }
 
   /**
@@ -272,8 +277,8 @@ export class ESpaceScanner extends ESpaceApi {
    * @param spanType Time period for statistics
    * @returns Top token transfers statistics
    */
-  async getTopTokenTransfers(spanType: StatsPeriod): Promise<ESpaceTopStatsResponse> {
-    return this.getTopStats<ESpaceTopStatsResponse>("/statistics/top/token/transfer", spanType);
+  async getTopTokenTransfers(spanType: StatsPeriod): Promise<TopStatsResponse> {
+    return this.getTopStats<TopStatsResponse>("/statistics/top/token/transfer", spanType);
   }
 
   /**
@@ -281,8 +286,8 @@ export class ESpaceScanner extends ESpaceApi {
    * @param spanType Time period for statistics
    * @returns Top token senders statistics
    */
-  async getTopTokenSenders(spanType: StatsPeriod): Promise<ESpaceTopStatsResponse> {
-    return this.getTopStats<ESpaceTopStatsResponse>("/statistics/top/token/sender", spanType);
+  async getTopTokenSenders(spanType: StatsPeriod): Promise<TopStatsResponse> {
+    return this.getTopStats<TopStatsResponse>("/statistics/top/token/sender", spanType);
   }
 
   /**
@@ -290,8 +295,8 @@ export class ESpaceScanner extends ESpaceApi {
    * @param spanType Time period for statistics
    * @returns Top token receivers statistics
    */
-  async getTopTokenReceivers(spanType: StatsPeriod): Promise<ESpaceTopStatsResponse> {
-    return this.getTopStats<ESpaceTopStatsResponse>("/statistics/top/token/receiver", spanType);
+  async getTopTokenReceivers(spanType: StatsPeriod): Promise<TopStatsResponse> {
+    return this.getTopStats<TopStatsResponse>("/statistics/top/token/receiver", spanType);
   }
 
   /**
@@ -299,8 +304,8 @@ export class ESpaceScanner extends ESpaceApi {
    * @param spanType Time period for statistics
    * @returns Top token participants statistics
    */
-  async getTopTokenParticipants(spanType: StatsPeriod): Promise<ESpaceTopStatsResponse> {
-    return this.getTopStats<ESpaceTopStatsResponse>("/statistics/top/token/participant", spanType);
+  async getTopTokenParticipants(spanType: StatsPeriod): Promise<TopStatsResponse> {
+    return this.getTopStats<TopStatsResponse>("/statistics/top/token/participant", spanType);
   }
 
   // Token statistics methods
@@ -313,12 +318,12 @@ export class ESpaceScanner extends ESpaceApi {
    */
   async getTokenHolderStats(
     contract: string,
-    params: ESpaceStatsParams = {}
-  ): Promise<ESpaceStatsResponse> {
+    params: StatsParams = {}
+  ): Promise<StatsResponse<TokenHolderStatItem>> {
     if (!AddressValidator.validateAddress(contract)) {
       throw new Error(`Invalid contract address: ${contract}`);
     }
-    return this.getBasicStats<ESpaceStatsResponse>("/statistics/token/holder", {
+    return this.getBasicStats<StatsResponse<TokenHolderStatItem>>("/statistics/token/holder", {
       contract,
       ...params,
     });
@@ -333,15 +338,18 @@ export class ESpaceScanner extends ESpaceApi {
    */
   async getTokenUniqueSenderStats(
     contract: string,
-    params: ESpaceStatsParams = {}
-  ): Promise<ESpaceStatsResponse> {
+    params: StatsParams = {}
+  ): Promise<StatsResponse<TokenUniqueStatItem>> {
     if (!AddressValidator.validateAddress(contract)) {
       throw new Error(`Invalid contract address: ${contract}`);
     }
-    return this.getBasicStats<ESpaceStatsResponse>("/statistics/token/unique/sender", {
-      contract,
-      ...params,
-    });
+    return this.getBasicStats<StatsResponse<TokenUniqueStatItem>>(
+      "/statistics/token/unique/sender",
+      {
+        contract,
+        ...params,
+      }
+    );
   }
 
   /**
@@ -353,15 +361,18 @@ export class ESpaceScanner extends ESpaceApi {
    */
   async getTokenUniqueReceiverStats(
     contract: string,
-    params: ESpaceStatsParams = {}
-  ): Promise<ESpaceStatsResponse> {
+    params: StatsParams = {}
+  ): Promise<StatsResponse<TokenUniqueStatItem>> {
     if (!AddressValidator.validateAddress(contract)) {
       throw new Error(`Invalid contract address: ${contract}`);
     }
-    return this.getBasicStats<ESpaceStatsResponse>("/statistics/token/unique/receiver", {
-      contract,
-      ...params,
-    });
+    return this.getBasicStats<StatsResponse<TokenUniqueStatItem>>(
+      "/statistics/token/unique/receiver",
+      {
+        contract,
+        ...params,
+      }
+    );
   }
 
   /**
@@ -373,15 +384,18 @@ export class ESpaceScanner extends ESpaceApi {
    */
   async getTokenUniqueParticipantStats(
     contract: string,
-    params: ESpaceStatsParams = {}
-  ): Promise<ESpaceStatsResponse> {
+    params: StatsParams = {}
+  ): Promise<StatsResponse<TokenUniqueStatItem>> {
     if (!AddressValidator.validateAddress(contract)) {
       throw new Error(`Invalid contract address: ${contract}`);
     }
-    return this.getBasicStats<ESpaceStatsResponse>("/statistics/token/unique/participant", {
-      contract,
-      ...params,
-    });
+    return this.getBasicStats<StatsResponse<TokenUniqueStatItem>>(
+      "/statistics/token/unique/participant",
+      {
+        contract,
+        ...params,
+      }
+    );
   }
 
   // Block statistics methods
@@ -390,8 +404,8 @@ export class ESpaceScanner extends ESpaceApi {
    * @param params Statistics parameters
    * @returns Block base fee statistics
    */
-  async getBlockBaseFeeStats(params: ESpaceStatsParams = {}): Promise<ESpaceStatsResponse> {
-    return this.getBasicStats<ESpaceStatsResponse>("/statistics/block/base-fee", params);
+  async getBlockBaseFeeStats(params: StatsParams = {}): Promise<StatsResponse<BlockStatItem>> {
+    return this.getBasicStats<StatsResponse<BlockStatItem>>("/statistics/block/base-fee", params);
   }
 
   /**
@@ -399,8 +413,8 @@ export class ESpaceScanner extends ESpaceApi {
    * @param params Statistics parameters
    * @returns Block gas used statistics
    */
-  async getBlockGasUsedStats(params: ESpaceStatsParams = {}): Promise<ESpaceStatsResponse> {
-    return this.getBasicStats<ESpaceStatsResponse>("/statistics/block/gas-used", params);
+  async getBlockGasUsedStats(params: StatsParams = {}): Promise<StatsResponse<BlockStatItem>> {
+    return this.getBasicStats<StatsResponse<BlockStatItem>>("/statistics/block/gas-used", params);
   }
 
   /**
@@ -408,8 +422,13 @@ export class ESpaceScanner extends ESpaceApi {
    * @param params Statistics parameters
    * @returns Block average priority fee statistics
    */
-  async getBlockAvgPriorityFeeStats(params: ESpaceStatsParams = {}): Promise<ESpaceStatsResponse> {
-    return this.getBasicStats<ESpaceStatsResponse>("/statistics/block/avg-priority-fee", params);
+  async getBlockAvgPriorityFeeStats(
+    params: StatsParams = {}
+  ): Promise<StatsResponse<BlockStatItem>> {
+    return this.getBasicStats<StatsResponse<BlockStatItem>>(
+      "/statistics/block/avg-priority-fee",
+      params
+    );
   }
 
   /**
@@ -417,19 +436,10 @@ export class ESpaceScanner extends ESpaceApi {
    * @param params Statistics parameters
    * @returns Block transactions by type statistics
    */
-  async getBlockTxsByTypeStats(params: ESpaceStatsParams = {}): Promise<ESpaceStatsResponse> {
-    return this.getBasicStats<ESpaceStatsResponse>("/statistics/block/txs-by-type", params);
-  }
-
-  protected validateAddress(address: string): void {
-    if (!/^0x[a-fA-F0-9]{40}$/.test(address)) {
-      throw new Error("Invalid address");
-    }
-  }
-
-  protected validateContractAddresses(addresses: string[]): void {
-    if (!addresses.every((address) => /^0x[a-fA-F0-9]{40}$/.test(address))) {
-      throw new Error("Invalid contract addresses provided");
-    }
+  async getBlockTxsByTypeStats(params: StatsParams = {}): Promise<StatsResponse<BlockStatItem>> {
+    return this.getBasicStats<StatsResponse<BlockStatItem>>(
+      "/statistics/block/txs-by-type",
+      params
+    );
   }
 }

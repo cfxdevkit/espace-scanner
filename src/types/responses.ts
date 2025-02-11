@@ -45,28 +45,47 @@ export interface TokenListResponse {
   total: number;
 }
 
-// Stats types
-export interface StatItem {
+// Basic Stats Items
+export interface BasicStatItem {
   statTime: string | number;
   count: string | number;
 }
 
-export interface ContractStatItem extends StatItem {
-  total: string | number;
-}
-
-export interface TransferStatItem {
+// Token Stats Items
+export interface TokenHolderStatItem {
   statTime: string | number;
-  transferCount: string | number;
-  userCount: string | number;
-  amount: string | number;
+  holderCount: string | number;
 }
 
+export interface TokenUniqueStatItem {
+  statTime: string | number;
+  uniqueSenderCount?: string | number;
+  uniqueReceiverCount?: string | number;
+  uniqueParticipantCount?: string | number;
+}
+
+// Block Stats Items
+export interface BlockStatItem {
+  statTime: string | number;
+  blockNumber: string | number;
+  timestamp: string | number;
+  baseFee?: string | number;
+  gasUsed?: string | number;
+  avgPriorityFee?: string | number;
+  txsInType?: {
+    legacy: number;
+    cip2930: number;
+    cip1559: number;
+  };
+}
+
+// TPS Stats Item
 export interface TpsStatItem {
   statTime: string | number;
   tps: string | number;
 }
 
+// Top Stats Items
 export interface TopGasItem {
   address: string;
   gas: string | number;
@@ -77,26 +96,10 @@ export interface TopValueItem {
   value: string | number;
 }
 
-export type ESpaceStatItem = {
-  statTime: string | number;
-  blockNumber?: string | number;
-  timestamp?: string | number;
-  count?: string | number;
-  value?: string | number;
-  gasUsed?: string | number;
-  baseFee?: string | number;
-  avgPriorityFee?: string | number;
-  txsInType?: {
-    legacy: number;
-    cip2930: number;
-    cip1559: number;
-  };
-  holderCount?: string | number;
-  uniqueSenderCount?: string | number;
-  uniqueReceiverCount?: string | number;
-  uniqueParticipantCount?: string | number;
-  tps?: string | number;
-};
+export interface TopTransferItem {
+  address: string;
+  transferCntr: string | number;
+}
 
 export interface TopStatsItem {
   address: string;
@@ -105,7 +108,7 @@ export interface TopStatsItem {
   transferCntr?: string | number;
 }
 
-export interface ESpaceTopStatsResponse {
+export interface TopStatsResponse {
   gasTotal?: string;
   valueTotal?: string | number;
   maxTime?: string;
@@ -113,9 +116,10 @@ export interface ESpaceTopStatsResponse {
   list: TopStatsItem[];
 }
 
-export interface ESpaceStatsResponse {
+// Generic Stats Response
+export interface StatsResponse<T = BasicStatItem> {
   total: string | number;
-  list: ESpaceStatItem[];
+  list: T[];
   intervalType?: string;
 }
 

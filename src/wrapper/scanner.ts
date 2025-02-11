@@ -6,14 +6,18 @@ import { ESpaceScanner } from "../core";
 import { ResponseFormatter } from "../formatters";
 import {
   TokenData,
-  ESpaceStatsParams,
+  StatsParams,
   StatsPeriod,
   ContractABIResponse,
   ContractSourceResponse,
   TokenListResponse,
-  ESpaceStatsResponse,
-  ESpaceTopStatsResponse,
-  ESpaceStatItem,
+  StatsResponse,
+  TopStatsResponse,
+  BasicStatItem,
+  TokenHolderStatItem,
+  TokenUniqueStatItem,
+  BlockStatItem,
+  TpsStatItem,
 } from "../types";
 import { ApiConfig } from "../types/api";
 
@@ -68,14 +72,17 @@ export class ESpaceScannerWrapper {
     skip: number = 0,
     limit: number = 10,
     returnRaw: boolean = false
-  ): Promise<TokenListResponse | TokenData[]> {
+  ): Promise<TokenListResponse> {
     const response = await this.scanner.getAccountTokens(address, type, skip, limit);
     if (returnRaw) return { list: response, total: response.length };
-    return response.map((token: TokenData) => ({
-      ...token,
-      amount: ResponseFormatter.formatUnit(token.amount, token.decimals),
-      priceInUSDT: token.priceInUSDT ? `$${token.priceInUSDT}` : undefined,
-    }));
+    return {
+      list: response.map((token: TokenData) => ({
+        ...token,
+        amount: ResponseFormatter.formatUnit(token.amount, token.decimals),
+        priceInUSDT: token.priceInUSDT ? `$${token.priceInUSDT}` : undefined,
+      })),
+      total: response.length,
+    };
   }
 
   /**
@@ -85,9 +92,9 @@ export class ESpaceScannerWrapper {
    * @returns Formatted or raw statistics response
    */
   async getActiveAccountStats(
-    params: ESpaceStatsParams = {},
+    params: StatsParams = {},
     returnRaw: boolean = false
-  ): Promise<ESpaceStatsResponse | { total: number; list: { statTime: string; count: string }[] }> {
+  ): Promise<StatsResponse<BasicStatItem>> {
     const data = await this.scanner.getActiveAccountStats(params);
     if (returnRaw) return data;
     return {
@@ -106,17 +113,15 @@ export class ESpaceScannerWrapper {
    * @returns Formatted or raw statistics response
    */
   async getCfxHolderStats(
-    params: ESpaceStatsParams = {},
+    params: StatsParams = {},
     returnRaw: boolean = false
-  ): Promise<
-    ESpaceStatsResponse | { total: number; list: { statTime: string | number; count: string }[] }
-  > {
+  ): Promise<StatsResponse<BasicStatItem>> {
     const data = await this.scanner.getCfxHolderStats(params);
     if (returnRaw) return data;
     return {
       total: data.total,
       list: data.list.map((item) => ({
-        statTime: item.statTime,
+        statTime: ResponseFormatter.formatTimestamp(item.statTime),
         count: ResponseFormatter.formatNumber(item.count),
       })),
     };
@@ -129,9 +134,9 @@ export class ESpaceScannerWrapper {
    * @returns Formatted or raw statistics response
    */
   async getAccountGrowthStats(
-    params: ESpaceStatsParams = {},
+    params: StatsParams = {},
     returnRaw: boolean = false
-  ): Promise<ESpaceStatsResponse | { total: number; list: { statTime: string; count: string }[] }> {
+  ): Promise<StatsResponse<BasicStatItem>> {
     const data = await this.scanner.getAccountGrowthStats(params);
     if (returnRaw) return data;
     return {
@@ -150,15 +155,18 @@ export class ESpaceScannerWrapper {
    * @returns Formatted or raw statistics response
    */
   async getContractStats(
-    params: ESpaceStatsParams = {},
+    params: StatsParams = {},
     returnRaw: boolean = false
-  ): Promise<ESpaceStatsResponse | string> {
+  ): Promise<StatsResponse<BasicStatItem>> {
     const data = await this.scanner.getContractStats(params);
     if (returnRaw) return data;
-    return (
-      data.list?.map((item) => ResponseFormatter.formatStatItem(item)).join("\n\n") ||
-      "No data available"
-    );
+    return {
+      total: data.total,
+      list: data.list.map((item) => ({
+        statTime: ResponseFormatter.formatTimestamp(item.statTime),
+        count: ResponseFormatter.formatNumber(item.count),
+      })),
+    };
   }
 
   /**
@@ -168,15 +176,18 @@ export class ESpaceScannerWrapper {
    * @returns Formatted or raw statistics response
    */
   async getTransactionStats(
-    params: ESpaceStatsParams = {},
+    params: StatsParams = {},
     returnRaw: boolean = false
-  ): Promise<ESpaceStatsResponse | string> {
+  ): Promise<StatsResponse<BasicStatItem>> {
     const data = await this.scanner.getTransactionStats(params);
     if (returnRaw) return data;
-    return (
-      data.list?.map((item) => ResponseFormatter.formatStatItem(item)).join("\n\n") ||
-      "No data available"
-    );
+    return {
+      total: data.total,
+      list: data.list.map((item) => ({
+        statTime: ResponseFormatter.formatTimestamp(item.statTime),
+        count: ResponseFormatter.formatNumber(item.count),
+      })),
+    };
   }
 
   /**
@@ -186,15 +197,18 @@ export class ESpaceScannerWrapper {
    * @returns Formatted or raw statistics response
    */
   async getCfxTransferStats(
-    params: ESpaceStatsParams = {},
+    params: StatsParams = {},
     returnRaw: boolean = false
-  ): Promise<ESpaceStatsResponse | string> {
+  ): Promise<StatsResponse<BasicStatItem>> {
     const data = await this.scanner.getCfxTransferStats(params);
     if (returnRaw) return data;
-    return (
-      data.list?.map((item) => ResponseFormatter.formatStatItem(item)).join("\n\n") ||
-      "No data available"
-    );
+    return {
+      total: data.total,
+      list: data.list.map((item) => ({
+        statTime: ResponseFormatter.formatTimestamp(item.statTime),
+        count: ResponseFormatter.formatNumber(item.count),
+      })),
+    };
   }
 
   /**
@@ -204,9 +218,9 @@ export class ESpaceScannerWrapper {
    * @returns Formatted or raw statistics response
    */
   async getTpsStats(
-    params: ESpaceStatsParams = {},
+    params: StatsParams = {},
     returnRaw: boolean = false
-  ): Promise<ESpaceStatsResponse | { total: number; list: { statTime: string; tps: string }[] }> {
+  ): Promise<StatsResponse<TpsStatItem>> {
     const data = await this.scanner.getTpsStats(params);
     if (returnRaw) return data;
     return {
@@ -227,9 +241,7 @@ export class ESpaceScannerWrapper {
   async getTopGasUsed(
     spanType: StatsPeriod,
     returnRaw: boolean = false
-  ): Promise<
-    ESpaceTopStatsResponse | { gasTotal: string; list: { address: string; gas: string }[] }
-  > {
+  ): Promise<TopStatsResponse> {
     const data = await this.scanner.getTopGasUsed(spanType);
     if (returnRaw) return data;
     return {
@@ -250,10 +262,7 @@ export class ESpaceScannerWrapper {
   async getTopTransactionSenders(
     spanType: StatsPeriod,
     returnRaw: boolean = false
-  ): Promise<
-    | ESpaceTopStatsResponse
-    | { maxTime?: string; valueTotal: string; list: { address: string; value: string }[] }
-  > {
+  ): Promise<TopStatsResponse> {
     const data = await this.scanner.getTopTransactionSenders(spanType);
     if (returnRaw) return data;
     return {
@@ -275,10 +284,7 @@ export class ESpaceScannerWrapper {
   async getTopTransactionReceivers(
     spanType: StatsPeriod,
     returnRaw: boolean = false
-  ): Promise<
-    | ESpaceTopStatsResponse
-    | { maxTime?: string; valueTotal: string; list: { address: string; value: string }[] }
-  > {
+  ): Promise<TopStatsResponse> {
     const data = await this.scanner.getTopTransactionReceivers(spanType);
     if (returnRaw) return data;
     return {
@@ -300,10 +306,7 @@ export class ESpaceScannerWrapper {
   async getTopCfxSenders(
     spanType: StatsPeriod,
     returnRaw: boolean = false
-  ): Promise<
-    | ESpaceTopStatsResponse
-    | { maxTime?: string; valueTotal: string; list: { address: string; value: string }[] }
-  > {
+  ): Promise<TopStatsResponse> {
     const data = await this.scanner.getTopCfxSenders(spanType);
     if (returnRaw) return data;
     return {
@@ -325,10 +328,7 @@ export class ESpaceScannerWrapper {
   async getTopCfxReceivers(
     spanType: StatsPeriod,
     returnRaw: boolean = false
-  ): Promise<
-    | ESpaceTopStatsResponse
-    | { maxTime?: string; valueTotal: string; list: { address: string; value: string }[] }
-  > {
+  ): Promise<TopStatsResponse> {
     const data = await this.scanner.getTopCfxReceivers(spanType);
     if (returnRaw) return data;
     return {
@@ -350,11 +350,9 @@ export class ESpaceScannerWrapper {
    */
   async getTokenHolderStats(
     contract: string,
-    params: ESpaceStatsParams = {},
+    params: StatsParams = {},
     returnRaw: boolean = false
-  ): Promise<
-    ESpaceStatsResponse | { total: number; list: { statTime: string; holderCount: string }[] }
-  > {
+  ): Promise<StatsResponse<TokenHolderStatItem>> {
     const data = await this.scanner.getTokenHolderStats(contract, params);
     if (returnRaw) return data;
     return {
@@ -375,11 +373,9 @@ export class ESpaceScannerWrapper {
    */
   async getTokenUniqueSenderStats(
     contract: string,
-    params: ESpaceStatsParams = {},
+    params: StatsParams = {},
     returnRaw: boolean = false
-  ): Promise<
-    ESpaceStatsResponse | { total: number; list: { statTime: string; uniqueSenderCount: string }[] }
-  > {
+  ): Promise<StatsResponse<TokenUniqueStatItem>> {
     const data = await this.scanner.getTokenUniqueSenderStats(contract, params);
     if (returnRaw) return data;
     return {
@@ -400,12 +396,9 @@ export class ESpaceScannerWrapper {
    */
   async getTokenUniqueReceiverStats(
     contract: string,
-    params: ESpaceStatsParams = {},
+    params: StatsParams = {},
     returnRaw: boolean = false
-  ): Promise<
-    | ESpaceStatsResponse
-    | { total: number; list: { statTime: string; uniqueReceiverCount: string }[] }
-  > {
+  ): Promise<StatsResponse<TokenUniqueStatItem>> {
     const data = await this.scanner.getTokenUniqueReceiverStats(contract, params);
     if (returnRaw) return data;
     return {
@@ -426,12 +419,9 @@ export class ESpaceScannerWrapper {
    */
   async getTokenUniqueParticipantStats(
     contract: string,
-    params: ESpaceStatsParams = {},
+    params: StatsParams = {},
     returnRaw: boolean = false
-  ): Promise<
-    | ESpaceStatsResponse
-    | { total: number; list: { statTime: string; uniqueParticipantCount: string }[] }
-  > {
+  ): Promise<StatsResponse<TokenUniqueStatItem>> {
     const data = await this.scanner.getTokenUniqueParticipantStats(contract, params);
     if (returnRaw) return data;
     return {
@@ -450,24 +440,15 @@ export class ESpaceScannerWrapper {
    * @returns Formatted or raw statistics response
    */
   async getBlockBaseFeeStats(
-    params: ESpaceStatsParams = {},
+    params: StatsParams = {},
     returnRaw: boolean = false
-  ): Promise<
-    | ESpaceStatsResponse
-    | {
-        total: string;
-        list: Array<{
-          blockNumber: number;
-          timestamp: string;
-          baseFee: string;
-        }>;
-      }
-  > {
+  ): Promise<StatsResponse<BlockStatItem>> {
     const data = await this.scanner.getBlockBaseFeeStats(params);
     if (returnRaw) return data;
     return {
       total: ResponseFormatter.formatGas(data.total),
-      list: data.list.map((item: ESpaceStatItem) => ({
+      list: data.list.map((item) => ({
+        statTime: ResponseFormatter.formatTimestamp(item.statTime),
         blockNumber: Number(item.blockNumber),
         timestamp: ResponseFormatter.formatTimestamp(item.timestamp),
         baseFee: ResponseFormatter.formatGas(item.baseFee),
@@ -482,24 +463,15 @@ export class ESpaceScannerWrapper {
    * @returns Formatted or raw statistics response
    */
   async getBlockGasUsedStats(
-    params: ESpaceStatsParams = {},
+    params: StatsParams = {},
     returnRaw: boolean = false
-  ): Promise<
-    | ESpaceStatsResponse
-    | {
-        total: string;
-        list: Array<{
-          blockNumber: number;
-          timestamp: string;
-          gasUsed: string;
-        }>;
-      }
-  > {
+  ): Promise<StatsResponse<BlockStatItem>> {
     const data = await this.scanner.getBlockGasUsedStats(params);
     if (returnRaw) return data;
     return {
       total: ResponseFormatter.formatGas(data.total),
-      list: data.list.map((item: ESpaceStatItem) => ({
+      list: data.list.map((item) => ({
+        statTime: ResponseFormatter.formatTimestamp(item.statTime),
         blockNumber: Number(item.blockNumber),
         timestamp: ResponseFormatter.formatTimestamp(item.timestamp),
         gasUsed: ResponseFormatter.formatGas(item.gasUsed),
@@ -514,24 +486,15 @@ export class ESpaceScannerWrapper {
    * @returns Formatted or raw statistics response
    */
   async getBlockAvgPriorityFeeStats(
-    params: ESpaceStatsParams = {},
+    params: StatsParams = {},
     returnRaw: boolean = false
-  ): Promise<
-    | ESpaceStatsResponse
-    | {
-        total: string;
-        list: Array<{
-          blockNumber: number;
-          timestamp: string;
-          avgPriorityFee: string;
-        }>;
-      }
-  > {
+  ): Promise<StatsResponse<BlockStatItem>> {
     const data = await this.scanner.getBlockAvgPriorityFeeStats(params);
     if (returnRaw) return data;
     return {
       total: ResponseFormatter.formatGas(data.total),
-      list: data.list.map((item: ESpaceStatItem) => ({
+      list: data.list.map((item) => ({
+        statTime: ResponseFormatter.formatTimestamp(item.statTime),
         blockNumber: Number(item.blockNumber),
         timestamp: ResponseFormatter.formatTimestamp(item.timestamp),
         avgPriorityFee: ResponseFormatter.formatGas(item.avgPriorityFee),
@@ -546,23 +509,9 @@ export class ESpaceScannerWrapper {
    * @returns Formatted or raw statistics response
    */
   async getBlockTxsByTypeStats(
-    params: ESpaceStatsParams = {},
+    params: StatsParams = {},
     returnRaw: boolean = false
-  ): Promise<
-    | ESpaceStatsResponse
-    | {
-        total: number;
-        list: Array<{
-          blockNumber: number;
-          timestamp: string;
-          txsInType: {
-            legacy: string;
-            cip2930: string;
-            cip1559: string;
-          };
-        }>;
-      }
-  > {
+  ): Promise<StatsResponse<BlockStatItem>> {
     const data = await this.scanner.getBlockTxsByTypeStats(params);
     if (returnRaw) return data;
     return {
@@ -570,12 +519,13 @@ export class ESpaceScannerWrapper {
       list: data.list.map((item) => {
         const txsInType = item.txsInType || { legacy: 0, cip2930: 0, cip1559: 0 };
         return {
+          statTime: ResponseFormatter.formatTimestamp(item.statTime),
           blockNumber: Number(item.blockNumber),
-          timestamp: ResponseFormatter.formatTimestamp(item.timestamp as number),
+          timestamp: ResponseFormatter.formatTimestamp(item.timestamp),
           txsInType: {
-            legacy: ResponseFormatter.formatNumber(txsInType.legacy),
-            cip2930: ResponseFormatter.formatNumber(txsInType.cip2930),
-            cip1559: ResponseFormatter.formatNumber(txsInType.cip1559),
+            legacy: Number(txsInType.legacy),
+            cip2930: Number(txsInType.cip2930),
+            cip1559: Number(txsInType.cip1559),
           },
         };
       }),
@@ -591,9 +541,7 @@ export class ESpaceScannerWrapper {
   async getTopTokenTransfers(
     spanType: StatsPeriod,
     returnRaw: boolean = false
-  ): Promise<
-    ESpaceTopStatsResponse | { maxTime?: string; list: { address: string; transferCntr: string }[] }
-  > {
+  ): Promise<TopStatsResponse> {
     const data = await this.scanner.getTopTokenTransfers(spanType);
     if (returnRaw) return data;
     return {
@@ -614,9 +562,7 @@ export class ESpaceScannerWrapper {
   async getTopTokenSenders(
     spanType: StatsPeriod,
     returnRaw: boolean = false
-  ): Promise<
-    ESpaceTopStatsResponse | { maxTime?: string; list: { address: string; transferCntr: string }[] }
-  > {
+  ): Promise<TopStatsResponse> {
     const data = await this.scanner.getTopTokenSenders(spanType);
     if (returnRaw) return data;
     return {
@@ -637,9 +583,7 @@ export class ESpaceScannerWrapper {
   async getTopTokenReceivers(
     spanType: StatsPeriod,
     returnRaw: boolean = false
-  ): Promise<
-    ESpaceTopStatsResponse | { maxTime?: string; list: { address: string; transferCntr: string }[] }
-  > {
+  ): Promise<TopStatsResponse> {
     const data = await this.scanner.getTopTokenReceivers(spanType);
     if (returnRaw) return data;
     return {
@@ -660,9 +604,7 @@ export class ESpaceScannerWrapper {
   async getTopTokenParticipants(
     spanType: StatsPeriod,
     returnRaw: boolean = false
-  ): Promise<
-    ESpaceTopStatsResponse | { maxTime?: string; list: { address: string; transferCntr: string }[] }
-  > {
+  ): Promise<TopStatsResponse> {
     const data = await this.scanner.getTopTokenParticipants(spanType);
     if (returnRaw) return data;
     return {

@@ -33,28 +33,21 @@ async function demonstrateESpaceScannerWrapperUsage(): Promise<void> {
   try {
     // Contract Methods Demonstration
     console.log("=== Contract Methods ===");
-    // Example contract address for demonstration
+    // Example address for demonstration
     const contractAddress = "0x704a2822d59cf4350fd3bbc4957bba48469770cc";
     const tokenAddress = "0x14b2d3bc65e74dae1030eafd8ac30c533c976a9b";
+    const walletAddress = "0xe796f076084eEF751968Cf13838AC0b0cB60ADaa";
 
-    // Get contract ABI in both formatted and raw forms
+    // Get contract ABI
     const contractABI = await mainnetScanner.getContractABI(contractAddress);
     console.log("---\ngetContractABI (formatted)\n", inspect(contractABI));
 
-    const rawContractABI = await mainnetScanner.getContractABI(contractAddress, true);
-    console.log("---\ngetContractABI (raw)\n", inspect(rawContractABI));
-
-    // Get contract source code in both formatted and raw forms
+    // Get contract source code
     const contractSource = await mainnetScanner.getContractSourceCode(contractAddress);
     console.log("---\ngetContractSourceCode (formatted)\n", inspect(contractSource));
 
-    const rawContractSource = await mainnetScanner.getContractSourceCode(contractAddress, true);
-    console.log("---\ngetContractSourceCode (raw)\n", inspect(rawContractSource));
-
     // Token Methods Demonstration
     console.log("\n=== Token Methods ===");
-    // Example wallet address for demonstration
-    const walletAddress = "0xe796f076084eEF751968Cf13838AC0b0cB60ADaa";
 
     // Test different token types with both formatted and raw data
     for (const tokenType of ["ERC20", "ERC721"] as const) {
@@ -113,7 +106,7 @@ async function demonstrateESpaceScannerWrapperUsage(): Promise<void> {
     // Top Statistics Methods Demonstration
     console.log("\n=== Top Statistics Methods ===");
     // Test different time periods with both formatted and raw data
-    const periods = ["24h", "7d"] as const;
+    const periods = ["24h", "7d"] as const; // Using periods supported by top statistics endpoints
     for (const period of periods) {
       // Get top gas usage statistics
       const topGasUsed = await mainnetScanner.getTopGasUsed(period);
