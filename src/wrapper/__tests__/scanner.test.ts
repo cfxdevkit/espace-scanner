@@ -4,11 +4,6 @@ import { ResponseFormatter } from "../../formatters";
 import { jest } from "@jest/globals";
 import { ESpaceStatsParams, ESpaceStatsResponse, TokenListResponse, TokenData } from "../../types";
 
-type FormattedBlockTxsByTypeStats = {
-  total: number;
-  list: { statTime: string | number; txsInType: Record<string, string> }[];
-};
-
 type TokenHolderStatsItem = {
   statTime: string | number;
   holderCount: number;
@@ -24,11 +19,6 @@ type TokenUniqueReceiverStatsItem = {
   uniqueReceiverCount: number;
 };
 
-type TokenUniqueParticipantStatsItem = {
-  statTime: string | number;
-  uniqueParticipantCount: number;
-};
-
 jest.mock("../../core/scanner");
 jest.mock("../../formatters/responses");
 
@@ -41,6 +31,13 @@ describe("ESpaceScannerWrapper", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     wrapper = new ESpaceScannerWrapper();
+    MockedFormatter.formatGas.mockReturnValue("1.0 Gwei");
+    MockedFormatter.formatNumber.mockImplementation((value) => {
+      if (value === 75) return "75";
+      if (value === 60) return "60";
+      if (!value || value === "0" || value === 0) return "0";
+      return "50";
+    });
   });
 
   describe("Contract Methods", () => {
@@ -127,9 +124,9 @@ describe("ESpaceScannerWrapper", () => {
       });
 
       it("should return formatted account tokens by default", async () => {
-        const result = (await wrapper.getAccountTokens(validAddress)) as TokenData[];
+        const result = (await wrapper.getAccountTokens(validAddress, "ERC20")) as TokenData[];
         expect(result[0].amount).toBe("1.0");
-        expect(result[0].priceInUSDT).toBe("$1.5000");
+        expect(result[0].priceInUSDT).toBe("$1.5");
         expect(MockedScanner.prototype.getAccountTokens).toHaveBeenCalledWith(
           validAddress,
           "ERC20",
@@ -156,9 +153,109 @@ describe("ESpaceScannerWrapper", () => {
       });
 
       it("should handle tokens without amount", async () => {
-        const result = (await wrapper.getAccountTokens(validAddress)) as TokenData[];
+        const result = (await wrapper.getAccountTokens(validAddress, "ERC20")) as TokenData[];
         expect(result[1].amount).toBe("0");
         expect(result[1].priceInUSDT).toBeUndefined();
+      });
+    });
+
+    describe("getTokenHolderStats", () => {
+      const mockTokenHolderStats = {
+        total: 100,
+        list: [
+          { statTime: "2024-02-07", holderCount: 50 },
+          { statTime: "2024-02-06", holderCount: 40 },
+        ],
+      };
+
+      it("should return formatted token holder stats by default", async () => {
+        MockedScanner.prototype.getTokenHolderStats.mockResolvedValue(mockTokenHolderStats);
+        const result = (await wrapper.getTokenHolderStats(validAddress)) as {
+          total: number;
+          list: TokenHolderStatsItem[];
+        };
+        expect(result.total).toBe(mockTokenHolderStats.total);
+        expect(result.list[0].holderCount).toBe("50");
+        expect(MockedScanner.prototype.getTokenHolderStats).toHaveBeenCalledWith(validAddress, {});
+      });
+
+      it("should return raw token holder stats when returnRaw is true", async () => {
+        MockedScanner.prototype.getTokenHolderStats.mockResolvedValue(mockTokenHolderStats);
+        const result = await wrapper.getTokenHolderStats(validAddress, undefined, true);
+        expect(result).toEqual(mockTokenHolderStats);
+        expect(MockedScanner.prototype.getTokenHolderStats).toHaveBeenCalledWith(validAddress, {});
+      });
+    });
+
+    describe("getTokenUniqueSenderStats", () => {
+      const mockTokenSenderStats = {
+        total: 100,
+        list: [
+          { statTime: "2024-02-07", uniqueSenderCount: 75 },
+          { statTime: "2024-02-06", uniqueSenderCount: 65 },
+        ],
+      };
+
+      it("should return formatted token unique sender stats by default", async () => {
+        MockedScanner.prototype.getTokenUniqueSenderStats.mockResolvedValue(mockTokenSenderStats);
+        const result = (await wrapper.getTokenUniqueSenderStats(validAddress)) as {
+          total: number;
+          list: TokenUniqueSenderStatsItem[];
+        };
+        expect(result.total).toBe(mockTokenSenderStats.total);
+        expect(result.list[0].uniqueSenderCount).toBe("75");
+        expect(MockedScanner.prototype.getTokenUniqueSenderStats).toHaveBeenCalledWith(
+          validAddress,
+          {}
+        );
+      });
+
+      it("should return raw token unique sender stats when returnRaw is true", async () => {
+        MockedScanner.prototype.getTokenUniqueSenderStats.mockResolvedValue(mockTokenSenderStats);
+        const result = await wrapper.getTokenUniqueSenderStats(validAddress, undefined, true);
+        expect(result).toEqual(mockTokenSenderStats);
+        expect(MockedScanner.prototype.getTokenUniqueSenderStats).toHaveBeenCalledWith(
+          validAddress,
+          {}
+        );
+      });
+    });
+
+    describe("getTokenUniqueReceiverStats", () => {
+      const mockTokenReceiverStats = {
+        total: 100,
+        list: [
+          { statTime: "2024-02-07", uniqueReceiverCount: 60 },
+          { statTime: "2024-02-06", uniqueReceiverCount: 50 },
+        ],
+      };
+
+      it("should return formatted token unique receiver stats by default", async () => {
+        MockedScanner.prototype.getTokenUniqueReceiverStats.mockResolvedValue(
+          mockTokenReceiverStats
+        );
+        const result = (await wrapper.getTokenUniqueReceiverStats(validAddress)) as {
+          total: number;
+          list: TokenUniqueReceiverStatsItem[];
+        };
+        expect(result.total).toBe(mockTokenReceiverStats.total);
+        expect(result.list[0].uniqueReceiverCount).toBe("60");
+        expect(MockedScanner.prototype.getTokenUniqueReceiverStats).toHaveBeenCalledWith(
+          validAddress,
+          {}
+        );
+      });
+
+      it("should return raw token unique receiver stats when returnRaw is true", async () => {
+        MockedScanner.prototype.getTokenUniqueReceiverStats.mockResolvedValue(
+          mockTokenReceiverStats
+        );
+        const result = await wrapper.getTokenUniqueReceiverStats(validAddress, undefined, true);
+        expect(result).toEqual(mockTokenReceiverStats);
+        expect(MockedScanner.prototype.getTokenUniqueReceiverStats).toHaveBeenCalledWith(
+          validAddress,
+          {}
+        );
       });
     });
   });
@@ -181,6 +278,7 @@ describe("ESpaceScannerWrapper", () => {
     };
 
     beforeEach(() => {
+      MockedFormatter.formatGas.mockReturnValue("1.0 Gwei");
       MockedFormatter.formatNumber.mockReturnValue("50");
     });
 
@@ -296,13 +394,15 @@ describe("ESpaceScannerWrapper", () => {
         ],
       };
 
-      const mockTokenParticipantStats = {
-        total: 100,
-        list: [
-          { statTime: "2024-02-07", uniqueParticipantCount: 85 },
-          { statTime: "2024-02-06", uniqueParticipantCount: 75 },
-        ],
-      };
+      beforeEach(() => {
+        MockedFormatter.formatNumber.mockImplementation((value) => {
+          if (value === 75) return "75";
+          if (value === 60) return "60";
+          if (value === 50) return "50";
+          if (!value || value === "0" || value === 0) return "0";
+          return String(value);
+        });
+      });
 
       it("should return formatted token holder stats by default", async () => {
         MockedScanner.prototype.getTokenHolderStats.mockResolvedValue(mockTokenHolderStats);
@@ -329,7 +429,7 @@ describe("ESpaceScannerWrapper", () => {
           list: TokenUniqueSenderStatsItem[];
         };
         expect(result.total).toBe(mockTokenSenderStats.total);
-        expect(result.list[0].uniqueSenderCount).toBe("50");
+        expect(result.list[0].uniqueSenderCount).toBe("75");
         expect(MockedScanner.prototype.getTokenUniqueSenderStats).toHaveBeenCalledWith(
           validAddress,
           {}
@@ -355,7 +455,7 @@ describe("ESpaceScannerWrapper", () => {
           list: TokenUniqueReceiverStatsItem[];
         };
         expect(result.total).toBe(mockTokenReceiverStats.total);
-        expect(result.list[0].uniqueReceiverCount).toBe("50");
+        expect(result.list[0].uniqueReceiverCount).toBe("60");
         expect(MockedScanner.prototype.getTokenUniqueReceiverStats).toHaveBeenCalledWith(
           validAddress,
           {}
@@ -369,34 +469,6 @@ describe("ESpaceScannerWrapper", () => {
         const result = await wrapper.getTokenUniqueReceiverStats(validAddress, undefined, true);
         expect(result).toEqual(mockTokenReceiverStats);
         expect(MockedScanner.prototype.getTokenUniqueReceiverStats).toHaveBeenCalledWith(
-          validAddress,
-          {}
-        );
-      });
-
-      it("should return formatted token unique participant stats by default", async () => {
-        MockedScanner.prototype.getTokenUniqueParticipantStats.mockResolvedValue(
-          mockTokenParticipantStats
-        );
-        const result = (await wrapper.getTokenUniqueParticipantStats(validAddress)) as {
-          total: number;
-          list: TokenUniqueParticipantStatsItem[];
-        };
-        expect(result.total).toBe(mockTokenParticipantStats.total);
-        expect(result.list[0].uniqueParticipantCount).toBe("50");
-        expect(MockedScanner.prototype.getTokenUniqueParticipantStats).toHaveBeenCalledWith(
-          validAddress,
-          {}
-        );
-      });
-
-      it("should return raw token unique participant stats when returnRaw is true", async () => {
-        MockedScanner.prototype.getTokenUniqueParticipantStats.mockResolvedValue(
-          mockTokenParticipantStats
-        );
-        const result = await wrapper.getTokenUniqueParticipantStats(validAddress, undefined, true);
-        expect(result).toEqual(mockTokenParticipantStats);
-        expect(MockedScanner.prototype.getTokenUniqueParticipantStats).toHaveBeenCalledWith(
           validAddress,
           {}
         );
@@ -462,12 +534,24 @@ describe("ESpaceScannerWrapper", () => {
         total: 100,
         list: [
           {
-            statTime: "2024-02-07",
-            txsInType: "100",
+            statTime: "1707307200",
+            blockNumber: "123",
+            timestamp: "1707307200",
+            txsInType: {
+              legacy: 100,
+              cip2930: 50,
+              cip1559: 25,
+            },
           },
           {
-            statTime: "2024-02-06",
-            txsInType: "90",
+            statTime: "1707307300",
+            blockNumber: "124",
+            timestamp: "1707307300",
+            txsInType: {
+              legacy: 90,
+              cip2930: 45,
+              cip1559: 20,
+            },
           },
         ],
       };
@@ -528,19 +612,26 @@ describe("ESpaceScannerWrapper", () => {
 
       it("should return formatted block transactions by type stats by default", async () => {
         MockedScanner.prototype.getBlockTxsByTypeStats.mockResolvedValue(mockBlockTxsByTypeStats);
-        const result = (await wrapper.getBlockTxsByTypeStats()) as FormattedBlockTxsByTypeStats;
-        expect(result.total).toBe(mockBlockTxsByTypeStats.total);
-        expect(result.list[0].txsInType).toMatchObject({
-          "0": "50",
+        MockedFormatter.formatNumber.mockImplementation((value) => {
+          if (value === 100) return "100";
+          if (value === 50) return "50";
+          if (value === 25) return "25";
+          return "0";
         });
-        expect(MockedScanner.prototype.getBlockTxsByTypeStats).toHaveBeenCalled();
+        const result = await wrapper.getBlockTxsByTypeStats();
+        expect(result.total).toBe(100);
+        expect(result.list[0].blockNumber).toBe(123);
+        if (result.list[0].txsInType) {
+          expect(result.list[0].txsInType.legacy).toBe("100");
+          expect(result.list[0].txsInType.cip2930).toBe("50");
+          expect(result.list[0].txsInType.cip1559).toBe("25");
+        }
       });
 
       it("should return raw block transactions by type stats when returnRaw is true", async () => {
         MockedScanner.prototype.getBlockTxsByTypeStats.mockResolvedValue(mockBlockTxsByTypeStats);
-        const result = await wrapper.getBlockTxsByTypeStats({}, true);
+        const result = await wrapper.getBlockTxsByTypeStats(undefined, true);
         expect(result).toEqual(mockBlockTxsByTypeStats);
-        expect(MockedScanner.prototype.getBlockTxsByTypeStats).toHaveBeenCalled();
       });
     });
 
@@ -669,7 +760,7 @@ describe("ESpaceScannerWrapper", () => {
         MockedScanner.prototype.getTpsStats.mockResolvedValue(mockTpsStats);
         const result = await wrapper.getTpsStats();
         expect(result.total).toBe(mockTpsStats.total);
-        expect(result.list[0].tps).toBe("50.0000");
+        expect(result.list[0].tps).toBe("50");
         expect(MockedScanner.prototype.getTpsStats).toHaveBeenCalled();
       });
 

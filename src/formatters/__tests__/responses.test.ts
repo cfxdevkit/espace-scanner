@@ -172,12 +172,12 @@ describe("ResponseFormatter", () => {
       const item: ESpaceStatItem = {
         statTime: 1707307200,
         count: 100,
-        value: 1000,
+        gasUsed: 1000,
       };
       const formatted = ResponseFormatter.formatStatItem(item);
       expect(formatted).toContain("Time:");
       expect(formatted).toContain("count: 100");
-      expect(formatted).toContain("value: 1,000");
+      expect(formatted).toContain("gasUsed: 1,000");
     });
 
     it("should handle items with only required fields", () => {

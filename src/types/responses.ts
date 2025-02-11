@@ -79,7 +79,23 @@ export interface TopValueItem {
 
 export interface ESpaceStatItem {
   statTime: string | number;
-  [key: string]: string | number;
+  blockNumber?: string | number;
+  timestamp?: string | number;
+  txsInType?: {
+    legacy: number;
+    cip2930: number;
+    cip1559: number;
+  };
+  baseFee?: string | number;
+  gasUsed?: string | number;
+  avgPriorityFee?: string | number;
+  count?: string | number;
+  holderCount?: string | number;
+  uniqueSenderCount?: string | number;
+  uniqueReceiverCount?: string | number;
+  normalTxCount?: string | number;
+  internalTxCount?: string | number;
+  tps?: string | number;
 }
 
 export interface TopStatsItem {

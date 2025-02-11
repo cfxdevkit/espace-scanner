@@ -5,7 +5,6 @@ A TypeScript library for interacting with Conflux eSpace Scanner API.
 [![npm version](https://img.shields.io/npm/v/@cfxdevkit/confluxscan-espace)](https://www.npmjs.com/package/@cfxdevkit/confluxscan-espace)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/cfxdevkit/espace-scanner/ci.yml)](https://github.com/cfxdevkit/espace-scanner/actions)
 [![Coverage Status](https://codecov.io/gh/cfxdevkit/espace-scanner/branch/main/graph/badge.svg)](https://codecov.io/gh/cfxdevkit/espace-scanner)
-[![npm bundle size](https://img.shields.io/bundlephobia/minzip/@cfxdevkit/confluxscan-espace)](https://bundlephobia.com/package/@cfxdevkit/confluxscan-espace)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
 [![Node Version](https://img.shields.io/node/v/@cfxdevkit/confluxscan-espace)](https://www.npmjs.com/package/@cfxdevkit/confluxscan-espace)
@@ -31,37 +30,144 @@ npm install @cfxdevkit/confluxscan-espace
 
 ## Usage
 
+### Basic Setup
+
 ```typescript
 import { ESpaceScanner, ESpaceScannerWrapper } from "@cfxdevkit/confluxscan-espace";
 
-const scanner = new ESpaceScanner({
-    target: "mainnet", 
-});
+// Initialize scanner for different networks
+const mainnetScanner = new ESpaceScannerWrapper({ target: "mainnet" });
+const testnetScanner = new ESpaceScannerWrapper({ target: "testnet" });
 
-// Initialize scanner with configuration
-const scannerWrapper = new ESpaceScannerWrapper({ 
-    target: "mainnet", 
+// With API key for higher rate limits
+const scannerWithApiKey = new ESpaceScannerWrapper({
+    target: "mainnet",
     apiKey: "YOUR_API_KEY" // optional
 });
-
-// Get contract ABI with formatted output
-const { formatted, raw } = await scannerWrapper.getContractABI("0x1234...");
-console.log(formatted); // human readable string output
-console.log(raw); // raw data output
-
-// Get token statistics with raw output
-const stats = await scanner.getTokenHolderStats("0x1234...");
-console.log(stats); // raw data output
-// Use formatters directly
-import { NumberFormatter, DateFormatter } from "@cfxdevkit/confluxscan-espace";
-
-// Format CFX amounts
-console.log(NumberFormatter.formatCFX("1000000000000000000")); // "1 CFX"
-
-// Format timestamps
-console.log(DateFormatter.formatTimestamp(1707307200)); // "2024-02-07 12:00:00"
-
 ```
+
+### Contract Methods
+
+```typescript
+// Get contract ABI (both formatted and raw)
+const contractABI = await mainnetScanner.getContractABI("0x1234...");
+const rawContractABI = await mainnetScanner.getContractABI("0x1234...", true);
+
+// Get contract source code
+const contractSource = await mainnetScanner.getContractSourceCode("0x1234...");
+const rawContractSource = await mainnetScanner.getContractSourceCode("0x1234...", true);
+```
+
+### Token Methods
+
+```typescript
+// Get account tokens (ERC20/ERC721)
+const erc20Tokens = await mainnetScanner.getAccountTokens(walletAddress, "ERC20");
+const erc721Tokens = await mainnetScanner.getAccountTokens(walletAddress, "ERC721");
+
+// Raw data with pagination
+const rawTokens = await mainnetScanner.getAccountTokens(
+    walletAddress,
+    "ERC20",
+    0,  // skip
+    10, // limit
+    true // returnRaw
+);
+```
+
+### Statistics Methods
+
+```typescript
+// Common statistics parameters
+const statsParams = {
+    minTimestamp: Math.floor(Date.now() / 1000) - 7 * 24 * 60 * 60, // 7 days ago
+    maxTimestamp: Math.floor(Date.now() / 1000),
+    limit: 5
+};
+
+// Active accounts statistics
+const activeAccounts = await mainnetScanner.getActiveAccountStats(statsParams);
+
+// CFX holder statistics
+const cfxHolders = await mainnetScanner.getCfxHolderStats(statsParams);
+
+// Account growth statistics
+const accountGrowth = await mainnetScanner.getAccountGrowthStats(statsParams);
+
+// TPS (Transactions Per Second) statistics
+const tpsStats = await mainnetScanner.getTpsStats({ 
+    ...statsParams, 
+    intervalType: "hour" 
+});
+```
+
+### Top Statistics Methods
+
+```typescript
+// Available periods: "24h" | "7d"
+const periods = ["24h", "7d"];
+
+// Top gas usage statistics
+const topGasUsed = await mainnetScanner.getTopGasUsed("24h");
+
+// Top transaction senders
+const topTxSenders = await mainnetScanner.getTopTransactionSenders("7d");
+
+// Top token statistics
+const topTokenTransfers = await mainnetScanner.getTopTokenTransfers("24h");
+const topTokenSenders = await mainnetScanner.getTopTokenSenders("24h");
+const topTokenReceivers = await mainnetScanner.getTopTokenReceivers("24h");
+const topTokenParticipants = await mainnetScanner.getTopTokenParticipants("24h");
+```
+
+### Token Statistics Methods
+
+```typescript
+// Token holder statistics
+const tokenHolderStats = await mainnetScanner.getTokenHolderStats(tokenAddress);
+
+// Token sender/receiver statistics
+const tokenSenderStats = await mainnetScanner.getTokenUniqueSenderStats(tokenAddress);
+const tokenReceiverStats = await mainnetScanner.getTokenUniqueReceiverStats(tokenAddress);
+```
+
+### Block Statistics Methods
+
+```typescript
+// Block base fee statistics
+const blockBaseFeeStats = await mainnetScanner.getBlockBaseFeeStats(statsParams);
+
+// Block gas used statistics
+const blockGasUsedStats = await mainnetScanner.getBlockGasUsedStats(statsParams);
+
+// Block average priority fee statistics
+const blockAvgPriorityFeeStats = await mainnetScanner.getBlockAvgPriorityFeeStats(statsParams);
+
+// Block transactions by type statistics
+const blockTxsByTypeStats = await mainnetScanner.getBlockTxsByTypeStats(statsParams);
+// Returns statistics for legacy, CIP-2930, and CIP-1559 transactions
+```
+
+### Error Handling
+
+The library includes comprehensive error handling:
+
+```typescript
+try {
+    // Invalid address
+    await scanner.getContractABI("0xinvalid");
+} catch (error) {
+    console.error("Invalid address error:", error.message);
+}
+
+try {
+    // Non-existent contract
+    await scanner.getContractABI("0x0000000000000000000000000000000000000000");
+} catch (error) {
+    console.error("Non-existent contract error:", error.message);
+}
+```
+
 For more comprehensive examples including error handling, statistics, and token operations, check out the [examples/usage.ts](examples/usage.ts) file.
 
 ## Project Structure

@@ -1,3 +1,7 @@
+/**
+ * High-level wrapper for the Conflux eSpace Scanner API.
+ * Provides formatted responses and additional data processing on top of the core scanner.
+ */
 import { ESpaceScanner } from "../core";
 import { ResponseFormatter } from "../formatters";
 import {
@@ -9,22 +13,38 @@ import {
   TokenListResponse,
   ESpaceStatsResponse,
   ESpaceTopStatsResponse,
+  ESpaceStatItem,
 } from "../types";
 import { ApiConfig } from "../types/api";
 
 export class ESpaceScannerWrapper {
   private scanner: ESpaceScanner;
 
+  /**
+   * Create a new ESpaceScannerWrapper instance
+   * @param config API configuration (optional)
+   */
   constructor(config: ApiConfig = {}) {
     this.scanner = new ESpaceScanner(config);
   }
 
-  // Contract methods
+  /**
+   * Get contract ABI with optional formatting
+   * @param address Contract address
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw contract ABI response
+   */
   async getContractABI(address: string, _returnRaw: boolean = false): Promise<ContractABIResponse> {
     const data = await this.scanner.getContractABI(address);
     return data;
   }
 
+  /**
+   * Get contract source code with optional formatting
+   * @param address Contract address
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw contract source code response
+   */
   async getContractSourceCode(
     address: string,
     _returnRaw: boolean = false
@@ -33,44 +53,58 @@ export class ESpaceScannerWrapper {
     return data;
   }
 
-  // Token methods
+  /**
+   * Get account tokens with optional formatting
+   * @param address Wallet address
+   * @param type Token type (ERC20 or ERC721)
+   * @param skip Number of items to skip (default: 0)
+   * @param limit Number of items to return (default: 10)
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw token list response
+   */
   async getAccountTokens(
     address: string,
-    tokenType: "ERC20" | "ERC721" | "ERC1155" = "ERC20",
-    skip = 0,
-    limit = 10,
+    type: "ERC20" | "ERC721",
+    skip: number = 0,
+    limit: number = 10,
     returnRaw: boolean = false
   ): Promise<TokenListResponse | TokenData[]> {
-    const tokens = await this.scanner.getAccountTokens(address, tokenType, skip, limit);
-    if (returnRaw) {
-      return { list: tokens, total: tokens.length };
-    }
-    return tokens.map((token) => ({
+    const response = await this.scanner.getAccountTokens(address, type, skip, limit);
+    if (returnRaw) return { list: response, total: response.length };
+    return response.map((token: TokenData) => ({
       ...token,
-      amount: token.amount ? ResponseFormatter.formatUnit(token.amount, token.decimals) : "0",
-      priceInUSDT: token.priceInUSDT ? `$${Number(token.priceInUSDT).toFixed(4)}` : undefined,
+      amount: ResponseFormatter.formatUnit(token.amount, token.decimals),
+      priceInUSDT: token.priceInUSDT ? `$${token.priceInUSDT}` : undefined,
     }));
   }
 
-  // Statistics methods
+  /**
+   * Get active account statistics with optional formatting
+   * @param params Statistics parameters
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw statistics response
+   */
   async getActiveAccountStats(
     params: ESpaceStatsParams = {},
     returnRaw: boolean = false
-  ): Promise<
-    | ESpaceStatsResponse
-    | { total: string | number; list: { statTime: string | number; count: string }[] }
-  > {
+  ): Promise<ESpaceStatsResponse | { total: number; list: { statTime: string; count: string }[] }> {
     const data = await this.scanner.getActiveAccountStats(params);
     if (returnRaw) return data;
     return {
       total: data.total,
       list: data.list.map((item) => ({
-        statTime: item.statTime,
+        statTime: ResponseFormatter.formatTimestamp(item.statTime),
         count: ResponseFormatter.formatNumber(item.count),
       })),
     };
   }
 
+  /**
+   * Get CFX holder statistics with optional formatting
+   * @param params Statistics parameters
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw statistics response
+   */
   async getCfxHolderStats(
     params: ESpaceStatsParams = {},
     returnRaw: boolean = false
@@ -88,24 +122,33 @@ export class ESpaceScannerWrapper {
     };
   }
 
+  /**
+   * Get account growth statistics with optional formatting
+   * @param params Statistics parameters
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw statistics response
+   */
   async getAccountGrowthStats(
     params: ESpaceStatsParams = {},
     returnRaw: boolean = false
-  ): Promise<
-    | ESpaceStatsResponse
-    | { total: string | number; list: { statTime: string | number; count: string }[] }
-  > {
+  ): Promise<ESpaceStatsResponse | { total: number; list: { statTime: string; count: string }[] }> {
     const data = await this.scanner.getAccountGrowthStats(params);
     if (returnRaw) return data;
     return {
       total: data.total,
       list: data.list.map((item) => ({
-        statTime: item.statTime,
+        statTime: ResponseFormatter.formatTimestamp(item.statTime),
         count: ResponseFormatter.formatNumber(item.count),
       })),
     };
   }
 
+  /**
+   * Get contract statistics with optional formatting
+   * @param params Statistics parameters
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw statistics response
+   */
   async getContractStats(
     params: ESpaceStatsParams = {},
     returnRaw: boolean = false
@@ -118,6 +161,12 @@ export class ESpaceScannerWrapper {
     );
   }
 
+  /**
+   * Get transaction statistics with optional formatting
+   * @param params Statistics parameters
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw statistics response
+   */
   async getTransactionStats(
     params: ESpaceStatsParams = {},
     returnRaw: boolean = false
@@ -130,6 +179,12 @@ export class ESpaceScannerWrapper {
     );
   }
 
+  /**
+   * Get CFX transfer statistics with optional formatting
+   * @param params Statistics parameters
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw statistics response
+   */
   async getCfxTransferStats(
     params: ESpaceStatsParams = {},
     returnRaw: boolean = false
@@ -142,26 +197,33 @@ export class ESpaceScannerWrapper {
     );
   }
 
+  /**
+   * Get TPS (Transactions Per Second) statistics with optional formatting
+   * @param params Statistics parameters
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw statistics response
+   */
   async getTpsStats(
     params: ESpaceStatsParams = {},
     returnRaw: boolean = false
-  ): Promise<
-    | ESpaceStatsResponse
-    | { total: number; list: { statTime: string | number; tps: string }[]; intervalType?: string }
-  > {
+  ): Promise<ESpaceStatsResponse | { total: number; list: { statTime: string; tps: string }[] }> {
     const data = await this.scanner.getTpsStats(params);
     if (returnRaw) return data;
     return {
       total: data.total,
       list: data.list.map((item) => ({
-        statTime: item.statTime,
-        tps: Number(item.tps).toFixed(4),
+        statTime: ResponseFormatter.formatTimestamp(item.statTime),
+        tps: item.tps,
       })),
-      intervalType: data.intervalType,
     };
   }
 
-  // Top statistics methods
+  /**
+   * Get top gas usage statistics with optional formatting
+   * @param spanType Time period for statistics
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw top statistics response
+   */
   async getTopGasUsed(
     spanType: StatsPeriod,
     returnRaw: boolean = false
@@ -179,6 +241,12 @@ export class ESpaceScannerWrapper {
     };
   }
 
+  /**
+   * Get top transaction senders statistics with optional formatting
+   * @param spanType Time period for statistics
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw top statistics response
+   */
   async getTopTransactionSenders(
     spanType: StatsPeriod,
     returnRaw: boolean = false
@@ -198,6 +266,12 @@ export class ESpaceScannerWrapper {
     };
   }
 
+  /**
+   * Get top transaction receivers statistics with optional formatting
+   * @param spanType Time period for statistics
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw top statistics response
+   */
   async getTopTransactionReceivers(
     spanType: StatsPeriod,
     returnRaw: boolean = false
@@ -217,6 +291,12 @@ export class ESpaceScannerWrapper {
     };
   }
 
+  /**
+   * Get top CFX senders statistics with optional formatting
+   * @param spanType Time period for statistics
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw top statistics response
+   */
   async getTopCfxSenders(
     spanType: StatsPeriod,
     returnRaw: boolean = false
@@ -236,6 +316,12 @@ export class ESpaceScannerWrapper {
     };
   }
 
+  /**
+   * Get top CFX receivers statistics with optional formatting
+   * @param spanType Time period for statistics
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw top statistics response
+   */
   async getTopCfxReceivers(
     spanType: StatsPeriod,
     returnRaw: boolean = false
@@ -255,6 +341,227 @@ export class ESpaceScannerWrapper {
     };
   }
 
+  /**
+   * Get token holder statistics with optional formatting
+   * @param contract Token contract address
+   * @param params Statistics parameters
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw statistics response
+   */
+  async getTokenHolderStats(
+    contract: string,
+    params: ESpaceStatsParams = {},
+    returnRaw: boolean = false
+  ): Promise<
+    ESpaceStatsResponse | { total: number; list: { statTime: string; holderCount: string }[] }
+  > {
+    const data = await this.scanner.getTokenHolderStats(contract, params);
+    if (returnRaw) return data;
+    return {
+      total: data.total,
+      list: data.list.map((item) => ({
+        statTime: ResponseFormatter.formatTimestamp(item.statTime),
+        holderCount: ResponseFormatter.formatNumber(item.holderCount),
+      })),
+    };
+  }
+
+  /**
+   * Get token unique sender statistics with optional formatting
+   * @param contract Token contract address
+   * @param params Statistics parameters
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw statistics response
+   */
+  async getTokenUniqueSenderStats(
+    contract: string,
+    params: ESpaceStatsParams = {},
+    returnRaw: boolean = false
+  ): Promise<
+    ESpaceStatsResponse | { total: number; list: { statTime: string; uniqueSenderCount: string }[] }
+  > {
+    const data = await this.scanner.getTokenUniqueSenderStats(contract, params);
+    if (returnRaw) return data;
+    return {
+      total: data.total,
+      list: data.list.map((item) => ({
+        statTime: ResponseFormatter.formatTimestamp(item.statTime),
+        uniqueSenderCount: ResponseFormatter.formatNumber(item.uniqueSenderCount),
+      })),
+    };
+  }
+
+  /**
+   * Get token unique receiver statistics with optional formatting
+   * @param contract Token contract address
+   * @param params Statistics parameters
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw statistics response
+   */
+  async getTokenUniqueReceiverStats(
+    contract: string,
+    params: ESpaceStatsParams = {},
+    returnRaw: boolean = false
+  ): Promise<
+    | ESpaceStatsResponse
+    | { total: number; list: { statTime: string; uniqueReceiverCount: string }[] }
+  > {
+    const data = await this.scanner.getTokenUniqueReceiverStats(contract, params);
+    if (returnRaw) return data;
+    return {
+      total: data.total,
+      list: data.list.map((item) => ({
+        statTime: ResponseFormatter.formatTimestamp(item.statTime),
+        uniqueReceiverCount: ResponseFormatter.formatNumber(item.uniqueReceiverCount),
+      })),
+    };
+  }
+
+  /**
+   * Get block base fee statistics with optional formatting
+   * @param params Statistics parameters
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw statistics response
+   */
+  async getBlockBaseFeeStats(
+    params: ESpaceStatsParams = {},
+    returnRaw: boolean = false
+  ): Promise<
+    | ESpaceStatsResponse
+    | {
+        total: string;
+        list: Array<{
+          blockNumber: number;
+          timestamp: string;
+          baseFee: string;
+        }>;
+      }
+  > {
+    const data = await this.scanner.getBlockBaseFeeStats(params);
+    if (returnRaw) return data;
+    return {
+      total: ResponseFormatter.formatGas(data.total),
+      list: data.list.map((item: ESpaceStatItem) => ({
+        blockNumber: Number(item.blockNumber),
+        timestamp: ResponseFormatter.formatTimestamp(item.timestamp),
+        baseFee: ResponseFormatter.formatGas(item.baseFee),
+      })),
+    };
+  }
+
+  /**
+   * Get block gas used statistics with optional formatting
+   * @param params Statistics parameters
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw statistics response
+   */
+  async getBlockGasUsedStats(
+    params: ESpaceStatsParams = {},
+    returnRaw: boolean = false
+  ): Promise<
+    | ESpaceStatsResponse
+    | {
+        total: string;
+        list: Array<{
+          blockNumber: number;
+          timestamp: string;
+          gasUsed: string;
+        }>;
+      }
+  > {
+    const data = await this.scanner.getBlockGasUsedStats(params);
+    if (returnRaw) return data;
+    return {
+      total: ResponseFormatter.formatGas(data.total),
+      list: data.list.map((item: ESpaceStatItem) => ({
+        blockNumber: Number(item.blockNumber),
+        timestamp: ResponseFormatter.formatTimestamp(item.timestamp),
+        gasUsed: ResponseFormatter.formatGas(item.gasUsed),
+      })),
+    };
+  }
+
+  /**
+   * Get block average priority fee statistics with optional formatting
+   * @param params Statistics parameters
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw statistics response
+   */
+  async getBlockAvgPriorityFeeStats(
+    params: ESpaceStatsParams = {},
+    returnRaw: boolean = false
+  ): Promise<
+    | ESpaceStatsResponse
+    | {
+        total: string;
+        list: Array<{
+          blockNumber: number;
+          timestamp: string;
+          avgPriorityFee: string;
+        }>;
+      }
+  > {
+    const data = await this.scanner.getBlockAvgPriorityFeeStats(params);
+    if (returnRaw) return data;
+    return {
+      total: ResponseFormatter.formatGas(data.total),
+      list: data.list.map((item: ESpaceStatItem) => ({
+        blockNumber: Number(item.blockNumber),
+        timestamp: ResponseFormatter.formatTimestamp(item.timestamp),
+        avgPriorityFee: ResponseFormatter.formatGas(item.avgPriorityFee),
+      })),
+    };
+  }
+
+  /**
+   * Get block transactions by type statistics with optional formatting
+   * @param params Statistics parameters
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw statistics response
+   */
+  async getBlockTxsByTypeStats(
+    params: ESpaceStatsParams = {},
+    returnRaw: boolean = false
+  ): Promise<
+    | ESpaceStatsResponse
+    | {
+        total: number;
+        list: Array<{
+          blockNumber: number;
+          timestamp: string;
+          txsInType: {
+            legacy: string;
+            cip2930: string;
+            cip1559: string;
+          };
+        }>;
+      }
+  > {
+    const data = await this.scanner.getBlockTxsByTypeStats(params);
+    if (returnRaw) return data;
+    return {
+      total: Number(data.total),
+      list: data.list.map((item) => {
+        const txsInType = item.txsInType || { legacy: 0, cip2930: 0, cip1559: 0 };
+        return {
+          blockNumber: Number(item.blockNumber),
+          timestamp: ResponseFormatter.formatTimestamp(item.timestamp as number),
+          txsInType: {
+            legacy: ResponseFormatter.formatNumber(txsInType.legacy),
+            cip2930: ResponseFormatter.formatNumber(txsInType.cip2930),
+            cip1559: ResponseFormatter.formatNumber(txsInType.cip1559),
+          },
+        };
+      }),
+    };
+  }
+
+  /**
+   * Get top token transfers statistics with optional formatting
+   * @param spanType Time period for statistics
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw top statistics response
+   */
   async getTopTokenTransfers(
     spanType: StatsPeriod,
     returnRaw: boolean = false
@@ -272,6 +579,12 @@ export class ESpaceScannerWrapper {
     };
   }
 
+  /**
+   * Get top token senders statistics with optional formatting
+   * @param spanType Time period for statistics
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw top statistics response
+   */
   async getTopTokenSenders(
     spanType: StatsPeriod,
     returnRaw: boolean = false
@@ -289,6 +602,12 @@ export class ESpaceScannerWrapper {
     };
   }
 
+  /**
+   * Get top token receivers statistics with optional formatting
+   * @param spanType Time period for statistics
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw top statistics response
+   */
   async getTopTokenReceivers(
     spanType: StatsPeriod,
     returnRaw: boolean = false
@@ -306,6 +625,12 @@ export class ESpaceScannerWrapper {
     };
   }
 
+  /**
+   * Get top token participants statistics with optional formatting
+   * @param spanType Time period for statistics
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw top statistics response
+   */
   async getTopTokenParticipants(
     spanType: StatsPeriod,
     returnRaw: boolean = false
@@ -319,181 +644,6 @@ export class ESpaceScannerWrapper {
       list: data.list.map((item) => ({
         address: item.address,
         transferCntr: ResponseFormatter.formatNumber(item.transferCntr),
-      })),
-    };
-  }
-
-  // Token statistics methods
-  async getTokenHolderStats(
-    contract: string,
-    params: ESpaceStatsParams = {},
-    returnRaw: boolean = false
-  ): Promise<
-    | ESpaceStatsResponse
-    | { total: number; list: { statTime: string | number; holderCount: string }[] }
-  > {
-    const data = await this.scanner.getTokenHolderStats(contract, params);
-    if (returnRaw) return data;
-    return {
-      total: data.total,
-      list: data.list.map((item) => ({
-        statTime: item.statTime,
-        holderCount: ResponseFormatter.formatNumber(item.holderCount),
-      })),
-    };
-  }
-
-  async getTokenUniqueSenderStats(
-    contract: string,
-    params: ESpaceStatsParams = {},
-    returnRaw: boolean = false
-  ): Promise<
-    | ESpaceStatsResponse
-    | { total: number; list: { statTime: string | number; uniqueSenderCount: string }[] }
-  > {
-    const data = await this.scanner.getTokenUniqueSenderStats(contract, params);
-    if (returnRaw) return data;
-    return {
-      total: data.total,
-      list: data.list.map((item) => ({
-        statTime: item.statTime,
-        uniqueSenderCount: ResponseFormatter.formatNumber(item.uniqueSenderCount),
-      })),
-    };
-  }
-
-  async getTokenUniqueReceiverStats(
-    contract: string,
-    params: ESpaceStatsParams = {},
-    returnRaw: boolean = false
-  ): Promise<
-    | ESpaceStatsResponse
-    | { total: number; list: { statTime: string | number; uniqueReceiverCount: string }[] }
-  > {
-    const data = await this.scanner.getTokenUniqueReceiverStats(contract, params);
-    if (returnRaw) return data;
-    return {
-      total: data.total,
-      list: data.list.map((item) => ({
-        statTime: item.statTime,
-        uniqueReceiverCount: ResponseFormatter.formatNumber(item.uniqueReceiverCount),
-      })),
-    };
-  }
-
-  async getTokenUniqueParticipantStats(
-    contract: string,
-    params: ESpaceStatsParams = {},
-    returnRaw: boolean = false
-  ): Promise<
-    | ESpaceStatsResponse
-    | { total: number; list: { statTime: string | number; uniqueParticipantCount: string }[] }
-  > {
-    const data = await this.scanner.getTokenUniqueParticipantStats(contract, params);
-    if (returnRaw) return data;
-    return {
-      total: data.total,
-      list: data.list.map((item) => ({
-        statTime: item.statTime,
-        uniqueParticipantCount: ResponseFormatter.formatNumber(item.uniqueParticipantCount),
-      })),
-    };
-  }
-
-  // Block statistics methods
-  async getBlockBaseFeeStats(
-    params: ESpaceStatsParams = {},
-    returnRaw: boolean = false
-  ): Promise<
-    | ESpaceStatsResponse
-    | {
-        total: string | number;
-        list: { blockNumber: string | number; timestamp: string | number; baseFee: string }[];
-      }
-  > {
-    const data = await this.scanner.getBlockBaseFeeStats(params);
-    if (returnRaw) return data;
-    return {
-      total: ResponseFormatter.formatGas(data.total),
-      list: data.list.map((item) => ({
-        blockNumber: item.blockNumber,
-        timestamp: ResponseFormatter.formatTimestamp(item.timestamp),
-        baseFee: ResponseFormatter.formatGas(item.baseFee),
-      })),
-    };
-  }
-
-  async getBlockAvgPriorityFeeStats(
-    params: ESpaceStatsParams = {},
-    returnRaw: boolean = false
-  ): Promise<
-    | ESpaceStatsResponse
-    | {
-        total: string | number;
-        list: {
-          blockNumber: string | number;
-          timestamp: string | number;
-          avgPriorityFee: string;
-        }[];
-      }
-  > {
-    const data = await this.scanner.getBlockAvgPriorityFeeStats(params);
-    if (returnRaw) return data;
-    return {
-      total: ResponseFormatter.formatGas(data.total),
-      list: data.list.map((item) => ({
-        blockNumber: item.blockNumber,
-        timestamp: ResponseFormatter.formatTimestamp(item.timestamp),
-        avgPriorityFee: ResponseFormatter.formatGas(item.avgPriorityFee),
-      })),
-    };
-  }
-
-  async getBlockGasUsedStats(
-    params: ESpaceStatsParams = {},
-    returnRaw: boolean = false
-  ): Promise<
-    | ESpaceStatsResponse
-    | {
-        total: string | number;
-        list: { blockNumber: string | number; timestamp: string | number; gasUsed: string }[];
-      }
-  > {
-    const data = await this.scanner.getBlockGasUsedStats(params);
-    if (returnRaw) return data;
-    return {
-      total: ResponseFormatter.formatGas(data.total),
-      list: data.list.map((item) => ({
-        blockNumber: item.blockNumber,
-        timestamp: ResponseFormatter.formatTimestamp(item.timestamp),
-        gasUsed: ResponseFormatter.formatGas(item.gasUsed),
-      })),
-    };
-  }
-
-  async getBlockTxsByTypeStats(
-    params: ESpaceStatsParams = {},
-    returnRaw: boolean = false
-  ): Promise<
-    | ESpaceStatsResponse
-    | {
-        total: string | number;
-        list: { statTime: string | number; txsInType: Record<string, string> }[];
-      }
-  > {
-    const data = await this.scanner.getBlockTxsByTypeStats(params);
-    if (returnRaw) return data;
-    return {
-      total: data.total,
-      list: data.list.map((item) => ({
-        statTime: item.statTime,
-        txsInType: Object.entries(item.txsInType || {}).reduce(
-          (acc, [key, value]) => ({
-            ...acc,
-            [key]: ResponseFormatter.formatNumber(value),
-          }),
-          {}
-        ),
       })),
     };
   }
