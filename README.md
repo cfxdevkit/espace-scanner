@@ -2,12 +2,20 @@
 
 A TypeScript library for interacting with Conflux eSpace Scanner API.
 
+[![npm version](https://img.shields.io/npm/v/@cfxdevkit/confluxscan-espace)](https://www.npmjs.com/package/@cfxdevkit/confluxscan-espace)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/cfxdevkit/confluxscan-espace/ci.yml)](https://github.com/cfxdevkit/confluxscan-espace/actions)
+[![Coverage Status](https://codecov.io/gh/cfxdevkit/confluxscan-espace/branch/main/graph/badge.svg)](https://codecov.io/gh/cfxdevkit/confluxscan-espace)
+[![npm bundle size](https://img.shields.io/bundlephobia/minzip/@cfxdevkit/confluxscan-espace)](https://bundlephobia.com/package/@cfxdevkit/confluxscan-espace)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue.svg)](https://www.typescriptlang.org/)
+[![Node Version](https://img.shields.io/node/v/@cfxdevkit/confluxscan-espace)](https://www.npmjs.com/package/@cfxdevkit/confluxscan-espace)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/cfxdevkit/confluxscan-espace/pulls)
+
+
 ## Installation
 
 ```bash
 npm install @cfxdevkit/confluxscan-espace
-# or
-yarn add @cfxdevkit/confluxscan-espace
 ```
 
 ## Features
