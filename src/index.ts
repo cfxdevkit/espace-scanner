@@ -8,9 +8,7 @@ export { ESpaceScannerWrapper } from "./wrapper";
 export { ApiConfig, ApiResponse, ConfluxTarget } from "./types/api";
 
 export {
-  ContractABIData,
   ContractSourceData,
-  ContractABIResponse,
   ContractSourceResponse,
   TokenData,
   TokenListResponse,

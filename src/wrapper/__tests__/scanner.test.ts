@@ -1,24 +1,27 @@
 import { ESpaceScannerWrapper } from "../scanner";
 import { ESpaceScanner } from "../../core";
-import { ResponseFormatter } from "../../formatters";
+import { ResponseFormatter, DateFormatter, NumberFormatter } from "../../formatters";
 import { jest } from "@jest/globals";
+import { StatsParams } from "../../types/params";
 import {
-  StatsParams,
   StatsResponse,
   BasicStatItem,
   TokenHolderStatItem,
   TokenUniqueStatItem,
-  BlockStatItem,
   TpsStatItem,
-} from "../../types";
+} from "../../types/responses";
 
 jest.mock("../../core/scanner");
 jest.mock("../../formatters/responses");
+jest.mock("../../formatters/dates");
+jest.mock("../../formatters/numbers");
 
 describe("ESpaceScannerWrapper", () => {
   let wrapper: ESpaceScannerWrapper;
   const MockedScanner = ESpaceScanner as jest.MockedClass<typeof ESpaceScanner>;
   const MockedFormatter = ResponseFormatter as jest.Mocked<typeof ResponseFormatter>;
+  const MockedDateFormatter = DateFormatter as jest.Mocked<typeof DateFormatter>;
+  const MockedNumberFormatter = NumberFormatter as jest.Mocked<typeof NumberFormatter>;
   const validAddress = "0x1234567890123456789012345678901234567890";
   const mockTokens = [
     {
@@ -43,6 +46,12 @@ describe("ESpaceScannerWrapper", () => {
     MockedFormatter.formatUnit.mockImplementation((value, _decimals) => {
       if (!value || value === "0" || value === 0) return "0";
       return value === "1000000000000000000" ? "1.0" : value.toString();
+    });
+    MockedFormatter.formatTimestamp.mockImplementation((timestamp) => {
+      if (timestamp === "1707307200") return "2024-02-07 12:00:00";
+      if (timestamp === "1707307100") return "2024-02-07 11:58:20";
+      if (timestamp === "1707307300") return "2024-02-07 12:01:40";
+      return String(timestamp);
     });
     MockedScanner.prototype.getAccountTokens.mockResolvedValue(mockTokens);
   });
@@ -70,19 +79,19 @@ describe("ESpaceScannerWrapper", () => {
 
     describe("getContractSourceCode", () => {
       const mockSourceCode = {
-        sourceCode: "contract Test {}",
-        abi: "[]",
-        contractName: "Test",
-        compiler: "v0.8.0",
-        optimizationUsed: true,
-        runs: 200,
-        constructorArguments: "",
-        evmVersion: "london",
-        library: "",
-        licenseType: "MIT",
-        proxy: "0x0",
-        implementation: "0x0",
-        swarmSource: "",
+        SourceCode: "contract Test {}",
+        ABI: "[]",
+        ContractName: "Test",
+        Compiler: "v0.8.0",
+        OptimizationUsed: true,
+        Runs: 200,
+        ConstructorArguments: "",
+        EVMVersion: "london",
+        Library: "",
+        LicenseType: "MIT",
+        Proxy: "0x0",
+        Implementation: "0x0",
+        SwarmSource: "",
       };
 
       beforeEach(() => {
@@ -275,85 +284,97 @@ describe("ESpaceScannerWrapper", () => {
       ],
     };
 
-    const mockBlockBaseFeeStats: StatsResponse<BlockStatItem> = {
+    const mockBlockGasUsedStats = {
       total: "100",
       list: [
         {
-          statTime: "1707307200",
           blockNumber: "1000",
           timestamp: "1707307200",
-          baseFee: "1000000000",
+          gasUsed: "1000000000",
         },
         {
-          statTime: "1707307100",
           blockNumber: "999",
           timestamp: "1707307100",
-          baseFee: "900000000",
+          gasUsed: "900000000",
         },
       ],
     };
 
-    const mockBlockGasUsedStats: StatsResponse<BlockStatItem> = {
+    const mockBlockAvgPriorityFeeStats = {
       total: "100",
       list: [
         {
-          statTime: "1707307200",
           blockNumber: "1000",
           timestamp: "1707307200",
-          gasUsed: "2000000000",
-        },
-        {
-          statTime: "1707307100",
-          blockNumber: "999",
-          timestamp: "1707307100",
-          gasUsed: "1800000000",
-        },
-      ],
-    };
-
-    const mockBlockAvgPriorityFeeStats: StatsResponse<BlockStatItem> = {
-      total: "100000000",
-      list: [
-        {
-          blockNumber: "1000",
-          timestamp: "1707307200",
-          avgPriorityFee: "500000000",
-          statTime: "1707307200",
+          avgPriorityFee: "1000000000",
         },
         {
           blockNumber: "999",
           timestamp: "1707307100",
-          avgPriorityFee: "450000000",
-          statTime: "1707307100",
+          avgPriorityFee: "900000000",
         },
       ],
     };
 
-    const mockBlockTxsByTypeStats: StatsResponse<BlockStatItem> = {
-      total: 100,
+    const mockBlockTxsByTypeStats = {
+      total: "100",
       list: [
         {
-          statTime: "1707307200",
-          blockNumber: "123",
+          blockNumber: "1000",
           timestamp: "1707307200",
           txsInType: {
-            legacy: 100,
-            cip2930: 50,
-            cip1559: 25,
+            legacy: 10,
+            cip2930: 5,
+            cip1559: 15,
           },
         },
         {
-          statTime: "1707307300",
-          blockNumber: "124",
+          blockNumber: "999",
           timestamp: "1707307300",
           txsInType: {
-            legacy: 90,
-            cip2930: 45,
-            cip1559: 20,
+            legacy: 8,
+            cip2930: 4,
+            cip1559: 12,
           },
         },
       ],
     };
+
+    it("should format block gas used stats", async () => {
+      MockedScanner.prototype.getBlockGasUsedStats.mockResolvedValue(mockBlockGasUsedStats);
+      const result = await wrapper.getBlockGasUsedStats();
+      expect(result.list[0]).toEqual({
+        blockNumber: 1000,
+        timestamp: "2024-02-07 12:00:00",
+        gasUsed: "1.0 Gwei",
+      });
+    });
+
+    it("should format block average priority fee stats", async () => {
+      MockedScanner.prototype.getBlockAvgPriorityFeeStats.mockResolvedValue(
+        mockBlockAvgPriorityFeeStats
+      );
+      const result = await wrapper.getBlockAvgPriorityFeeStats();
+      expect(result.list[0]).toEqual({
+        blockNumber: 1000,
+        timestamp: "2024-02-07 12:00:00",
+        avgPriorityFee: "1.0 Gwei",
+      });
+    });
+
+    it("should format block transactions by type stats", async () => {
+      MockedScanner.prototype.getBlockTxsByTypeStats.mockResolvedValue(mockBlockTxsByTypeStats);
+      const result = await wrapper.getBlockTxsByTypeStats();
+      expect(result.list[0]).toEqual({
+        blockNumber: 1000,
+        timestamp: "2024-02-07 12:00:00",
+        txsInType: {
+          legacy: 10,
+          cip2930: 5,
+          cip1559: 15,
+        },
+      });
+    });
 
     const mockTopTokenTransfers = {
       maxTime: "2024-02-07",
@@ -557,74 +578,77 @@ describe("ESpaceScannerWrapper", () => {
       });
     });
 
-    describe("Block Stats Methods", () => {
-      it("should return formatted block base fee stats by default", async () => {
-        MockedScanner.prototype.getBlockBaseFeeStats.mockResolvedValue(mockBlockBaseFeeStats);
+    describe("Block Statistics Methods", () => {
+      const mockBlockStatsResponse = {
+        total: "100",
+        list: [
+          {
+            blockNumber: "1000",
+            timestamp: "1707307200",
+            baseFee: "1000000000",
+          },
+          {
+            blockNumber: "999",
+            timestamp: "1707307100",
+            baseFee: "900000000",
+          },
+        ],
+      };
+
+      beforeEach(() => {
+        MockedScanner.prototype.getBlockBaseFeeStats.mockResolvedValue(mockBlockStatsResponse);
+        MockedDateFormatter.formatTimestamp.mockReturnValue("2024-02-07 12:00:00");
+        MockedNumberFormatter.formatGas.mockReturnValue("1.0 Gwei");
+      });
+
+      it("should format block base fee stats", async () => {
         const result = await wrapper.getBlockBaseFeeStats();
-        expect(result.total).toBe("1.0 Gwei");
-        expect(result.list[0].baseFee).toBe("1.0 Gwei");
-        expect(MockedScanner.prototype.getBlockBaseFeeStats).toHaveBeenCalled();
+        expect(result.list[0]).toEqual({
+          blockNumber: 1000,
+          timestamp: "2024-02-07 12:00:00",
+          baseFee: "1.0 Gwei",
+        });
       });
 
-      it("should return raw block base fee stats when returnRaw is true", async () => {
-        MockedScanner.prototype.getBlockBaseFeeStats.mockResolvedValue(mockBlockBaseFeeStats);
+      it("should return raw block base fee stats", async () => {
         const result = await wrapper.getBlockBaseFeeStats({}, true);
-        expect(result).toEqual(mockBlockBaseFeeStats);
-        expect(MockedScanner.prototype.getBlockBaseFeeStats).toHaveBeenCalled();
+        expect(result).toEqual(mockBlockStatsResponse);
       });
 
-      it("should return formatted block gas used stats by default", async () => {
+      it("should format block gas used stats", async () => {
         MockedScanner.prototype.getBlockGasUsedStats.mockResolvedValue(mockBlockGasUsedStats);
         const result = await wrapper.getBlockGasUsedStats();
-        expect(result.total).toBe("1.0 Gwei");
-        expect(result.list[0].gasUsed).toBe("1.0 Gwei");
-        expect(MockedScanner.prototype.getBlockGasUsedStats).toHaveBeenCalled();
+        expect(result.list[0]).toEqual({
+          blockNumber: 1000,
+          timestamp: "2024-02-07 12:00:00",
+          gasUsed: "1.0 Gwei",
+        });
       });
 
-      it("should return raw block gas used stats when returnRaw is true", async () => {
-        MockedScanner.prototype.getBlockGasUsedStats.mockResolvedValue(mockBlockGasUsedStats);
-        const result = await wrapper.getBlockGasUsedStats({}, true);
-        expect(result).toEqual(mockBlockGasUsedStats);
-        expect(MockedScanner.prototype.getBlockGasUsedStats).toHaveBeenCalled();
-      });
-
-      it("should return formatted block average priority fee stats by default", async () => {
+      it("should format block average priority fee stats", async () => {
         MockedScanner.prototype.getBlockAvgPriorityFeeStats.mockResolvedValue(
           mockBlockAvgPriorityFeeStats
         );
         const result = await wrapper.getBlockAvgPriorityFeeStats();
-        expect(result.total).toBe("1.0 Gwei");
-        expect(result.list[0].avgPriorityFee).toBe("1.0 Gwei");
-        expect(MockedScanner.prototype.getBlockAvgPriorityFeeStats).toHaveBeenCalled();
+        expect(result.list[0]).toEqual({
+          blockNumber: 1000,
+          timestamp: "2024-02-07 12:00:00",
+          avgPriorityFee: "1.0 Gwei",
+        });
       });
 
-      it("should return raw block average priority fee stats when returnRaw is true", async () => {
-        MockedScanner.prototype.getBlockAvgPriorityFeeStats.mockResolvedValue(
-          mockBlockAvgPriorityFeeStats
-        );
-        const result = await wrapper.getBlockAvgPriorityFeeStats({}, true);
-        expect(result).toEqual(mockBlockAvgPriorityFeeStats);
-        expect(MockedScanner.prototype.getBlockAvgPriorityFeeStats).toHaveBeenCalled();
-      });
-
-      it("should return formatted block transactions by type stats by default", async () => {
+      it("should format block transactions by type stats", async () => {
         MockedScanner.prototype.getBlockTxsByTypeStats.mockResolvedValue(mockBlockTxsByTypeStats);
         const result = await wrapper.getBlockTxsByTypeStats();
-        expect(result.total).toBe(mockBlockTxsByTypeStats.total);
-        expect(result.list[0].blockNumber).toBe(
-          Number(mockBlockTxsByTypeStats.list[0].blockNumber)
-        );
-        if (result.list[0].txsInType) {
-          expect(result.list[0].txsInType.legacy).toBe(100);
-          expect(result.list[0].txsInType.cip2930).toBe(50);
-          expect(result.list[0].txsInType.cip1559).toBe(25);
-        }
-      });
-
-      it("should return raw block transactions by type stats when returnRaw is true", async () => {
-        MockedScanner.prototype.getBlockTxsByTypeStats.mockResolvedValue(mockBlockTxsByTypeStats);
-        const result = await wrapper.getBlockTxsByTypeStats(undefined, true);
-        expect(result).toEqual(mockBlockTxsByTypeStats);
+        expect(result.list[0]).toEqual({
+          blockNumber: 1000,
+          timestamp: "2024-02-07 12:00:00",
+          txsInType: {
+            legacy: 10,
+            cip2930: 5,
+            cip1559: 15,
+          },
+        });
       });
     });
 

@@ -8,7 +8,6 @@ import {
   TokenData,
   StatsParams,
   StatsPeriod,
-  ContractABIResponse,
   ContractSourceResponse,
   TokenListResponse,
   StatsResponse,
@@ -18,6 +17,12 @@ import {
   TokenUniqueStatItem,
   BlockStatItem,
   TpsStatItem,
+  AccountBalanceMulti,
+  TransactionList,
+  InternalTransactionList,
+  TokenTransferList,
+  NFTTransferList,
+  MinedBlockList,
 } from "../types";
 import { ApiConfig } from "../types/api";
 
@@ -33,12 +38,123 @@ export class ESpaceScannerWrapper {
   }
 
   /**
+   * Get CFX balance for a single address with optional formatting
+   * @param address Account address to check balance
+   * @param tag Block parameter (latest_state, latest_confirmed, etc.)
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw balance response
+   */
+  async getBalance(
+    address: string,
+    tag: string = "latest_state",
+    returnRaw: boolean = false
+  ): Promise<string> {
+    const data = await this.scanner.getBalance(address, tag);
+    if (returnRaw) return data;
+    return ResponseFormatter.formatCFX(data);
+  }
+
+  /**
+   * Get CFX balance for multiple addresses with optional formatting
+   * @param addresses Array of account addresses to check balance
+   * @param tag Block parameter (latest_state, latest_confirmed, etc.)
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw balance response
+   */
+  async getBalanceMulti(
+    addresses: string[],
+    tag: string = "latest_state",
+    returnRaw: boolean = false
+  ): Promise<AccountBalanceMulti> {
+    const data = await this.scanner.getBalanceMulti(addresses, tag);
+    if (returnRaw) return data;
+    return data.map(([address, balance]) => [address, ResponseFormatter.formatCFX(balance)]);
+  }
+
+  /**
+   * Get a list of normal transactions by address with optional formatting
+   * @param address Account address
+   * @param startBlock Starting block number (optional)
+   * @param endBlock Ending block number (optional)
+   * @param page Page number (optional, default: 1)
+   * @param offset Number of records per page (optional, default: 100)
+   * @param sort Sorting order (optional, default: 'desc')
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw transaction list response
+   */
+  async getTransactionList(
+    address: string,
+    startBlock?: number,
+    endBlock?: number,
+    page: number = 1,
+    offset: number = 100,
+    sort: "asc" | "desc" = "desc",
+    returnRaw: boolean = false
+  ): Promise<TransactionList> {
+    const data = await this.scanner.getTransactionList(
+      address,
+      startBlock,
+      endBlock,
+      page,
+      offset,
+      sort
+    );
+    console.log(data);
+    if (returnRaw) return data;
+    return data.map((tx) => ({
+      ...tx,
+      timeStamp: ResponseFormatter.formatTimestamp(tx.timeStamp),
+      value: ResponseFormatter.formatCFX(tx.value),
+      gas: ResponseFormatter.formatGas(tx.gas),
+      gasPrice: ResponseFormatter.formatGas(tx.gasPrice),
+      cumulativeGasUsed: ResponseFormatter.formatGas(tx.cumulativeGasUsed),
+      gasUsed: ResponseFormatter.formatGas(tx.gasUsed),
+    }));
+  }
+
+  /**
+   * Get a list of internal transactions with optional formatting
+   * @param options Options for filtering internal transactions
+   * @param options.address Account address (optional)
+   * @param options.txhash Transaction hash (optional)
+   * @param options.startBlock Starting block number (optional)
+   * @param options.endBlock Ending block number (optional)
+   * @param options.page Page number (optional, default: 1)
+   * @param options.offset Number of records per page (optional, default: 100)
+   * @param options.sort Sorting order (optional, default: 'desc')
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw internal transaction list response
+   */
+  async getInternalTransactionList(
+    options: {
+      address?: string;
+      txhash?: string;
+      startBlock?: number;
+      endBlock?: number;
+      page?: number;
+      offset?: number;
+      sort?: "asc" | "desc";
+    },
+    returnRaw: boolean = false
+  ): Promise<InternalTransactionList> {
+    const data = await this.scanner.getInternalTransactionList(options);
+    if (returnRaw) return data;
+    return data.map((tx) => ({
+      ...tx,
+      timeStamp: ResponseFormatter.formatTimestamp(tx.timeStamp),
+      value: ResponseFormatter.formatCFX(tx.value),
+      gas: ResponseFormatter.formatGas(tx.gas),
+      gasUsed: ResponseFormatter.formatGas(tx.gasUsed),
+    }));
+  }
+
+  /**
    * Get contract ABI with optional formatting
    * @param address Contract address
    * @param returnRaw Whether to return raw data (default: false)
    * @returns Formatted or raw contract ABI response
    */
-  async getContractABI(address: string, _returnRaw: boolean = false): Promise<ContractABIResponse> {
+  async getContractABI(address: string, _returnRaw: boolean = false): Promise<object> {
     const data = await this.scanner.getContractABI(address);
     return data;
   }
@@ -448,7 +564,6 @@ export class ESpaceScannerWrapper {
     return {
       total: ResponseFormatter.formatGas(data.total),
       list: data.list.map((item) => ({
-        statTime: ResponseFormatter.formatTimestamp(item.statTime),
         blockNumber: Number(item.blockNumber),
         timestamp: ResponseFormatter.formatTimestamp(item.timestamp),
         baseFee: ResponseFormatter.formatGas(item.baseFee),
@@ -471,7 +586,6 @@ export class ESpaceScannerWrapper {
     return {
       total: ResponseFormatter.formatGas(data.total),
       list: data.list.map((item) => ({
-        statTime: ResponseFormatter.formatTimestamp(item.statTime),
         blockNumber: Number(item.blockNumber),
         timestamp: ResponseFormatter.formatTimestamp(item.timestamp),
         gasUsed: ResponseFormatter.formatGas(item.gasUsed),
@@ -494,7 +608,6 @@ export class ESpaceScannerWrapper {
     return {
       total: ResponseFormatter.formatGas(data.total),
       list: data.list.map((item) => ({
-        statTime: ResponseFormatter.formatTimestamp(item.statTime),
         blockNumber: Number(item.blockNumber),
         timestamp: ResponseFormatter.formatTimestamp(item.timestamp),
         avgPriorityFee: ResponseFormatter.formatGas(item.avgPriorityFee),
@@ -519,7 +632,6 @@ export class ESpaceScannerWrapper {
       list: data.list.map((item) => {
         const txsInType = item.txsInType || { legacy: 0, cip2930: 0, cip1559: 0 };
         return {
-          statTime: ResponseFormatter.formatTimestamp(item.statTime),
           blockNumber: Number(item.blockNumber),
           timestamp: ResponseFormatter.formatTimestamp(item.timestamp),
           txsInType: {
@@ -545,7 +657,6 @@ export class ESpaceScannerWrapper {
     const data = await this.scanner.getTopTokenTransfers(spanType);
     if (returnRaw) return data;
     return {
-      maxTime: data.maxTime,
       list: data.list.map((item) => ({
         address: item.address,
         transferCntr: ResponseFormatter.formatNumber(item.transferCntr),
@@ -614,5 +725,239 @@ export class ESpaceScannerWrapper {
         transferCntr: ResponseFormatter.formatNumber(item.transferCntr),
       })),
     };
+  }
+
+  /**
+   * Get a list of token transfers with optional formatting
+   * @param options Options for filtering token transfers
+   * @param options.address Account address (optional)
+   * @param options.contractAddress Token contract address (optional)
+   * @param options.startBlock Starting block number (optional)
+   * @param options.endBlock Ending block number (optional)
+   * @param options.page Page number (optional, default: 1)
+   * @param options.offset Number of records per page (optional, default: 100)
+   * @param options.sort Sorting order (optional, default: 'desc')
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw token transfer list response
+   */
+  async getTokenTransfers(
+    options: {
+      address?: string;
+      contractAddress?: string;
+      startBlock?: number;
+      endBlock?: number;
+      page?: number;
+      offset?: number;
+      sort?: "asc" | "desc";
+    },
+    returnRaw: boolean = false
+  ): Promise<TokenTransferList> {
+    const data = await this.scanner.getTokenTransfers(options);
+    if (returnRaw) return data;
+    return data.map((tx) => ({
+      ...tx,
+      timeStamp: ResponseFormatter.formatTimestamp(tx.timeStamp),
+      value: ResponseFormatter.formatUnit(tx.value, Number(tx.tokenDecimal)),
+      gas: ResponseFormatter.formatGas(tx.gas),
+      gasPrice: ResponseFormatter.formatGas(tx.gasPrice),
+      cumulativeGasUsed: ResponseFormatter.formatGas(tx.cumulativeGasUsed),
+      gasUsed: ResponseFormatter.formatGas(tx.gasUsed),
+    }));
+  }
+
+  /**
+   * Get a list of NFT token transfers with optional formatting
+   * @param options Options for filtering NFT token transfers
+   * @param options.address Account address (optional)
+   * @param options.contractAddress Token contract address (optional)
+   * @param options.startBlock Starting block number (optional)
+   * @param options.endBlock Ending block number (optional)
+   * @param options.page Page number (optional, default: 1)
+   * @param options.offset Number of records per page (optional, default: 100)
+   * @param options.sort Sorting order (optional, default: 'desc')
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw NFT token transfer list response
+   */
+  async getNFTTransfers(
+    options: {
+      address?: string;
+      contractAddress?: string;
+      startBlock?: number;
+      endBlock?: number;
+      page?: number;
+      offset?: number;
+      sort?: "asc" | "desc";
+    },
+    returnRaw: boolean = false
+  ): Promise<NFTTransferList> {
+    const data = await this.scanner.getNFTTransfers(options);
+    if (returnRaw) return data;
+    return data.map((tx) => ({
+      ...tx,
+      timeStamp: ResponseFormatter.formatTimestamp(tx.timeStamp),
+      gas: ResponseFormatter.formatGas(tx.gas),
+      gasPrice: ResponseFormatter.formatGas(tx.gasPrice),
+      cumulativeGasUsed: ResponseFormatter.formatGas(tx.cumulativeGasUsed),
+      gasUsed: ResponseFormatter.formatGas(tx.gasUsed),
+    }));
+  }
+
+  /**
+   * Get a list of blocks mined by an address with optional formatting
+   * @param address Miner address
+   * @param blockType Block type (optional, default: 'blocks')
+   * @param page Page number (optional, default: 1)
+   * @param offset Number of records per page (optional, default: 100)
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw mined blocks response
+   */
+  async getMinedBlocks(
+    address: string,
+    blockType: string = "blocks",
+    page: number = 1,
+    offset: number = 100,
+    returnRaw: boolean = false
+  ): Promise<MinedBlockList> {
+    const data = await this.scanner.getMinedBlocks(address, blockType, page, offset);
+    if (returnRaw) return data;
+    return data.map((block) => ({
+      ...block,
+      timeStamp: ResponseFormatter.formatTimestamp(block.timeStamp),
+      blockReward: ResponseFormatter.formatCFX(block.blockReward),
+      gasUsed: ResponseFormatter.formatGas(block.gasUsed),
+      gasLimit: ResponseFormatter.formatGas(block.gasLimit),
+    }));
+  }
+
+  /**
+   * Get ERC20 token balance for an address with optional formatting
+   * @param contractAddress Token contract address
+   * @param address Account address
+   * @param decimals Token decimals (optional, default: 18)
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw token balance
+   */
+  async getTokenBalance(
+    contractAddress: string,
+    address: string,
+    decimals: number = 18,
+    returnRaw: boolean = false
+  ): Promise<string> {
+    const data = await this.scanner.getTokenBalance(contractAddress, address);
+    if (returnRaw) return data;
+    return ResponseFormatter.formatUnit(data, decimals);
+  }
+
+  /**
+   * Get ERC20 token total supply with optional formatting
+   * @param contractAddress Token contract address
+   * @param decimals Token decimals (optional, default: 18)
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw token total supply
+   */
+  async getTokenSupply(
+    contractAddress: string,
+    decimals: number = 18,
+    returnRaw: boolean = false
+  ): Promise<string> {
+    const data = await this.scanner.getTokenSupply(contractAddress);
+    if (returnRaw) return data;
+    return ResponseFormatter.formatUnit(data, decimals);
+  }
+
+  /**
+   * Get historical ERC20 token total supply at a specific block with optional formatting
+   * @param contractAddress Token contract address
+   * @param blockNumber Block number to check supply at
+   * @param decimals Token decimals (optional, default: 18)
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw historical token supply
+   */
+  async getTokenSupplyHistory(
+    contractAddress: string,
+    blockNumber: number,
+    decimals: number = 18,
+    returnRaw: boolean = false
+  ): Promise<string> {
+    const data = await this.scanner.getTokenSupplyHistory(contractAddress, blockNumber);
+    if (returnRaw) return data;
+    return ResponseFormatter.formatUnit(data, decimals);
+  }
+
+  /**
+   * Get block number by Unix timestamp with optional formatting
+   * @param timestamp Unix timestamp in seconds
+   * @param closest The closest available block to the provided timestamp ('before' or 'after')
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Formatted or raw block number
+   */
+  async getBlockNumberByTime(
+    timestamp: number,
+    closest: "before" | "after" = "before",
+    returnRaw: boolean = false
+  ): Promise<string | number> {
+    const data = await this.scanner.getBlockNumberByTime(timestamp, closest);
+    if (returnRaw) return data;
+    return Number(data);
+  }
+
+  /**
+   * Check source code verification submission status
+   * @param guid GUID returned from source code verification submission
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Verification status response
+   */
+  async checkVerifyStatus(guid: string, _returnRaw: boolean = false): Promise<string> {
+    const data = await this.scanner.checkVerifyStatus(guid);
+    return data;
+  }
+
+  /**
+   * Verify a proxy contract
+   * @param address Contract address to verify
+   * @param expectedImplementation Expected implementation contract address (optional)
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Verification response
+   */
+  async verifyProxyContract(
+    address: string,
+    expectedImplementation?: string,
+    _returnRaw: boolean = false
+  ): Promise<string> {
+    const data = await this.scanner.verifyProxyContract(address, expectedImplementation);
+    return data;
+  }
+
+  /**
+   * Check proxy contract verification submission status
+   * @param guid GUID returned from proxy contract verification submission
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Verification status response
+   */
+  async checkProxyVerification(guid: string, _returnRaw: boolean = false): Promise<string> {
+    const data = await this.scanner.checkProxyVerification(guid);
+    return data;
+  }
+
+  /**
+   * Check contract execution status for a transaction
+   * @param txhash Transaction hash
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Transaction status response
+   */
+  async getTransactionStatus(txhash: string, _returnRaw: boolean = false): Promise<string> {
+    const data = await this.scanner.getTransactionStatus(txhash);
+    return data;
+  }
+
+  /**
+   * Check transaction receipt status
+   * @param txhash Transaction hash
+   * @param returnRaw Whether to return raw data (default: false)
+   * @returns Transaction receipt status response
+   */
+  async getTransactionReceiptStatus(txhash: string, _returnRaw: boolean = false): Promise<string> {
+    const data = await this.scanner.getTransactionReceiptStatus(txhash);
+    return data;
   }
 }

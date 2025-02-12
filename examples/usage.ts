@@ -31,12 +31,79 @@ async function demonstrateESpaceScannerWrapperUsage(): Promise<void> {
   });
 
   try {
+    // Account Methods Demonstration
+    console.log("=== Account Methods ===");
+    const walletAddress = "0xe796f076084eEF751968Cf13838AC0b0cB60ADaa";
+    const multiAddresses = [
+      "0xe796f076084eEF751968Cf13838AC0b0cB60ADaa",
+      "0x704a2822d59cf4350fd3bbc4957bba48469770cc",
+    ];
+
+    // Get single account balance
+    const balance = await mainnetScanner.getBalance(walletAddress);
+    console.log("---\ngetBalance (formatted)\n", inspect(balance));
+
+    const rawBalance = await mainnetScanner.getBalance(walletAddress, "latest_state", true);
+    console.log("---\ngetBalance (raw)\n", inspect(rawBalance));
+
+    // Get multiple account balances
+    const multiBalance = await mainnetScanner.getBalanceMulti(multiAddresses);
+    console.log("---\ngetBalanceMulti (formatted)\n", inspect(multiBalance));
+
+    const rawMultiBalance = await mainnetScanner.getBalanceMulti(
+      multiAddresses,
+      "latest_state",
+      true
+    );
+    console.log("---\ngetBalanceMulti (raw)\n", inspect(rawMultiBalance));
+
+    // Get transaction list
+    const txList = await mainnetScanner.getTransactionList(
+      walletAddress,
+      undefined,
+      undefined,
+      1,
+      5
+    );
+    console.log("---\ngetTransactionList (formatted)\n", inspect(txList));
+
+    const rawTxList = await mainnetScanner.getTransactionList(
+      walletAddress,
+      undefined,
+      undefined,
+      1,
+      5,
+      "desc",
+      true
+    );
+    console.log("---\ngetTransactionList (raw)\n", inspect(rawTxList));
+
+    // Get internal transaction list by address
+    const internalTxList = await mainnetScanner.getInternalTransactionList({
+      address: walletAddress,
+      page: 1,
+      offset: 5,
+    });
+    console.log(
+      "---\ngetInternalTransactionList by address (formatted)\n",
+      inspect(internalTxList)
+    );
+
+    const rawInternalTxList = await mainnetScanner.getInternalTransactionList(
+      {
+        address: walletAddress,
+        page: 1,
+        offset: 5,
+      },
+      true
+    );
+    console.log("---\ngetInternalTransactionList by address (raw)\n", inspect(rawInternalTxList));
+
     // Contract Methods Demonstration
-    console.log("=== Contract Methods ===");
+    console.log("\n=== Contract Methods ===");
     // Example address for demonstration
     const contractAddress = "0x704a2822d59cf4350fd3bbc4957bba48469770cc";
     const tokenAddress = "0x14b2d3bc65e74dae1030eafd8ac30c533c976a9b";
-    const walletAddress = "0xe796f076084eEF751968Cf13838AC0b0cB60ADaa";
 
     // Get contract ABI
     const contractABI = await mainnetScanner.getContractABI(contractAddress);
@@ -44,7 +111,162 @@ async function demonstrateESpaceScannerWrapperUsage(): Promise<void> {
 
     // Get contract source code
     const contractSource = await mainnetScanner.getContractSourceCode(contractAddress);
+    contractSource.SourceCode = contractSource.SourceCode.slice(0, 100);
+    contractSource.ABI = contractSource.ABI.slice(0, 100);
     console.log("---\ngetContractSourceCode (formatted)\n", inspect(contractSource));
+
+    // Get token transfers by address
+    const tokenTxList = await mainnetScanner.getTokenTransfers({
+      address: walletAddress,
+      page: 1,
+      offset: 5,
+    });
+    console.log("---\ngetTokenTransfers by address (formatted)\n", inspect(tokenTxList));
+
+    const rawTokenTxList = await mainnetScanner.getTokenTransfers(
+      {
+        address: walletAddress,
+        page: 1,
+        offset: 5,
+      },
+      true
+    );
+    console.log("---\ngetTokenTransfers by address (raw)\n", inspect(rawTokenTxList));
+
+    // Get token transfers by contract
+    const tokenTxByContract = await mainnetScanner.getTokenTransfers({
+      contractAddress: tokenAddress,
+      page: 1,
+      offset: 5,
+    });
+    console.log("---\ngetTokenTransfers by contract (formatted)\n", inspect(tokenTxByContract));
+
+    const rawTokenTxByContract = await mainnetScanner.getTokenTransfers(
+      {
+        contractAddress: tokenAddress,
+        page: 1,
+        offset: 5,
+      },
+      true
+    );
+    console.log("---\ngetTokenTransfers by contract (raw)\n", inspect(rawTokenTxByContract));
+
+    // Get token transfers filtered by both address and contract
+    const tokenTxFiltered = await mainnetScanner.getTokenTransfers({
+      address: walletAddress,
+      contractAddress: tokenAddress,
+      page: 1,
+      offset: 5,
+    });
+    console.log("---\ngetTokenTransfers filtered (formatted)\n", inspect(tokenTxFiltered));
+
+    const rawTokenTxFiltered = await mainnetScanner.getTokenTransfers(
+      {
+        address: walletAddress,
+        contractAddress: tokenAddress,
+        page: 1,
+        offset: 5,
+      },
+      true
+    );
+    console.log("---\ngetTokenTransfers filtered (raw)\n", inspect(rawTokenTxFiltered));
+
+    // Get NFT transfers by address
+    const nftTxList = await mainnetScanner.getNFTTransfers({
+      address: walletAddress,
+      page: 1,
+      offset: 5,
+    });
+    console.log("---\ngetNFTTransfers by address (formatted)\n", inspect(nftTxList));
+
+    const rawNftTxList = await mainnetScanner.getNFTTransfers(
+      {
+        address: walletAddress,
+        page: 1,
+        offset: 5,
+      },
+      true
+    );
+    console.log("---\ngetNFTTransfers by address (raw)\n", inspect(rawNftTxList));
+
+    // Get NFT transfers by contract
+    const nftTxByContract = await mainnetScanner.getNFTTransfers({
+      contractAddress: tokenAddress,
+      page: 1,
+      offset: 5,
+    });
+    console.log("---\ngetNFTTransfers by contract (formatted)\n", inspect(nftTxByContract));
+
+    const rawNftTxByContract = await mainnetScanner.getNFTTransfers(
+      {
+        contractAddress: tokenAddress,
+        page: 1,
+        offset: 5,
+      },
+      true
+    );
+    console.log("---\ngetNFTTransfers by contract (raw)\n", inspect(rawNftTxByContract));
+
+    // Get NFT transfers filtered by both address and contract
+    const nftTxFiltered = await mainnetScanner.getNFTTransfers({
+      address: walletAddress,
+      contractAddress: tokenAddress,
+      page: 1,
+      offset: 5,
+    });
+    console.log("---\ngetNFTTransfers filtered (formatted)\n", inspect(nftTxFiltered));
+
+    const rawNftTxFiltered = await mainnetScanner.getNFTTransfers(
+      {
+        address: walletAddress,
+        contractAddress: tokenAddress,
+        page: 1,
+        offset: 5,
+      },
+      true
+    );
+    console.log("---\ngetNFTTransfers filtered (raw)\n", inspect(rawNftTxFiltered));
+
+    // Get mined blocks by address
+    const minedBlocks = await mainnetScanner.getMinedBlocks(walletAddress, "blocks", 1, 5);
+    console.log("---\ngetMinedBlocks (formatted)\n", inspect(minedBlocks));
+
+    const rawMinedBlocks = await mainnetScanner.getMinedBlocks(walletAddress, "blocks", 1, 5, true);
+    console.log("---\ngetMinedBlocks (raw)\n", inspect(rawMinedBlocks));
+
+    // Get token balance
+    const tokenBalance = await mainnetScanner.getTokenBalance(tokenAddress, walletAddress);
+    console.log("---\ngetTokenBalance (formatted)\n", inspect(tokenBalance));
+
+    const rawTokenBalance = await mainnetScanner.getTokenBalance(
+      tokenAddress,
+      walletAddress,
+      18,
+      true
+    );
+    console.log("---\ngetTokenBalance (raw)\n", inspect(rawTokenBalance));
+
+    // Get token total supply
+    const tokenSupply = await mainnetScanner.getTokenSupply(tokenAddress);
+    console.log("---\ngetTokenSupply (formatted)\n", inspect(tokenSupply));
+
+    const rawTokenSupply = await mainnetScanner.getTokenSupply(tokenAddress, 18, true);
+    console.log("---\ngetTokenSupply (raw)\n", inspect(rawTokenSupply));
+
+    // Get block number by timestamp
+    const timestamp = Math.floor(Date.now() / 1000) - 3600; // 1 hour ago
+    const blockNumber = await mainnetScanner.getBlockNumberByTime(timestamp);
+    console.log("---\ngetBlockNumberByTime (formatted)\n", inspect(blockNumber));
+
+    const rawBlockNumber = await mainnetScanner.getBlockNumberByTime(timestamp, "before", true);
+    console.log("---\ngetBlockNumberByTime (raw)\n", inspect(rawBlockNumber));
+
+    // Get block number after timestamp
+    const blockNumberAfter = await mainnetScanner.getBlockNumberByTime(timestamp, "after");
+    console.log("---\ngetBlockNumberByTime after (formatted)\n", inspect(blockNumberAfter));
+
+    const rawBlockNumberAfter = await mainnetScanner.getBlockNumberByTime(timestamp, "after", true);
+    console.log("---\ngetBlockNumberByTime after (raw)\n", inspect(rawBlockNumberAfter));
 
     // Token Methods Demonstration
     console.log("\n=== Token Methods ===");

@@ -1,6 +1,10 @@
-import { ApiConfig, ApiResponse } from "../types/api";
+import { ApiConfig } from "../types/api";
 import { createLogger } from "../utils/logger";
 
+/**
+ * Base API class for making HTTP requests to the Conflux eSpace API.
+ * Provides common functionality for API endpoints.
+ */
 export class ESpaceApi {
   protected baseUrl: string;
   protected apiKey?: string;
@@ -15,78 +19,79 @@ export class ESpaceApi {
     this.logger.debug({ target, host: this.baseUrl }, "API instance initialized");
   }
 
+  /**
+   * Make an API request with the given parameters
+   * @param endpoint API endpoint
+   * @param params Query parameters
+   * @returns API response
+   */
   protected async fetchApi<T>(
     endpoint: string,
-    params: Record<string, string | number | boolean> = {}
-  ): Promise<ApiResponse<T>> {
-    try {
-      let url: URL;
-      if (endpoint === "/api") {
-        // Module/action pattern
-        url = new URL(endpoint, this.baseUrl);
-      } else {
-        // Direct path pattern
-        url = new URL(endpoint, this.baseUrl);
-      }
+    params: Record<string, string | number | boolean | null | undefined> = {}
+  ): Promise<{ result: T }> {
+    // Filter out undefined and null values
+    const validParams = Object.fromEntries(
+      Object.entries(params).filter(([_, value]) => value != null)
+    ) as Record<string, string | number | boolean>;
 
-      const fetchParams = { ...params };
-      if (this.apiKey) {
-        fetchParams.apiKey = this.apiKey;
-      }
-      Object.entries(fetchParams).forEach(([key, value]) => {
-        if (value !== undefined) {
-          url.searchParams.append(key, String(value));
-        }
-      });
+    const queryParams = new URLSearchParams();
+    Object.entries(validParams).forEach(([key, value]) => {
+      queryParams.append(key, String(value));
+    });
 
-      this.logger.debug({ url: url.toString(), params: fetchParams }, "Making API request");
-      const response = await fetch(url.toString(), { headers: {} });
+    if (this.apiKey) {
+      queryParams.append("apiKey", this.apiKey);
+    }
 
-      if (!response.ok) {
-        this.logger.error(
-          {
-            status: response.status,
-            statusText: response.statusText,
-            endpoint,
-            params: fetchParams,
-          },
-          "API request failed"
-        );
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+    const url = `${this.baseUrl}${endpoint}${
+      queryParams.toString() ? "?" + queryParams.toString() : ""
+    }`;
 
-      const data = await response.json();
-      if (data.status === "0") {
-        this.logger.error(
-          {
-            endpoint,
-            params: fetchParams,
-            error: data.message,
-          },
-          "API returned error status"
-        );
-        throw new Error(`API error: ${data.message || "Unknown error"}`);
-      }
+    this.logger.debug({ url: url }, "Making API request");
+    const response = await fetch(url, { headers: {} });
 
-      this.logger.debug({ endpoint, responseStatus: data.status }, "API request successful");
-      return data;
-    } catch (error) {
+    if (!response.ok) {
       this.logger.error(
         {
-          error: error instanceof Error ? error.message : String(error),
+          status: response.status,
+          statusText: response.statusText,
           endpoint,
-          params,
+          params: validParams,
         },
-        "Error in API request"
+        "API request failed"
       );
-      throw error;
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+
+    const data = await response.json();
+    if (data.error) {
+      this.logger.error(
+        {
+          endpoint,
+          params: validParams,
+          error: data.error.message,
+        },
+        "API returned error"
+      );
+      throw new Error(`API error: ${data.error.message}`);
+    }
+
+    this.logger.debug({ endpoint, responseStatus: data.status }, "API request successful");
+    return data;
   }
 
+  /**
+   * Get current timestamp in seconds
+   * @returns Current timestamp
+   */
   protected getCurrentTimestamp(): number {
     return Math.floor(Date.now() / 1000);
   }
 
+  /**
+   * Get timestamp from 24 hours ago
+   * @returns Timestamp from 24 hours ago
+   */
   protected get24HoursAgo(): number {
     return this.getCurrentTimestamp() - 24 * 60 * 60;
   }

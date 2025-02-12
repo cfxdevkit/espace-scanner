@@ -76,7 +76,7 @@ export class NumberFormatter {
       const formatted = formatUnits(BigInt(value), 9);
       return `${this.formatNumber(formatted)} Gwei`;
     } catch (error) {
-      console.error("Error formatting gas value", { module: "NumberFormatter", value, error });
+      logger.error("Error formatting gas value", { module: "NumberFormatter", value, error });
       return "0 Gwei";
     }
   }
@@ -96,69 +96,8 @@ export class NumberFormatter {
       const formatted = formatEther(BigInt(value));
       return `${formatted} CFX`;
     } catch (error) {
-      console.error("Error formatting CFX value", { module: "NumberFormatter", value, error });
+      logger.error("Error formatting CFX value", { module: "NumberFormatter", value, error });
       return "0 CFX";
-    }
-  }
-
-  /**
-   * Formats a token amount with proper decimals.
-   * Can handle both regular tokens and CFX tokens.
-   * @param amount - The token amount to format
-   * @param decimals - Number of decimals for the token (default: 18)
-   * @param isCFX - Whether this is a CFX token amount (default: false)
-   * @returns Formatted token amount string
-   * @example
-   * formatTokenAmount("1000000000000000000", 18) // returns "1"
-   * formatTokenAmount("1000000000000000000", 18, true) // returns "1 CFX"
-   */
-  static formatTokenAmount(
-    amount: string | number,
-    decimals: number = 18,
-    isCFX: boolean = false
-  ): string {
-    if (!amount) {
-      logger.debug("Empty amount provided, returning 0");
-      return isCFX ? "0 CFX" : "0";
-    }
-    try {
-      let formatted: string;
-      if (isCFX) {
-        // Handle scientific notation by converting to BigInt first
-        const bigAmount =
-          typeof amount === "string" ? BigInt(amount) : BigInt(Math.floor(Number(amount)));
-        formatted = formatEther(bigAmount);
-        logger.debug(
-          {
-            originalAmount: amount,
-            bigAmount: bigAmount.toString(),
-            formatted,
-          },
-          "Successfully formatted CFX token amount"
-        );
-        return `${this.formatNumber(formatted)} CFX`;
-      }
-      formatted = formatUnits(BigInt(amount), decimals);
-      logger.debug(
-        {
-          originalAmount: amount,
-          decimals,
-          formatted,
-        },
-        "Successfully formatted token amount"
-      );
-      return this.formatNumber(formatted);
-    } catch (error) {
-      logger.error(
-        {
-          amount,
-          decimals,
-          isCFX,
-          error: error instanceof Error ? error.message : String(error),
-        },
-        "Error formatting token amount"
-      );
-      return isCFX ? "0 CFX" : "0";
     }
   }
 }

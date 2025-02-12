@@ -1,30 +1,119 @@
-// Contract types
-export interface ContractABIData {
-  abi: string;
-}
-
 export interface ContractSourceData {
-  sourceCode: string;
-  abi: string;
-  contractName: string;
-  compiler: string;
-  optimizationUsed: boolean;
-  runs: number;
-  constructorArguments: string;
-  evmVersion: string;
-  library: string;
-  licenseType: string;
-  proxy: string;
-  implementation: string;
-  swarmSource: string;
+  SourceCode: string;
+  ABI: string;
+  ContractName: string;
+  Compiler: string;
+  OptimizationUsed: boolean;
+  Runs: number;
+  ConstructorArguments: string;
+  EVMVersion: string;
+  Library: string;
+  LicenseType: string;
+  Proxy: string;
+  Implementation: string;
+  SwarmSource: string;
 }
 
-export type ContractABIResponse = ContractABIData;
 export type ContractSourceResponse = ContractSourceData;
+
+export interface TokenTransferItem {
+  blockNumber: string;
+  timeStamp: string;
+  hash: string;
+  nonce: string;
+  blockHash: string;
+  from: string;
+  contractAddress: string;
+  to: string;
+  value: string;
+  tokenName: string;
+  tokenSymbol: string;
+  tokenDecimal: string;
+  transactionIndex: string;
+  gas: string;
+  gasPrice: string;
+  gasUsed: string;
+  cumulativeGasUsed: string;
+  input: string;
+  confirmations: string;
+}
+
+export type TokenTransferList = TokenTransferItem[];
+
+export interface NFTTransferItem {
+  blockNumber: string;
+  timeStamp: string;
+  hash: string;
+  nonce: string;
+  blockHash: string;
+  from: string;
+  contractAddress: string;
+  to: string;
+  tokenID: string;
+  tokenName: string;
+  tokenSymbol: string;
+  tokenDecimal: string;
+  transactionIndex: string;
+  gas: string;
+  gasPrice: string;
+  gasUsed: string;
+  cumulativeGasUsed: string;
+  input: string;
+  confirmations: string;
+}
+
+export type NFTTransferList = NFTTransferItem[];
+
+export interface MinedBlockItem {
+  blockNumber: string;
+  timeStamp: string;
+  blockReward: string;
+  blockMiner: string;
+  blockHash: string;
+  difficulty: string;
+  totalDifficulty: string;
+  size: string;
+  gasUsed: string;
+  gasLimit: string;
+  extraData: string;
+  uncles: string[];
+}
+
+export type MinedBlockList = MinedBlockItem[];
+
+export type AccountBalanceMultiItem = Array<[string, string]>;
+
+export type AccountBalanceMulti = AccountBalanceMultiItem;
+
+// Transaction types
+export interface TransactionItem {
+  blockNumber: string;
+  timeStamp: string;
+  hash: string;
+  nonce: string;
+  blockHash: string;
+  transactionIndex: string;
+  from: string;
+  to: string;
+  value: string;
+  gas: string;
+  gasPrice: string;
+  isError: string;
+  txreceipt_status: string;
+  input: string;
+  contractAddress: string;
+  cumulativeGasUsed: string;
+  gasUsed: string;
+  confirmations: string;
+  methodId: string;
+  functionName: string;
+}
+
+export type TransactionList = TransactionItem[];
 
 // Token types
 export interface TokenData {
-  address: string;
+  address?: string;
   name: string;
   symbol: string;
   decimals: number;
@@ -66,7 +155,6 @@ export interface TokenUniqueStatItem {
 
 // Block Stats Items
 export interface BlockStatItem {
-  statTime: string | number;
   blockNumber: string | number;
   timestamp: string | number;
   baseFee?: string | number;
@@ -127,4 +215,116 @@ export interface ListResponse<T> {
   list: T[];
   valueTotal?: string | number;
   gasTotal?: string;
+}
+
+export interface InternalTransactionItem {
+  blockNumber: string;
+  timeStamp: string;
+  hash: string;
+  from: string;
+  to: string;
+  value: string;
+  contractAddress: string;
+  input: string;
+  type: string;
+  gas: string;
+  gasUsed: string;
+  isError: string;
+  errCode: string;
+}
+
+export type InternalTransactionList = InternalTransactionItem[];
+
+// NFT Types
+export interface NFTBalance {
+  contract: string;
+  tokenId: string;
+  amount: string;
+  tokenUri?: string;
+  metadata?: {
+    name?: string;
+    description?: string;
+    image?: string;
+    [key: string]: unknown;
+  };
+}
+
+export interface NFTToken {
+  contract: string;
+  tokenId: string;
+  owner: string;
+  tokenUri?: string;
+  metadata?: {
+    name?: string;
+    description?: string;
+    image?: string;
+    [key: string]: unknown;
+  };
+}
+
+export interface NFTPreview {
+  contract: string;
+  tokenId: string;
+  tokenUri?: string;
+  metadata?: {
+    name?: string;
+    description?: string;
+    image?: string;
+    [key: string]: unknown;
+  };
+}
+
+export interface NFTFungibleToken {
+  contract: string;
+  name: string;
+  symbol: string;
+  decimals: number;
+  totalSupply?: string;
+}
+
+export interface NFTOwner {
+  address: string;
+  quantity: string;
+}
+
+// Method Decode Types
+export interface DecodedMethod {
+  name: string;
+  params: {
+    name: string;
+    type: string;
+    value: string;
+  }[];
+}
+
+export interface DecodedMethodRaw {
+  methodId: string;
+  methodName: string;
+  params: string[];
+}
+
+// Response Types
+export interface NFTBalanceResponse {
+  total: number;
+  list: NFTBalance[];
+}
+
+export interface NFTTokenResponse {
+  total: number;
+  list: NFTToken[];
+}
+
+export interface NFTPreviewResponse {
+  total: number;
+  list: NFTPreview[];
+}
+
+export interface NFTFungibleTokenResponse {
+  total: number;
+  list: NFTFungibleToken[];
+}
+
+export interface NFTOwnerResponse {
+  total: number;
+  list: NFTOwner[];
 }

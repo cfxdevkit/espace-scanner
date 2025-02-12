@@ -1,10 +1,8 @@
 import { NumberFormatter } from "../numbers";
 import { formatEther, formatUnits } from "viem";
+import { jest } from "@jest/globals";
 
-jest.mock("viem", () => ({
-  formatEther: jest.fn(),
-  formatUnits: jest.fn(),
-}));
+jest.mock("viem");
 
 describe("NumberFormatter", () => {
   const MockedFormatEther = formatEther as jest.MockedFunction<typeof formatEther>;
@@ -12,40 +10,48 @@ describe("NumberFormatter", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    MockedFormatEther.mockImplementation((value) => {
-      if (!value || value === BigInt(0)) return "0";
-      return "1.0";
-    });
-    MockedFormatUnits.mockImplementation((value) => {
-      if (!value || value === BigInt(0)) return "0";
-      return "1.0";
-    });
+    MockedFormatEther.mockReturnValue("1.0");
+    MockedFormatUnits.mockReturnValue("1.0");
   });
 
   describe("formatNumber", () => {
-    it("should format integer numbers with commas", () => {
+    it("should format number values", () => {
+      expect(NumberFormatter.formatNumber("1234.5678")).toBe("1,234.5678");
+      expect(NumberFormatter.formatNumber(1234.5678)).toBe("1,234.5678");
+    });
+
+    it("should handle zero", () => {
+      expect(NumberFormatter.formatNumber("0")).toBe("0");
+      expect(NumberFormatter.formatNumber(0)).toBe("0");
+    });
+
+    it("should handle undefined values", () => {
+      expect(NumberFormatter.formatNumber(undefined)).toBe("0");
+      expect(NumberFormatter.formatNumber("")).toBe("0");
+    });
+
+    it("should handle invalid values", () => {
+      expect(NumberFormatter.formatNumber("invalid")).toBe("0");
+    });
+
+    it("should handle large numbers", () => {
+      expect(NumberFormatter.formatNumber("1000000")).toBe("1,000,000");
       expect(NumberFormatter.formatNumber(1000000)).toBe("1,000,000");
     });
 
-    it("should format decimal numbers", () => {
+    it("should handle decimal numbers", () => {
       expect(NumberFormatter.formatNumber("1234.5678")).toBe("1,234.5678");
+      expect(NumberFormatter.formatNumber(1234.5678)).toBe("1,234.5678");
     });
 
     it("should truncate decimals to 4 places", () => {
       expect(NumberFormatter.formatNumber("1234.56789")).toBe("1,234.5678");
+      expect(NumberFormatter.formatNumber(1234.56789)).toBe("1,234.5678");
     });
 
-    it("should handle zero", () => {
-      expect(NumberFormatter.formatNumber(0)).toBe("0");
-    });
-
-    it("should handle undefined/empty values", () => {
-      expect(NumberFormatter.formatNumber("")).toBe("0");
-      expect(NumberFormatter.formatNumber(undefined as unknown as string)).toBe("0");
-    });
-
-    it("should handle invalid numbers", () => {
-      expect(NumberFormatter.formatNumber("invalid")).toBe("0");
+    it("should handle scientific notation", () => {
+      expect(NumberFormatter.formatNumber("1.234e3")).toBe("1,234");
+      expect(NumberFormatter.formatNumber(1.234e3)).toBe("1,234");
     });
   });
 
@@ -72,13 +78,13 @@ describe("NumberFormatter", () => {
     beforeEach(() => {
       MockedFormatUnits.mockImplementation((value) => {
         if (!value || value === BigInt(0)) return "0";
-        if (value === BigInt("1000000000")) return "1.0";
         return "1.0";
       });
     });
 
-    it("should format gas value in Gwei", () => {
+    it("should format gas values", () => {
       expect(NumberFormatter.formatGas("1000000000")).toBe("1 Gwei");
+      expect(NumberFormatter.formatGas(1000000000)).toBe("1 Gwei");
     });
 
     it("should handle zero", () => {
@@ -86,9 +92,13 @@ describe("NumberFormatter", () => {
       expect(NumberFormatter.formatGas(0)).toBe("0 Gwei");
     });
 
+    it("should handle undefined values", () => {
+      expect(NumberFormatter.formatGas(undefined)).toBe("0 Gwei");
+      expect(NumberFormatter.formatGas("")).toBe("0 Gwei");
+    });
+
     it("should handle invalid values", () => {
       expect(NumberFormatter.formatGas("invalid")).toBe("0 Gwei");
-      expect(NumberFormatter.formatGas(undefined)).toBe("0 Gwei");
     });
   });
 
@@ -114,36 +124,6 @@ describe("NumberFormatter", () => {
 
     it("should handle invalid values", () => {
       expect(NumberFormatter.formatCFX("invalid")).toBe("0 CFX");
-    });
-  });
-
-  describe("formatTokenAmount", () => {
-    it("should format token amount", () => {
-      MockedFormatUnits.mockReturnValue("1.5");
-      expect(NumberFormatter.formatTokenAmount("1500000000000000000", 18)).toBe("1.5");
-    });
-
-    it("should format CFX amount", () => {
-      MockedFormatEther.mockReturnValue("1.5");
-      expect(NumberFormatter.formatTokenAmount("1500000000000000000", 18, true)).toBe("1.5 CFX");
-    });
-
-    it("should handle scientific notation for CFX", () => {
-      MockedFormatEther.mockReturnValue("1.5");
-      expect(NumberFormatter.formatTokenAmount(1.5e18, 18, true)).toBe("1.5 CFX");
-    });
-
-    it("should handle zero", () => {
-      expect(NumberFormatter.formatTokenAmount(0)).toBe("0");
-      expect(NumberFormatter.formatTokenAmount(0, 18, true)).toBe("0 CFX");
-    });
-
-    it("should handle errors", () => {
-      MockedFormatUnits.mockImplementation(() => {
-        throw new Error("Test error");
-      });
-      expect(NumberFormatter.formatTokenAmount("invalid")).toBe("0");
-      expect(NumberFormatter.formatTokenAmount("invalid", 18, true)).toBe("0 CFX");
     });
   });
 });
