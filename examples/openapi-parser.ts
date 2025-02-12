@@ -13,7 +13,9 @@ export interface ApiEndpointInfo {
     type: string;
     description?: string;
     schema?: OpenAPIV3.SchemaObject;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     enum?: any[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     default?: any;
   }[];
   responseSchema: OpenAPIV3.SchemaObject | null;
@@ -28,6 +30,7 @@ function resolveParameterRef(
   spec: OpenAPIV3.Document
 ): OpenAPIV3.ParameterObject | null {
   const refPath = ref.replace("#/components/parameters/", "").split("/");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let current: any = spec.components?.parameters;
 
   for (const segment of refPath) {
@@ -43,6 +46,7 @@ function resolveParameterRef(
  */
 function resolveSchemaRef(ref: string, spec: OpenAPIV3.Document): OpenAPIV3.SchemaObject | null {
   const refPath = ref.replace("#/components/schemas/", "").split("/");
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let current: any = spec.components?.schemas;
 
   for (const segment of refPath) {

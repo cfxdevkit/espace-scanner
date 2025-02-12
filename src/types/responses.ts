@@ -14,7 +14,21 @@ export interface ContractSourceData {
   SwarmSource: string;
 }
 
-export type ContractSourceResponse = ContractSourceData;
+export interface ContractSourceResponse {
+  SourceCode: string;
+  ABI: string;
+  ContractName: string;
+  Compiler: string;
+  OptimizationUsed: boolean;
+  Runs: string | number;
+  ConstructorArguments: string;
+  EVMVersion: string;
+  Library: string;
+  LicenseType: string;
+  Proxy: string;
+  Implementation: string;
+  SwarmSource: string;
+}
 
 export interface TokenTransferItem {
   blockNumber: string;
@@ -148,9 +162,9 @@ export interface TokenHolderStatItem {
 
 export interface TokenUniqueStatItem {
   statTime: string | number;
-  uniqueSenderCount?: string | number;
-  uniqueReceiverCount?: string | number;
-  uniqueParticipantCount?: string | number;
+  uniqueSender?: string | number;
+  uniqueReceiver?: string | number;
+  uniqueParticipant?: string | number;
 }
 
 // Block Stats Items
@@ -194,13 +208,19 @@ export interface TopStatsItem {
   gas?: string;
   value?: string | number;
   transferCntr?: string | number;
+  count?: string | number;
+  blockCntr?: string | number;
+  rewardSum?: string | number;
+  txFeeSum?: string | number;
+  hashRate?: string | number;
 }
 
 export interface TopStatsResponse {
   gasTotal?: string;
   valueTotal?: string | number;
-  maxTime?: string;
+  maxTime?: string | number;
   total?: number;
+  difficultyTotal?: number;
   list: TopStatsItem[];
 }
 

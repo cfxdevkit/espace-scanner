@@ -30,3 +30,5 @@ endpoint.parameters.forEach((param) => {
   if (param.enum) console.log(`  Allowed values: ${param.enum.join(", ")}`);
   if (param.default !== undefined) console.log(`  Default: ${param.default}`);
 });
+
+console.log(generateTypeDefinitions(endpoint));

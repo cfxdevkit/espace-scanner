@@ -13,7 +13,7 @@ import util from "util";
 const inspect = <T>(obj: T): string =>
   util.inspect(obj, {
     depth: 4,
-    colors: true,
+    colors: false,
     maxArrayLength: 2,
   });
 
@@ -40,17 +40,17 @@ async function demonstrateESpaceScannerWrapperUsage(): Promise<void> {
     ];
 
     // Get single account balance
-    const balance = await mainnetScanner.getBalance(walletAddress);
+    const balance = await mainnetScanner.account.getBalance(walletAddress);
     console.log("---\ngetBalance (formatted)\n", inspect(balance));
 
-    const rawBalance = await mainnetScanner.getBalance(walletAddress, "latest_state", true);
+    const rawBalance = await mainnetScanner.account.getBalance(walletAddress, "latest_state", true);
     console.log("---\ngetBalance (raw)\n", inspect(rawBalance));
 
     // Get multiple account balances
-    const multiBalance = await mainnetScanner.getBalanceMulti(multiAddresses);
+    const multiBalance = await mainnetScanner.account.getBalanceMulti(multiAddresses);
     console.log("---\ngetBalanceMulti (formatted)\n", inspect(multiBalance));
 
-    const rawMultiBalance = await mainnetScanner.getBalanceMulti(
+    const rawMultiBalance = await mainnetScanner.account.getBalanceMulti(
       multiAddresses,
       "latest_state",
       true
@@ -58,28 +58,24 @@ async function demonstrateESpaceScannerWrapperUsage(): Promise<void> {
     console.log("---\ngetBalanceMulti (raw)\n", inspect(rawMultiBalance));
 
     // Get transaction list
-    const txList = await mainnetScanner.getTransactionList(
-      walletAddress,
-      undefined,
-      undefined,
-      1,
-      5
-    );
+    const txList = await mainnetScanner.account.getTransactionList(walletAddress);
     console.log("---\ngetTransactionList (formatted)\n", inspect(txList));
 
-    const rawTxList = await mainnetScanner.getTransactionList(
+    const rawTxList = await mainnetScanner.account.getTransactionList(
       walletAddress,
-      undefined,
-      undefined,
-      1,
-      5,
-      "desc",
+      {
+        startBlock: undefined,
+        endBlock: undefined,
+        page: 1,
+        offset: 5,
+        sort: "desc",
+      },
       true
     );
     console.log("---\ngetTransactionList (raw)\n", inspect(rawTxList));
 
     // Get internal transaction list by address
-    const internalTxList = await mainnetScanner.getInternalTransactionList({
+    const internalTxList = await mainnetScanner.transaction.getInternalTransactionList({
       address: walletAddress,
       page: 1,
       offset: 5,
@@ -89,7 +85,7 @@ async function demonstrateESpaceScannerWrapperUsage(): Promise<void> {
       inspect(internalTxList)
     );
 
-    const rawInternalTxList = await mainnetScanner.getInternalTransactionList(
+    const rawInternalTxList = await mainnetScanner.transaction.getInternalTransactionList(
       {
         address: walletAddress,
         page: 1,
@@ -106,24 +102,24 @@ async function demonstrateESpaceScannerWrapperUsage(): Promise<void> {
     const tokenAddress = "0x14b2d3bc65e74dae1030eafd8ac30c533c976a9b";
 
     // Get contract ABI
-    const contractABI = await mainnetScanner.getContractABI(contractAddress);
+    const contractABI = await mainnetScanner.contract.getContractABI(contractAddress);
     console.log("---\ngetContractABI (formatted)\n", inspect(contractABI));
 
     // Get contract source code
-    const contractSource = await mainnetScanner.getContractSourceCode(contractAddress);
+    const contractSource = await mainnetScanner.contract.getContractSourceCode(contractAddress);
     contractSource.SourceCode = contractSource.SourceCode.slice(0, 100);
     contractSource.ABI = contractSource.ABI.slice(0, 100);
     console.log("---\ngetContractSourceCode (formatted)\n", inspect(contractSource));
 
     // Get token transfers by address
-    const tokenTxList = await mainnetScanner.getTokenTransfers({
+    const tokenTxList = await mainnetScanner.token.getTokenTransfers({
       address: walletAddress,
       page: 1,
       offset: 5,
     });
     console.log("---\ngetTokenTransfers by address (formatted)\n", inspect(tokenTxList));
 
-    const rawTokenTxList = await mainnetScanner.getTokenTransfers(
+    const rawTokenTxList = await mainnetScanner.token.getTokenTransfers(
       {
         address: walletAddress,
         page: 1,
@@ -134,14 +130,14 @@ async function demonstrateESpaceScannerWrapperUsage(): Promise<void> {
     console.log("---\ngetTokenTransfers by address (raw)\n", inspect(rawTokenTxList));
 
     // Get token transfers by contract
-    const tokenTxByContract = await mainnetScanner.getTokenTransfers({
+    const tokenTxByContract = await mainnetScanner.token.getTokenTransfers({
       contractAddress: tokenAddress,
       page: 1,
       offset: 5,
     });
     console.log("---\ngetTokenTransfers by contract (formatted)\n", inspect(tokenTxByContract));
 
-    const rawTokenTxByContract = await mainnetScanner.getTokenTransfers(
+    const rawTokenTxByContract = await mainnetScanner.token.getTokenTransfers(
       {
         contractAddress: tokenAddress,
         page: 1,
@@ -152,7 +148,7 @@ async function demonstrateESpaceScannerWrapperUsage(): Promise<void> {
     console.log("---\ngetTokenTransfers by contract (raw)\n", inspect(rawTokenTxByContract));
 
     // Get token transfers filtered by both address and contract
-    const tokenTxFiltered = await mainnetScanner.getTokenTransfers({
+    const tokenTxFiltered = await mainnetScanner.token.getTokenTransfers({
       address: walletAddress,
       contractAddress: tokenAddress,
       page: 1,
@@ -160,7 +156,7 @@ async function demonstrateESpaceScannerWrapperUsage(): Promise<void> {
     });
     console.log("---\ngetTokenTransfers filtered (formatted)\n", inspect(tokenTxFiltered));
 
-    const rawTokenTxFiltered = await mainnetScanner.getTokenTransfers(
+    const rawTokenTxFiltered = await mainnetScanner.token.getTokenTransfers(
       {
         address: walletAddress,
         contractAddress: tokenAddress,
@@ -172,14 +168,14 @@ async function demonstrateESpaceScannerWrapperUsage(): Promise<void> {
     console.log("---\ngetTokenTransfers filtered (raw)\n", inspect(rawTokenTxFiltered));
 
     // Get NFT transfers by address
-    const nftTxList = await mainnetScanner.getNFTTransfers({
+    const nftTxList = await mainnetScanner.nft.getNFTTransfers({
       address: walletAddress,
       page: 1,
       offset: 5,
     });
     console.log("---\ngetNFTTransfers by address (formatted)\n", inspect(nftTxList));
 
-    const rawNftTxList = await mainnetScanner.getNFTTransfers(
+    const rawNftTxList = await mainnetScanner.nft.getNFTTransfers(
       {
         address: walletAddress,
         page: 1,
@@ -190,14 +186,14 @@ async function demonstrateESpaceScannerWrapperUsage(): Promise<void> {
     console.log("---\ngetNFTTransfers by address (raw)\n", inspect(rawNftTxList));
 
     // Get NFT transfers by contract
-    const nftTxByContract = await mainnetScanner.getNFTTransfers({
+    const nftTxByContract = await mainnetScanner.nft.getNFTTransfers({
       contractAddress: tokenAddress,
       page: 1,
       offset: 5,
     });
     console.log("---\ngetNFTTransfers by contract (formatted)\n", inspect(nftTxByContract));
 
-    const rawNftTxByContract = await mainnetScanner.getNFTTransfers(
+    const rawNftTxByContract = await mainnetScanner.nft.getNFTTransfers(
       {
         contractAddress: tokenAddress,
         page: 1,
@@ -208,7 +204,7 @@ async function demonstrateESpaceScannerWrapperUsage(): Promise<void> {
     console.log("---\ngetNFTTransfers by contract (raw)\n", inspect(rawNftTxByContract));
 
     // Get NFT transfers filtered by both address and contract
-    const nftTxFiltered = await mainnetScanner.getNFTTransfers({
+    const nftTxFiltered = await mainnetScanner.nft.getNFTTransfers({
       address: walletAddress,
       contractAddress: tokenAddress,
       page: 1,
@@ -216,7 +212,7 @@ async function demonstrateESpaceScannerWrapperUsage(): Promise<void> {
     });
     console.log("---\ngetNFTTransfers filtered (formatted)\n", inspect(nftTxFiltered));
 
-    const rawNftTxFiltered = await mainnetScanner.getNFTTransfers(
+    const rawNftTxFiltered = await mainnetScanner.nft.getNFTTransfers(
       {
         address: walletAddress,
         contractAddress: tokenAddress,
@@ -228,17 +224,29 @@ async function demonstrateESpaceScannerWrapperUsage(): Promise<void> {
     console.log("---\ngetNFTTransfers filtered (raw)\n", inspect(rawNftTxFiltered));
 
     // Get mined blocks by address
-    const minedBlocks = await mainnetScanner.getMinedBlocks(walletAddress, "blocks", 1, 5);
+    const minedBlocks = await mainnetScanner.account.getMinedBlocks(walletAddress, {
+      blockType: "blocks",
+      page: 1,
+      offset: 5,
+    });
     console.log("---\ngetMinedBlocks (formatted)\n", inspect(minedBlocks));
 
-    const rawMinedBlocks = await mainnetScanner.getMinedBlocks(walletAddress, "blocks", 1, 5, true);
+    const rawMinedBlocks = await mainnetScanner.account.getMinedBlocks(
+      walletAddress,
+      {
+        blockType: "blocks",
+        page: 1,
+        offset: 5,
+      },
+      true
+    );
     console.log("---\ngetMinedBlocks (raw)\n", inspect(rawMinedBlocks));
 
     // Get token balance
-    const tokenBalance = await mainnetScanner.getTokenBalance(tokenAddress, walletAddress);
+    const tokenBalance = await mainnetScanner.token.getTokenBalance(tokenAddress, walletAddress);
     console.log("---\ngetTokenBalance (formatted)\n", inspect(tokenBalance));
 
-    const rawTokenBalance = await mainnetScanner.getTokenBalance(
+    const rawTokenBalance = await mainnetScanner.token.getTokenBalance(
       tokenAddress,
       walletAddress,
       18,
@@ -247,25 +255,33 @@ async function demonstrateESpaceScannerWrapperUsage(): Promise<void> {
     console.log("---\ngetTokenBalance (raw)\n", inspect(rawTokenBalance));
 
     // Get token total supply
-    const tokenSupply = await mainnetScanner.getTokenSupply(tokenAddress);
+    const tokenSupply = await mainnetScanner.token.getTokenSupply(tokenAddress);
     console.log("---\ngetTokenSupply (formatted)\n", inspect(tokenSupply));
 
-    const rawTokenSupply = await mainnetScanner.getTokenSupply(tokenAddress, 18, true);
+    const rawTokenSupply = await mainnetScanner.token.getTokenSupply(tokenAddress, 18, true);
     console.log("---\ngetTokenSupply (raw)\n", inspect(rawTokenSupply));
 
     // Get block number by timestamp
     const timestamp = Math.floor(Date.now() / 1000) - 3600; // 1 hour ago
-    const blockNumber = await mainnetScanner.getBlockNumberByTime(timestamp);
+    const blockNumber = await mainnetScanner.block.getBlockNumberByTime(timestamp);
     console.log("---\ngetBlockNumberByTime (formatted)\n", inspect(blockNumber));
 
-    const rawBlockNumber = await mainnetScanner.getBlockNumberByTime(timestamp, "before", true);
+    const rawBlockNumber = await mainnetScanner.block.getBlockNumberByTime(
+      timestamp,
+      "before",
+      true
+    );
     console.log("---\ngetBlockNumberByTime (raw)\n", inspect(rawBlockNumber));
 
     // Get block number after timestamp
-    const blockNumberAfter = await mainnetScanner.getBlockNumberByTime(timestamp, "after");
+    const blockNumberAfter = await mainnetScanner.block.getBlockNumberByTime(timestamp, "after");
     console.log("---\ngetBlockNumberByTime after (formatted)\n", inspect(blockNumberAfter));
 
-    const rawBlockNumberAfter = await mainnetScanner.getBlockNumberByTime(timestamp, "after", true);
+    const rawBlockNumberAfter = await mainnetScanner.block.getBlockNumberByTime(
+      timestamp,
+      "after",
+      true
+    );
     console.log("---\ngetBlockNumberByTime after (raw)\n", inspect(rawBlockNumberAfter));
 
     // Token Methods Demonstration
@@ -273,10 +289,10 @@ async function demonstrateESpaceScannerWrapperUsage(): Promise<void> {
 
     // Test different token types with both formatted and raw data
     for (const tokenType of ["ERC20", "ERC721"] as const) {
-      const tokens = await mainnetScanner.getAccountTokens(walletAddress, tokenType);
+      const tokens = await mainnetScanner.token.getAccountTokens(walletAddress, tokenType);
       console.log(`---\ngetAccountTokens ${tokenType} (formatted)\n`, inspect(tokens));
 
-      const rawTokens = await mainnetScanner.getAccountTokens(
+      const rawTokens = await mainnetScanner.token.getAccountTokens(
         walletAddress,
         tokenType,
         0,
@@ -295,31 +311,34 @@ async function demonstrateESpaceScannerWrapperUsage(): Promise<void> {
     };
 
     // Get active accounts statistics
-    const activeAccounts = await mainnetScanner.getActiveAccountStats(statsParams);
+    const activeAccounts = await mainnetScanner.stats.getActiveAccountStats(statsParams);
     console.log("---\ngetActiveAccountStats (formatted)\n", inspect(activeAccounts));
 
-    const rawActiveAccounts = await mainnetScanner.getActiveAccountStats(statsParams, true);
+    const rawActiveAccounts = await mainnetScanner.stats.getActiveAccountStats(statsParams, true);
     console.log("---\ngetActiveAccountStats (raw)\n", inspect(rawActiveAccounts));
 
     // Get CFX holder statistics
-    const cfxHolders = await mainnetScanner.getCfxHolderStats(statsParams);
+    const cfxHolders = await mainnetScanner.stats.getCfxHolderStats(statsParams);
     console.log("---\ngetCfxHolderStats (formatted)\n", inspect(cfxHolders));
 
-    const rawCfxHolders = await mainnetScanner.getCfxHolderStats(statsParams, true);
+    const rawCfxHolders = await mainnetScanner.stats.getCfxHolderStats(statsParams, true);
     console.log("---\ngetCfxHolderStats (raw)\n", inspect(rawCfxHolders));
 
     // Get account growth statistics
-    const accountGrowth = await mainnetScanner.getAccountGrowthStats(statsParams);
+    const accountGrowth = await mainnetScanner.stats.getAccountGrowthStats(statsParams);
     console.log("---\ngetAccountGrowthStats (formatted)\n", inspect(accountGrowth));
 
-    const rawAccountGrowth = await mainnetScanner.getAccountGrowthStats(statsParams, true);
+    const rawAccountGrowth = await mainnetScanner.stats.getAccountGrowthStats(statsParams, true);
     console.log("---\ngetAccountGrowthStats (raw)\n", inspect(rawAccountGrowth));
 
     // Get TPS (Transactions Per Second) statistics
-    const tpsStats = await mainnetScanner.getTpsStats({ ...statsParams, intervalType: "hour" });
+    const tpsStats = await mainnetScanner.stats.getTpsStats({
+      ...statsParams,
+      intervalType: "hour",
+    });
     console.log("---\ngetTpsStats (formatted)\n", inspect(tpsStats));
 
-    const rawTpsStats = await mainnetScanner.getTpsStats(
+    const rawTpsStats = await mainnetScanner.stats.getTpsStats(
       { ...statsParams, intervalType: "hour" },
       true
     );
@@ -331,149 +350,116 @@ async function demonstrateESpaceScannerWrapperUsage(): Promise<void> {
     const periods = ["24h", "7d"] as const; // Using periods supported by top statistics endpoints
     for (const period of periods) {
       // Get top gas usage statistics
-      const topGasUsed = await mainnetScanner.getTopGasUsed(period);
+      const topGasUsed = await mainnetScanner.stats.getTopGasUsed(period);
       console.log(`---\ngetTopGasUsed (${period}) (formatted)\n`, inspect(topGasUsed));
 
-      const rawTopGasUsed = await mainnetScanner.getTopGasUsed(period, true);
+      const rawTopGasUsed = await mainnetScanner.stats.getTopGasUsed(period, true);
       console.log(`---\ngetTopGasUsed (${period}) (raw)\n`, inspect(rawTopGasUsed));
 
       // Get top transaction senders statistics
-      const topTxSenders = await mainnetScanner.getTopTransactionSenders(period);
+      const topTxSenders = await mainnetScanner.stats.getTopTransactionSenders(period);
       console.log(`---\ngetTopTransactionSenders (${period}) (formatted)\n`, inspect(topTxSenders));
 
-      const rawTopTxSenders = await mainnetScanner.getTopTransactionSenders(period, true);
+      const rawTopTxSenders = await mainnetScanner.stats.getTopTransactionSenders(period, true);
       console.log(`---\ngetTopTransactionSenders (${period}) (raw)\n`, inspect(rawTopTxSenders));
 
-      // Get top token transfers statistics
-      const topTokenTransfers = await mainnetScanner.getTopTokenTransfers(period);
-      console.log(
-        `---\ngetTopTokenTransfers (${period}) (formatted)\n`,
-        inspect(topTokenTransfers)
-      );
+      // Get top CFX senders statistics
+      const topCfxSenders = await mainnetScanner.stats.getTopCfxSenders(period);
+      console.log(`---\ngetTopCfxSenders (${period}) (formatted)\n`, inspect(topCfxSenders));
 
-      const rawTopTokenTransfers = await mainnetScanner.getTopTokenTransfers(period, true);
-      console.log(`---\ngetTopTokenTransfers (${period}) (raw)\n`, inspect(rawTopTokenTransfers));
+      const rawTopCfxSenders = await mainnetScanner.stats.getTopCfxSenders(period, true);
+      console.log(`---\ngetTopCfxSenders (${period}) (raw)\n`, inspect(rawTopCfxSenders));
 
-      // Get top token senders statistics
-      const topTokenSenders = await mainnetScanner.getTopTokenSenders(period);
-      console.log(`---\ngetTopTokenSenders (${period}) (formatted)\n`, inspect(topTokenSenders));
+      // Get top CFX receivers statistics
+      const topCfxReceivers = await mainnetScanner.stats.getTopCfxReceivers(period);
+      console.log(`---\ngetTopCfxReceivers (${period}) (formatted)\n`, inspect(topCfxReceivers));
 
-      const rawTopTokenSenders = await mainnetScanner.getTopTokenSenders(period, true);
-      console.log(`---\ngetTopTokenSenders (${period}) (raw)\n`, inspect(rawTopTokenSenders));
+      const rawTopCfxReceivers = await mainnetScanner.stats.getTopCfxReceivers(period, true);
+      console.log(`---\ngetTopCfxReceivers (${period}) (raw)\n`, inspect(rawTopCfxReceivers));
 
-      // Get top token receivers statistics
-      const topTokenReceivers = await mainnetScanner.getTopTokenReceivers(period);
-      console.log(
-        `---\ngetTopTokenReceivers (${period}) (formatted)\n`,
-        inspect(topTokenReceivers)
-      );
+      // Get top miners statistics
+      const topMiners = await mainnetScanner.stats.getTopMiner(period);
+      console.log(`---\ngetTopMiner (${period}) (formatted)\n`, inspect(topMiners));
 
-      const rawTopTokenReceivers = await mainnetScanner.getTopTokenReceivers(period, true);
-      console.log(`---\ngetTopTokenReceivers (${period}) (raw)\n`, inspect(rawTopTokenReceivers));
-
-      // Get top token participants statistics
-      const topTokenParticipants = await mainnetScanner.getTopTokenParticipants(period);
-      console.log(
-        `---\ngetTopTokenParticipants (${period}) (formatted)\n`,
-        inspect(topTokenParticipants)
-      );
-
-      const rawTopTokenParticipants = await mainnetScanner.getTopTokenParticipants(period, true);
-      console.log(
-        `---\ngetTopTokenParticipants (${period}) (raw)\n`,
-        inspect(rawTopTokenParticipants)
-      );
+      const rawTopMiners = await mainnetScanner.stats.getTopMiner(period, true);
+      console.log(`---\ngetTopMiner (${period}) (raw)\n`, inspect(rawTopMiners));
     }
 
     // Token Statistics Methods Demonstration
     console.log("\n=== Token Statistics Methods ===");
     // Get token holder statistics
-    const tokenHolderStats = await mainnetScanner.getTokenHolderStats(tokenAddress);
+    const tokenHolderStats = await mainnetScanner.stats.getTokenHolderStats(tokenAddress);
     console.log("---\ngetTokenHolderStats (formatted)\n", inspect(tokenHolderStats));
 
-    const rawTokenHolderStats = await mainnetScanner.getTokenHolderStats(tokenAddress, {}, true);
+    const rawTokenHolderStats = await mainnetScanner.stats.getTokenHolderStats(
+      tokenAddress,
+      {},
+      true
+    );
     console.log("---\ngetTokenHolderStats (raw)\n", inspect(rawTokenHolderStats));
-
-    // Get token unique sender statistics
-    const tokenUniqueSenderStats = await mainnetScanner.getTokenUniqueSenderStats(tokenAddress);
-    console.log("---\ngetTokenUniqueSenderStats (formatted)\n", inspect(tokenUniqueSenderStats));
-
-    const rawTokenUniqueSenderStats = await mainnetScanner.getTokenUniqueSenderStats(
-      tokenAddress,
-      {},
-      true
-    );
-    console.log("---\ngetTokenUniqueSenderStats (raw)\n", inspect(rawTokenUniqueSenderStats));
-
-    // Get token unique receiver statistics
-    const tokenUniqueReceiverStats = await mainnetScanner.getTokenUniqueReceiverStats(tokenAddress);
-    console.log(
-      "---\ngetTokenUniqueReceiverStats (formatted)\n",
-      inspect(tokenUniqueReceiverStats)
-    );
-
-    const rawTokenUniqueReceiverStats = await mainnetScanner.getTokenUniqueReceiverStats(
-      tokenAddress,
-      {},
-      true
-    );
-    console.log("---\ngetTokenUniqueReceiverStats (raw)\n", inspect(rawTokenUniqueReceiverStats));
 
     // Block Statistics Methods Demonstration
     console.log("\n=== Block Statistics Methods ===");
     // Get block base fee statistics
-    const blockBaseFeeStats = await mainnetScanner.getBlockBaseFeeStats(statsParams);
+    const blockBaseFeeStats = await mainnetScanner.stats.getBlockBaseFeeStats(statsParams);
     console.log("---\ngetBlockBaseFeeStats (formatted)\n", inspect(blockBaseFeeStats));
 
-    const rawBlockBaseFeeStats = await mainnetScanner.getBlockBaseFeeStats(statsParams, true);
+    const rawBlockBaseFeeStats = await mainnetScanner.stats.getBlockBaseFeeStats(statsParams, true);
     console.log("---\ngetBlockBaseFeeStats (raw)\n", inspect(rawBlockBaseFeeStats));
 
     // Get block gas used statistics
-    const blockGasUsedStats = await mainnetScanner.getBlockGasUsedStats(statsParams);
+    const blockGasUsedStats = await mainnetScanner.stats.getBlockGasUsedStats(statsParams);
     console.log("---\ngetBlockGasUsedStats (formatted)\n", inspect(blockGasUsedStats));
 
-    const rawBlockGasUsedStats = await mainnetScanner.getBlockGasUsedStats(statsParams, true);
+    const rawBlockGasUsedStats = await mainnetScanner.stats.getBlockGasUsedStats(statsParams, true);
     console.log("---\ngetBlockGasUsedStats (raw)\n", inspect(rawBlockGasUsedStats));
 
     // Get block average priority fee statistics
-    const blockAvgPriorityFeeStats = await mainnetScanner.getBlockAvgPriorityFeeStats(statsParams);
+    const blockAvgPriorityFeeStats =
+      await mainnetScanner.stats.getBlockAvgPriorityFeeStats(statsParams);
     console.log(
       "---\ngetBlockAvgPriorityFeeStats (formatted)\n",
       inspect(blockAvgPriorityFeeStats)
     );
 
-    const rawBlockAvgPriorityFeeStats = await mainnetScanner.getBlockAvgPriorityFeeStats(
+    const rawBlockAvgPriorityFeeStats = await mainnetScanner.stats.getBlockAvgPriorityFeeStats(
       statsParams,
       true
     );
     console.log("---\ngetBlockAvgPriorityFeeStats (raw)\n", inspect(rawBlockAvgPriorityFeeStats));
 
     // Get block transactions by type statistics
-    const blockTxsByTypeStats = await mainnetScanner.getBlockTxsByTypeStats(statsParams);
+    const blockTxsByTypeStats = await mainnetScanner.stats.getBlockTxsByTypeStats(statsParams);
     console.log("---\ngetBlockTxsByTypeStats (formatted)\n", inspect(blockTxsByTypeStats));
 
-    const rawBlockTxsByTypeStats = await mainnetScanner.getBlockTxsByTypeStats(statsParams, true);
+    const rawBlockTxsByTypeStats = await mainnetScanner.stats.getBlockTxsByTypeStats(
+      statsParams,
+      true
+    );
     console.log("---\ngetBlockTxsByTypeStats (raw)\n", inspect(rawBlockTxsByTypeStats));
 
     // Testnet Example Demonstration
     console.log("\n=== Testnet Example ===");
     // Get testnet block statistics
-    const testnetBlockStats = await testnetScanner.getBlockBaseFeeStats(statsParams);
+    const testnetBlockStats = await testnetScanner.stats.getBlockBaseFeeStats(statsParams);
     console.log("---\ngetBlockBaseFeeStats (testnet) (formatted)\n", inspect(testnetBlockStats));
 
-    const rawTestnetBlockStats = await testnetScanner.getBlockBaseFeeStats(statsParams, true);
+    const rawTestnetBlockStats = await testnetScanner.stats.getBlockBaseFeeStats(statsParams, true);
     console.log("---\ngetBlockBaseFeeStats (testnet) (raw)\n", inspect(rawTestnetBlockStats));
 
     // API Key Example Demonstration
     if (process.env.API_KEY) {
       console.log("\n=== API Key Example ===");
-      const apiKeyBlockStats = await _scannerWithApiKey.getBlockBaseFeeStats(statsParams);
+      const apiKeyBlockStats = await _scannerWithApiKey.stats.getBlockBaseFeeStats(statsParams);
       console.log(
         "---\ngetBlockBaseFeeStats (with API Key) (formatted)\n",
         inspect(apiKeyBlockStats)
       );
 
-      const rawApiKeyBlockStats = await _scannerWithApiKey.getBlockBaseFeeStats(statsParams, true);
+      const rawApiKeyBlockStats = await _scannerWithApiKey.stats.getBlockBaseFeeStats(
+        statsParams,
+        true
+      );
       console.log("---\ngetBlockBaseFeeStats (with API Key) (raw)\n", inspect(rawApiKeyBlockStats));
     }
   } catch (error) {
@@ -494,7 +480,7 @@ async function demonstrateErrorHandling(): Promise<void> {
 
   try {
     console.log("\nTesting invalid address handling...");
-    await scanner.getContractABI("0xinvalid");
+    await scanner.contract.getContractABI("0xinvalid");
   } catch (error) {
     console.error(
       "Expected error for invalid address:",
@@ -504,7 +490,7 @@ async function demonstrateErrorHandling(): Promise<void> {
 
   try {
     console.log("\nTesting non-existent contract handling...");
-    await scanner.getContractABI("0x0000000000000000000000000000000000000000");
+    await scanner.contract.getContractABI("0x0000000000000000000000000000000000000000");
   } catch (error) {
     console.error(
       "Expected error for non-existent contract:",

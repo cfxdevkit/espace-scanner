@@ -28,4 +28,12 @@ export class ResponseFormatter {
     if (value === undefined) return "N/A";
     return DateFormatter.formatTimestamp(value);
   }
+
+  static formatDate(
+    value: string | number | undefined,
+    style: "full" | "date" | "unix" = "full"
+  ): string {
+    if (value === undefined) return "N/A";
+    return DateFormatter.formatDate(value, style);
+  }
 }

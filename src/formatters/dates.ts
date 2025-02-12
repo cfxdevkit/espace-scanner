@@ -10,21 +10,29 @@ export class DateFormatter {
   /**
    * Formats a timestamp into a human-readable date string.
    * @param timestamp - Unix timestamp (seconds) or ISO date string
-   * @returns Formatted date string in "YYYY-MM-DD HH:mm:ss" format (UTC)
-   * @example
-   * formatTimestamp(1707307200) // returns "2024-02-07 12:00:00"
-   * formatTimestamp("2024-02-07T12:00:00Z") // returns "2024-02-07 12:00:00"
+   * @param style - Format style: "full" (YYYY-MM-DD HH:mm:ss), "date" (YYYY-MM-DD), or "unix" (timestamp)
+   * @returns Formatted date string in the specified format
    */
-  static formatTimestamp(timestamp: number | string): string {
+  static formatDate(timestamp: number | string, style: "full" | "date" | "unix" = "full"): string {
     try {
       const date = typeof timestamp === "string" ? new Date(timestamp) : new Date(timestamp * 1000);
       if (isNaN(date.getTime())) {
         logger.warn({ timestamp }, "Invalid timestamp provided");
         return "N/A";
       }
+
+      if (style === "unix") {
+        return Math.floor(date.getTime() / 1000).toString();
+      }
+
       const year = date.getUTCFullYear();
       const month = String(date.getUTCMonth() + 1).padStart(2, "0");
       const day = String(date.getUTCDate()).padStart(2, "0");
+
+      if (style === "date") {
+        return `${year}-${month}-${day}`;
+      }
+
       const hours = String(date.getUTCHours()).padStart(2, "0");
       const minutes = String(date.getUTCMinutes()).padStart(2, "0");
       const seconds = String(date.getUTCSeconds()).padStart(2, "0");
@@ -41,6 +49,18 @@ export class DateFormatter {
       );
       return "N/A";
     }
+  }
+
+  /**
+   * Formats a timestamp into a human-readable date string.
+   * @param timestamp - Unix timestamp (seconds) or ISO date string
+   * @returns Formatted date string in "YYYY-MM-DD HH:mm:ss" format (UTC)
+   * @example
+   * formatTimestamp(1707307200) // returns "2024-02-07 12:00:00"
+   * formatTimestamp("2024-02-07T12:00:00Z") // returns "2024-02-07 12:00:00"
+   */
+  static formatTimestamp(timestamp: number | string): string {
+    return this.formatDate(timestamp, "full");
   }
 
   /**
