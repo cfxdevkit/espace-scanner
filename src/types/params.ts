@@ -6,6 +6,8 @@ export interface BaseParams {
   page?: number;
   /** Number of items per page */
   limit?: number;
+  /** Offset */
+  offset?: number;
 }
 
 /**
@@ -38,8 +40,6 @@ export interface BlockParams extends BaseParams {
   blockHash?: string;
   /** Block type */
   blockType?: string;
-  /** Number of items to skip */
-  offset?: number;
   /** Miner address */
   miner?: string;
 }
@@ -60,8 +60,6 @@ export interface TransactionParams extends BaseParams {
   startBlock?: number;
   /** End block number */
   endBlock?: number;
-  /** Number of items to skip */
-  offset?: number;
   /** Sort order (asc/desc) */
   sort?: "asc" | "desc";
 }
