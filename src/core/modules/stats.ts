@@ -14,6 +14,10 @@ import {
 } from "../../types";
 import { ApiConfig } from "../../types/api";
 
+/**
+ * Module for interacting with statistics-related endpoints of the Conflux eSpace Scanner API.
+ * Provides methods for fetching various statistics about accounts, transactions, tokens, and blocks.
+ */
 export class StatsModule extends ESpaceApi {
   protected logger = createLogger("StatsModule");
 
@@ -23,6 +27,10 @@ export class StatsModule extends ESpaceApi {
 
   /**
    * Base method for fetching statistics data
+   * @param endpoint - API endpoint to fetch data from
+   * @param params - Optional parameters for the request
+   * @returns Promise resolving to the statistics data
+   * @internal
    */
   protected async getBasicStats<T>(endpoint: string, params: StatsParams = {}): Promise<T> {
     this.logger.debug({ endpoint, params }, "Getting basic stats");
@@ -44,6 +52,13 @@ export class StatsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Base method for fetching top statistics data
+   * @param endpoint - API endpoint to fetch data from
+   * @param spanType - Time period for the statistics
+   * @returns Promise resolving to the top statistics data
+   * @internal
+   */
   protected async getTopStats<T>(endpoint: string, spanType: StatsPeriod = "24h"): Promise<T> {
     this.logger.debug({ endpoint, spanType }, "Getting top stats");
     const response = await this.fetchApi<T>(endpoint, { spanType });
@@ -55,11 +70,20 @@ export class StatsModule extends ESpaceApi {
     return response.result;
   }
 
-  // Basic statistics methods
+  /**
+   * Get active account statistics
+   * @param params - Optional parameters for filtering and pagination
+   * @returns Promise resolving to active account statistics
+   */
   async getActiveAccountStats(params: StatsParams = {}): Promise<StatsResponse<BasicStatItem>> {
     return this.getBasicStats<StatsResponse<BasicStatItem>>("/statistics/account/active", params);
   }
 
+  /**
+   * Get CFX holder statistics
+   * @param params - Optional parameters for filtering and pagination
+   * @returns Promise resolving to CFX holder statistics
+   */
   async getCfxHolderStats(params: StatsParams = {}): Promise<StatsResponse<BasicStatItem>> {
     return this.getBasicStats<StatsResponse<BasicStatItem>>(
       "/statistics/account/cfx/holder",
