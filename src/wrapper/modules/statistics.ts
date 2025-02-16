@@ -53,6 +53,7 @@ export class StatisticsWrapper extends BaseWrapper {
     data.list = data.list?.map((item) => ({
       ...item,
       tps: item.tps ? this.formatNumber(item.tps) : item.tps,
+      statTime: item.statTime ? this.formatTimestamp(item.statTime) : item.statTime,
     }));
     return data;
   }

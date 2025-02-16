@@ -16,16 +16,48 @@ expect.extend({
       };
     }
   },
+  toBeValidHash(received: string): { message: () => string; pass: boolean } {
+    const pass = /^0x[a-fA-F0-9]{64}$/.test(received);
+    return {
+      message: (): string =>
+        pass
+          ? `expected ${received} not to be a valid hash`
+          : `expected ${received} to be a valid hash`,
+      pass,
+    };
+  },
+
+  toBeValidBlockNumber(received: string | number): { message: () => string; pass: boolean } {
+    const num = Number(received);
+    const pass = !isNaN(num) && num >= 0;
+    return {
+      message: (): string =>
+        pass
+          ? `expected ${received} not to be a valid block number`
+          : `expected ${received} to be a valid block number`,
+      pass,
+    };
+  },
 });
 
 // Global test timeout
 jest.setTimeout(30000);
 
-// Mock fetch globally
+// Add default test config
+export const TEST_CONFIG = {
+  target: "mainnet" as const,
+  apiKey: "test-api-key",
+};
+
+// Update global fetch mock with more realistic response
 global.fetch = jest.fn(() =>
   Promise.resolve({
     ok: true,
-    json: () => Promise.resolve({}),
+    json: () =>
+      Promise.resolve({
+        status: "1",
+        result: {},
+      }),
   } as Response)
 );
 
@@ -38,5 +70,7 @@ afterEach(() => {
 declare global {
   interface JestMatchers<R> {
     toBeValidAddress(): R;
+    toBeValidHash(): R;
+    toBeValidBlockNumber(): R;
   }
 }

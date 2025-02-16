@@ -73,6 +73,11 @@ export class TokenModule extends ESpaceApi {
       throw new Error(`Invalid contract address: ${params.contractaddress}`);
     }
 
+    if (!AddressValidator.validateAddress(params.address)) {
+      this.logger.error({ params }, "Invalid address provided for historical token supply");
+      throw new Error(`Invalid address: ${params.address}`);
+    }
+
     if (typeof params.blockno !== "number" || params.blockno < 0) {
       this.logger.error({ params }, "Invalid block number provided");
       throw new Error(`Invalid block number: ${params.blockno}`);

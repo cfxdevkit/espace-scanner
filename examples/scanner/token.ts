@@ -1,7 +1,6 @@
 import { TokenModule } from "../../src";
 import {
   TEST_ADDRESSES,
-  TEST_DATA,
   inspect,
   demonstrationWrapper,
   getCurrentBlockNumber,

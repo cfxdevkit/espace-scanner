@@ -16,7 +16,7 @@ export class DateFormatter {
   static formatDate(timestamp: number | string, style: "full" | "date" | "unix" = "full"): string {
     try {
       const date = typeof timestamp === "string" ? new Date(timestamp) : new Date(timestamp * 1000);
-      if (isNaN(date.getTime())) {
+      if (isNaN(date.getTime()) || timestamp === null || timestamp === undefined) {
         logger.warn({ timestamp }, "Invalid timestamp provided");
         return "N/A";
       }

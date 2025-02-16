@@ -1,7 +1,6 @@
 import { TokenWrapper } from "../../src";
 import {
   TEST_ADDRESSES,
-  TEST_DATA,
   inspect,
   demonstrationWrapper,
   MODULE_OPTIONS,

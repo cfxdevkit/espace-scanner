@@ -4,29 +4,25 @@ import { ResponseFormatter } from "../formatters";
  * Handles module instance creation and common formatting methods.
  */
 export class BaseWrapper {
-  protected readonly formatter: typeof ResponseFormatter;
-
-  constructor() {
-    this.formatter = ResponseFormatter;
-  }
+  constructor() {}
 
   protected formatTimestamp(value: string | number): string {
-    return this.formatter.formatTimestamp(value);
+    return ResponseFormatter.formatTimestamp(value);
   }
 
   protected formatCFX(value: string): string {
-    return this.formatter.formatCFX(value);
+    return ResponseFormatter.formatCFX(value);
   }
 
   protected formatGas(value: string): string {
-    return this.formatter.formatGas(value);
+    return ResponseFormatter.formatGas(value);
   }
 
   protected formatNumber(value: string | number): string {
-    return this.formatter.formatNumber(value);
+    return ResponseFormatter.formatNumber(value);
   }
 
   protected formatUnit(value: string, decimals: number): string {
-    return this.formatter.formatUnit(value, decimals);
+    return ResponseFormatter.formatUnit(value, decimals);
   }
 }

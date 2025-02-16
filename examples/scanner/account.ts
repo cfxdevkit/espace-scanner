@@ -1,7 +1,6 @@
 import { AccountModule } from "../../src";
 import {
   TEST_ADDRESSES,
-  TEST_DATA,
   BLOCK_RANGE,
   PAGINATION,
   inspect,
