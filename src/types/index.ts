@@ -2,7 +2,7 @@
 export * from "./base";
 
 // Common types
-export * from "./common";
+export * as Common from "./common";
 
 // Domain-specific types
 export * as Account from "./domains/account";

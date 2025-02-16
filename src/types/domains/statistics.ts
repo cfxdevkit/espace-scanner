@@ -1,889 +1,839 @@
-export type Supply = {
+/**
+ * @packageDocumentation
+ * Statistics-related type definitions for the Conflux eSpace Scanner SDK.
+ * Contains types for network statistics, token metrics, and account activity.
+ * @module types/domains/statistics
+ */
+
+import { PaginationParams, TimestampRangeParams, StatsIntervalType, StatsPeriod } from "../common";
+
+/**
+ * Network supply information
+ * Contains various token supply metrics
+ *
+ * @interface Supply
+ */
+export interface Supply {
   /** Total issued balance in Drip */
   totalIssued: string;
-
   /** Total circulating balance in Drip */
   totalCirculating: string;
-
   /** Total staking balance in Drip */
   totalStaking: string;
-
   /** Total collateral balance in Drip */
   totalCollateral: string;
-
   /** Zero address's balance in Drip */
   nullAddressBalance: string;
-
   /** Two year unlock address's balance in Drip */
   twoYearUnlockBalance: string;
-
-  /** Four year unlock address's balance in `Drip` */
+  /** Four year unlock address's balance in Drip */
   fourYearUnlockBalance: string;
-};
-
-// Types for /statistics/mining
-export interface MiningParams {
-  /** Indicator calculation period, should be one of min(minute), hour or day. Default is hour.
-   * @default hour
-   * @enum min, hour, day */
-  intervalType?: "min" | "hour" | "day";
-
-  /** Timestamp in seconds. */
-  minTimestamp?: number;
-
-  /** Timestamp in seconds. */
-  maxTimestamp?: number;
-
-  /** Sort in ASC or DESC order by timestamp
-   * @default DESC */
-  sort?: string;
-
-  /** The number of skipped records, usually it's pageSize * (pageNumber - 1).
-   * @default 0 */
-  skip?: number;
-
-  /** The number of records displayed on the page. Maximum 2000.
-   * @default 10 */
-  limit?: number;
 }
 
-export type Mining = {
+/**
+ * Parameters for mining statistics
+ *
+ * @interface MiningParams
+ * @extends {PaginationParams}
+ * @extends {TimestampRangeParams}
+ */
+export interface MiningParams extends PaginationParams, TimestampRangeParams {
+  /** Interval for data aggregation */
+  intervalType?: StatsIntervalType;
+}
+
+/**
+ * Mining statistics information
+ *
+ * @interface Mining
+ */
+export interface Mining {
+  /** Total number of records */
   total?: number;
-
+  /** List of mining statistics */
   list?: Array<{
+    /** Average block time in seconds */
     blockTime?: string;
-
+    /** Network hash rate */
     hashRate?: string;
-
+    /** Mining difficulty */
     difficulty?: string;
-
-    /** Statistics time, UTC. */
+    /** Statistics timestamp (UTC) */
     statTime?: string;
   }>;
-};
-
-// Types for /statistics/tps
-export interface TpsParams {
-  /** Indicate calculation period, should be one of min(minute), hour or day. Default is hour.
-   * @default hour
-   * @enum min, hour, day */
-  intervalType?: "min" | "hour" | "day";
-
-  /** Timestamp in seconds. */
-  minTimestamp?: number;
-
-  /** Timestamp in seconds. */
-  maxTimestamp?: number;
-
-  /** Sort in ASC or DESC order by timestamp
-   * @default DESC */
-  sort?: string;
-
-  /** The number of skipped records, usually it's pageSize * (pageNumber - 1).
-   * @default 0 */
-  skip?: number;
-
-  /** The number of records displayed on the page. Maximum 2000.
-   * @default 10 */
-  limit?: number;
 }
 
-export type Tps = {
-  total?: number | string;
+/**
+ * Parameters for TPS (Transactions Per Second) statistics
+ *
+ * @interface TpsParams
+ * @extends {PaginationParams}
+ * @extends {TimestampRangeParams}
+ */
+export interface TpsParams extends PaginationParams, TimestampRangeParams {
+  /** Interval for data aggregation */
+  intervalType?: StatsIntervalType;
+}
 
+/**
+ * TPS statistics information
+ *
+ * @interface Tps
+ */
+export interface Tps {
+  /** Total number of records */
+  total?: number | string;
+  /** List of TPS statistics */
   list?: Array<{
+    /** Transactions per second */
     tps?: string;
-
-    /** Statistics time, UTC. */
+    /** Statistics timestamp (UTC) */
     statTime?: string;
   }>;
-};
-
-// Types for /statistics/contract
-export interface ContractParams {
-  /** Timestamp in seconds. */
-  minTimestamp?: number;
-
-  /** Timestamp in seconds. */
-  maxTimestamp?: number;
-
-  /** Sort in ASC or DESC order by timestamp
-   * @default DESC */
-  sort?: string;
-
-  /** The number of skipped records, usually it's pageSize * (pageNumber - 1).
-   * @default 0 */
-  skip?: number;
-
-  /** The number of records displayed on the page. Maximum 2000.
-   * @default 10 */
-  limit?: number;
 }
 
-export type Contract = {
+/**
+ * Parameters for contract statistics
+ *
+ * @interface ContractParams
+ * @extends {PaginationParams}
+ * @extends {TimestampRangeParams}
+ */
+export interface ContractParams extends PaginationParams, TimestampRangeParams {}
+
+/**
+ * Contract deployment statistics
+ *
+ * @interface Contract
+ */
+export interface Contract {
+  /** Total number of records */
   total?: number | string;
-
+  /** List of contract statistics */
   list?: Array<{
-    /** daily deployed contracts. */
+    /** Daily deployed contracts count */
     count?: string;
-
-    /** total deployed contracts. */
+    /** Total deployed contracts count */
     total?: string;
-
-    /** Statistics time, UTC. */
+    /** Statistics timestamp (UTC) */
     statTime?: string;
   }>;
-};
-
-// Types for /statistics/account/cfx/holder
-export interface CfxHolderParams {
-  /** Timestamp in seconds. */
-  minTimestamp?: number;
-
-  /** Timestamp in seconds. */
-  maxTimestamp?: number;
-
-  /** Sort in ASC or DESC order by timestamp
-   * @default DESC */
-  sort?: string;
-
-  /** The number of skipped records, usually it's pageSize * (pageNumber - 1).
-   * @default 0 */
-  skip?: number;
-
-  /** The number of records displayed on the page. Maximum 2000.
-   * @default 10 */
-  limit?: number;
 }
 
-export type CfxHolder = {
-  total?: number | string;
+/**
+ * Parameters for CFX holder statistics
+ *
+ * @interface CfxHolderParams
+ * @extends {PaginationParams}
+ * @extends {TimestampRangeParams}
+ */
+export interface CfxHolderParams extends PaginationParams, TimestampRangeParams {}
 
+/**
+ * CFX holder statistics
+ *
+ * @interface CfxHolder
+ */
+export interface CfxHolder {
+  /** Total number of records */
+  total?: number | string;
+  /** List of holder statistics */
   list?: Array<{
-    /** total cfx holders count by daily */
+    /** Daily CFX holders count */
     count?: string;
-
-    /** Statistics time, UTC. */
+    /** Statistics timestamp (UTC) */
     statTime?: string;
   }>;
-};
-
-// Types for /statistics/account/growth
-export interface AccountGrowthParams {
-  /** Timestamp in seconds. */
-  minTimestamp?: number;
-
-  /** Timestamp in seconds. */
-  maxTimestamp?: number;
-
-  /** Sort in ASC or DESC order by timestamp
-   * @default DESC */
-  sort?: string;
-
-  /** The number of skipped records, usually it's pageSize * (pageNumber - 1).
-   * @default 0 */
-  skip?: number;
-
-  /** The number of records displayed on the page. Maximum 2000.
-   * @default 10 */
-  limit?: number;
 }
 
-export type AccountGrowth = {
-  total?: number | string;
+/**
+ * Parameters for account growth statistics
+ *
+ * @interface AccountGrowthParams
+ * @extends {PaginationParams}
+ * @extends {TimestampRangeParams}
+ */
+export interface AccountGrowthParams extends PaginationParams, TimestampRangeParams {}
 
+/**
+ * Account growth statistics
+ *
+ * @interface AccountGrowth
+ */
+export interface AccountGrowth {
+  /** Total number of records */
+  total?: number | string;
+  /** List of account growth statistics */
   list?: Array<{
-    /** daily account growth count. */
+    /** Daily new accounts count */
     count?: string;
-
-    /** Statistics time, UTC. */
+    /** Statistics timestamp (UTC) */
     statTime?: string;
   }>;
-};
-
-// Types for /statistics/account/active
-export interface AccountActiveParams {
-  /** Timestamp in seconds. */
-  minTimestamp?: number;
-
-  /** Timestamp in seconds. */
-  maxTimestamp?: number;
-
-  /** Sort in ASC or DESC order by timestamp
-   * @default DESC */
-  sort?: string;
-
-  /** The number of skipped records, usually it's pageSize * (pageNumber - 1).
-   * @default 0 */
-  skip?: number;
-
-  /** The number of records displayed on the page. Maximum 2000.
-   * @default 10 */
-  limit?: number;
 }
 
-export type AccountActive = {
-  total?: number | string;
+/**
+ * Parameters for account activity statistics
+ *
+ * @interface AccountActiveParams
+ * @extends {PaginationParams}
+ * @extends {TimestampRangeParams}
+ */
+export interface AccountActiveParams extends PaginationParams, TimestampRangeParams {}
 
+/**
+ * Account activity statistics
+ *
+ * @interface AccountActive
+ */
+export interface AccountActive {
+  /** Total number of records */
+  total?: number | string;
+  /** List of account activity statistics */
   list?: Array<{
-    /** daily active account count. */
+    /** Daily active accounts count */
     count?: string;
-
-    /** Statistics time, UTC. */
+    /** Statistics timestamp (UTC) */
     statTime?: string;
   }>;
-};
-
-// Types for /statistics/account/active/overall
-export interface ActiveOverallParams {
-  /** Timestamp in seconds. */
-  minTimestamp?: number;
-
-  /** Timestamp in seconds. */
-  maxTimestamp?: number;
-
-  /** Sort in ASC or DESC order by timestamp
-   * @default DESC */
-  sort?: string;
-
-  /** The number of skipped records, usually it's pageSize * (pageNumber - 1).
-   * @default 0 */
-  skip?: number;
-
-  /** The number of records displayed on the page. Maximum 2000.
-   * @default 10 */
-  limit?: number;
 }
 
-export type ActiveOverall = {
-  total?: number | string;
+/**
+ * Parameters for overall account activity statistics
+ *
+ * @interface ActiveOverallParams
+ * @extends {PaginationParams}
+ * @extends {TimestampRangeParams}
+ */
+export interface ActiveOverallParams extends PaginationParams, TimestampRangeParams {}
 
+/**
+ * Overall account activity statistics
+ *
+ * @interface ActiveOverall
+ */
+export interface ActiveOverall {
+  /** Total number of records */
+  total?: number | string;
+  /** List of overall activity statistics */
   list?: Array<{
-    /** daily active account count. */
+    /** Daily active accounts count */
     count?: string;
-
-    /** Statistics time, UTC. */
+    /** Statistics timestamp (UTC) */
     statTime?: string;
   }>;
-};
-
-// Types for /statistics/transaction
-export interface TransactionParams {
-  /** Timestamp in seconds. */
-  minTimestamp?: number;
-
-  /** Timestamp in seconds. */
-  maxTimestamp?: number;
-
-  /** Sort in ASC or DESC order by timestamp
-   * @default DESC */
-  sort?: string;
-
-  /** The number of skipped records, usually it's pageSize * (pageNumber - 1).
-   * @default 0 */
-  skip?: number;
-
-  /** The number of records displayed on the page. Maximum 2000.
-   * @default 10 */
-  limit?: number;
 }
 
-export type Transaction = {
-  total?: number | string;
+/**
+ * Parameters for transaction statistics
+ *
+ * @interface TransactionParams
+ * @extends {PaginationParams}
+ * @extends {TimestampRangeParams}
+ */
+export interface TransactionParams extends PaginationParams, TimestampRangeParams {}
 
+/**
+ * Transaction statistics
+ *
+ * @interface Transaction
+ */
+export interface Transaction {
+  /** Total number of records */
+  total?: number | string;
+  /** List of transaction statistics */
   list?: Array<{
-    /** daily transaction count. */
+    /** Daily transaction count */
     count?: string;
-
-    /** Statistics time, UTC. */
+    /** Statistics timestamp (UTC) */
     statTime?: string;
   }>;
-};
-
-// Types for /statistics/cfx/transfer
-export interface CfxTransferParams {
-  /** Timestamp in seconds. */
-  minTimestamp?: number;
-
-  /** Timestamp in seconds. */
-  maxTimestamp?: number;
-
-  /** Sort in ASC or DESC order by timestamp
-   * @default DESC */
-  sort?: string;
-
-  /** The number of skipped records, usually it's pageSize * (pageNumber - 1).
-   * @default 0 */
-  skip?: number;
-
-  /** The number of records displayed on the page. Maximum 2000.
-   * @default 10 */
-  limit?: number;
 }
 
-export type CfxTransfer = {
-  total?: number | string;
+/**
+ * Parameters for CFX transfer statistics
+ *
+ * @interface CfxTransferParams
+ * @extends {PaginationParams}
+ * @extends {TimestampRangeParams}
+ */
+export interface CfxTransferParams extends PaginationParams, TimestampRangeParams {}
 
+/**
+ * CFX transfer statistics
+ *
+ * @interface CfxTransfer
+ */
+export interface CfxTransfer {
+  /** Total number of records */
+  total?: number | string;
+  /** List of transfer statistics */
   list?: Array<{
-    /** daily cfx transfer count. */
+    /** Daily CFX transfer count */
     transferCount?: string;
-
-    /** daily user count. */
+    /** Daily unique users count */
     userCount?: string;
-
-    /** daily amount of cfx transfer. */
+    /** Daily total CFX amount transferred */
     amount?: string;
-
-    /** Statistics time, UTC. */
+    /** Statistics timestamp (UTC) */
     statTime?: string;
   }>;
-};
+}
 
-// Types for /statistics/token/transfer
-export interface TokenTransferParams {
-  /** Contract address, it's like 0x672158893ce87d812befd2209bc1b7818fe48b2a */
+/**
+ * Parameters for token transfer statistics
+ *
+ * @interface TokenTransferParams
+ * @extends {PaginationParams}
+ * @extends {TimestampRangeParams}
+ */
+export interface TokenTransferParams extends PaginationParams, TimestampRangeParams {
+  /** Token contract address */
   contract?: string;
-
-  /** Timestamp in seconds. */
-  minTimestamp?: number;
-
-  /** Timestamp in seconds. */
-  maxTimestamp?: number;
-
-  /** Sort in ASC or DESC order by timestamp
-   * @default DESC */
-  sort?: string;
-
-  /** The number of skipped records, usually it's pageSize * (pageNumber - 1).
-   * @default 0 */
-  skip?: number;
-
-  /** The number of records displayed on the page. Maximum 2000.
-   * @default 10 */
-  limit?: number;
 }
 
-export type TokenTransfer = {
+/**
+ * Token transfer statistics
+ *
+ * @interface TokenTransfer
+ */
+export interface TokenTransfer {
+  /** Total number of records */
   total?: number | string;
-
+  /** List of token transfer statistics */
   list?: Array<{
-    /** daily token transfer count. */
+    /** Daily token transfer count */
     transferCount?: string;
-
-    /** daily user count. */
+    /** Daily unique users count */
     userCount?: string;
-
-    /** Statistics time, UTC. */
+    /** Statistics timestamp (UTC) */
     statTime?: string;
   }>;
-};
-
-// Types for /statistics/top/gas/used
-export interface TopGasUsedParams {
-  /** Calculates the ranking in the specified time span 24h, 3d or 7d. If not provided, default value is 24h
-   * @default 24h */
-  spanType?: string;
 }
 
-export type TopGasUsed = {
+/**
+ * Parameters for top gas used statistics
+ *
+ * @interface TopGasUsedParams
+ */
+export interface TopGasUsedParams {
+  /** Time span for ranking calculation */
+  spanType?: StatsPeriod;
+}
+
+/**
+ * Top gas used statistics
+ *
+ * @interface TopGasUsed
+ */
+export interface TopGasUsed {
+  /** Total gas used */
   gasTotal?: string;
-
+  /** List of top gas users */
   list?: Array<{
-    /** account address. */
+    /** Account address */
     address?: string;
-
-    /** gas used. */
+    /** Gas used amount */
     gas?: string;
   }>;
-};
-
-// Types for /statistics/top/miner
-export interface TopMinerParams {
-  /** Calculates the ranking in the specified time span 24h, 3d or 7d. If not provided, default value is 24h
-   * @default 24h */
-  spanType?: string;
 }
 
-export type TopMiner = {
+/**
+ * Parameters for top miner statistics
+ *
+ * @interface TopMinerParams
+ */
+export interface TopMinerParams {
+  /** Time span for ranking calculation */
+  spanType?: StatsPeriod;
+}
+
+/**
+ * Top miner statistics
+ *
+ * @interface TopMiner
+ */
+export interface TopMiner {
+  /** Minimum timestamp in range */
   minTime?: string;
-
+  /** Maximum timestamp in range */
   maxTime?: string;
-
+  /** Total difficulty in range */
   difficultyTotal?: string;
-
+  /** List of top miners */
   list?: Array<{
-    /** account address. */
+    /** Miner address */
     address?: string;
-
-    /** block count */
+    /** Blocks mined count */
     blockCntr?: string;
-
-    /** reward sum */
+    /** Total mining rewards */
     rewardSum?: string;
-
-    /** tx fee sum */
+    /** Total transaction fees */
     txFeeSum?: string;
-
-    /** hash rate */
+    /** Hash rate */
     hashRate?: string;
   }>;
-};
+}
 
-// Types for /statistics/top/transaction/sender
+/**
+ * Parameters for top transaction sender statistics
+ *
+ * @interface TopTransactionSenderParams
+ */
 export interface TopTransactionSenderParams {
-  /** Calculates the ranking in the specified time span 24h, 3d or 7d. If not provided, default value is 24h
-   * @default 24h */
-  spanType?: string;
+  /** Time span for ranking calculation */
+  spanType?: StatsPeriod;
 }
 
-export type TopTransactionSender = {
+/**
+ * Top transaction sender statistics
+ *
+ * @interface TopTransactionSender
+ */
+export interface TopTransactionSender {
+  /** Minimum timestamp in range */
   minTime?: string;
-
+  /** Maximum timestamp in range */
   maxTime?: string;
-
+  /** Total value in range */
   valueTotal?: string;
-
+  /** List of top senders */
   list?: Array<{
-    /** account address. */
+    /** Account address */
     address?: string;
-
-    /** address transaction count. */
+    /** Transaction count */
     value?: string;
   }>;
-};
+}
 
-// Types for /statistics/top/transaction/receiver
+/**
+ * Parameters for top transaction receiver statistics
+ *
+ * @interface TopTransactionReceiverParams
+ */
 export interface TopTransactionReceiverParams {
-  /** Calculates the ranking in the specified time span 24h, 3d or 7d. If not provided, default value is 24h
-   * @default 24h */
-  spanType?: string;
+  /** Time span for ranking calculation */
+  spanType?: StatsPeriod;
 }
 
-export type TopTransactionReceiver = {
+/**
+ * Top transaction receiver statistics
+ *
+ * @interface TopTransactionReceiver
+ */
+export interface TopTransactionReceiver {
+  /** Minimum timestamp in range */
   minTime?: string;
-
+  /** Maximum timestamp in range */
   maxTime?: string;
-
+  /** Total value in range */
   valueTotal?: string;
-
+  /** List of top receivers */
   list?: Array<{
-    /** account address. */
+    /** Account address */
     address?: string;
-
-    /** address transaction count. */
+    /** Transaction count */
     value?: string;
   }>;
-};
+}
 
-// Types for /statistics/top/cfx/sender
+/**
+ * Parameters for top CFX sender statistics
+ *
+ * @interface TopCfxSenderParams
+ */
 export interface TopCfxSenderParams {
-  /** Calculates the ranking in the specified time span 24h, 3d or 7d. If not provided, default value is 24h
-   * @default 24h */
-  spanType?: string;
+  /** Time span for ranking calculation */
+  spanType?: StatsPeriod;
 }
 
-export type TopCfxSender = {
+/**
+ * Top CFX sender statistics
+ *
+ * @interface TopCfxSender
+ */
+export interface TopCfxSender {
+  /** Minimum timestamp in range */
   minTime?: string;
-
+  /** Maximum timestamp in range */
   maxTime?: string;
-
+  /** Total value in range */
   valueTotal?: string;
-
+  /** List of top senders */
   list?: Array<{
-    /** account address. */
+    /** Account address */
     address?: string;
-
-    /** address transfer value. */
+    /** Total CFX sent */
     value?: string;
   }>;
-};
+}
 
-// Types for /statistics/top/cfx/receiver
+/**
+ * Parameters for top CFX receiver statistics
+ *
+ * @interface TopCfxReceiverParams
+ */
 export interface TopCfxReceiverParams {
-  /** Calculates the ranking in the specified time span 24h, 3d or 7d. If not provided, default value is 24h
-   * @default 24h */
-  spanType?: string;
+  /** Time span for ranking calculation */
+  spanType?: StatsPeriod;
 }
 
-export type TopCfxReceiver = {
+/**
+ * Top CFX receiver statistics
+ *
+ * @interface TopCfxReceiver
+ */
+export interface TopCfxReceiver {
+  /** Minimum timestamp in range */
   minTime?: string;
-
+  /** Maximum timestamp in range */
   maxTime?: string;
-
+  /** Total value in range */
   valueTotal?: string;
-
+  /** List of top receivers */
   list?: Array<{
-    /** account address. */
+    /** Account address */
     address?: string;
-
-    /** address transfer value. */
+    /** Total CFX received */
     value?: string;
   }>;
-};
+}
 
-// Types for /statistics/top/token/transfer
+/**
+ * Parameters for top token transfer statistics
+ *
+ * @interface TopTokenTransferParams
+ */
 export interface TopTokenTransferParams {
-  /** Calculates the ranking in the specified time span 24h, 3d or 7d. If not provided, default value is 24h
-   * @default 24h */
-  spanType?: string;
+  /** Time span for ranking calculation */
+  spanType?: StatsPeriod;
 }
 
-export type TopTokenTransfer = {
+/**
+ * Top token transfer statistics
+ *
+ * @interface TopTokenTransfer
+ */
+export interface TopTokenTransfer {
+  /** List of top transferred tokens */
   list?: Array<{
-    /** token address. */
+    /** Token contract address */
     address?: string;
-
-    /** token transfer count. */
+    /** Transfer count */
     transferCntr?: string;
   }>;
-};
-
-// Types for /statistics/top/token/sender
-export interface TopTokenSenderParams {
-  /** Calculates the ranking in the specified time span 24h, 3d or 7d. If not provided, default value is 24h
-   * @default 24h */
-  spanType?: string;
 }
 
-export type TopTokenSender = {
-  list?: Array<{
-    /** token address. */
-    address?: string;
+/**
+ * Parameters for top token sender statistics
+ *
+ * @interface TopTokenSenderParams
+ */
+export interface TopTokenSenderParams {
+  /** Time span for ranking calculation */
+  spanType?: StatsPeriod;
+}
 
-    /** token sender count. */
+/**
+ * Top token sender statistics
+ *
+ * @interface TopTokenSender
+ */
+export interface TopTokenSender {
+  /** List of top token senders */
+  list?: Array<{
+    /** Account address */
+    address?: string;
+    /** Send count */
     value?: string;
   }>;
-};
+}
 
-// Types for /statistics/top/token/receiver
+/**
+ * Parameters for top token receiver statistics
+ *
+ * @interface TopTokenReceiverParams
+ */
 export interface TopTokenReceiverParams {
-  /** Calculates the ranking in the specified time span 24h, 3d or 7d. If not provided, default value is 24h
-   * @default 24h */
-  spanType?: string;
+  /** Time span for ranking calculation */
+  spanType?: StatsPeriod;
 }
 
-export type TopTokenReceiver = {
+/**
+ * Top token receiver statistics
+ *
+ * @interface TopTokenReceiver
+ */
+export interface TopTokenReceiver {
+  /** Maximum timestamp in range */
   maxTime?: string;
+  /** List of top token receivers */
   list?: Array<{
-    /** token address. */
+    /** Account address */
     address?: string;
-
-    /** token receiver count. */
+    /** Receive count */
     transferCntr?: string;
   }>;
-};
+}
 
-// Types for /statistics/top/token/participant
+/**
+ * Parameters for top token participant statistics
+ *
+ * @interface TopTokenParticipantParams
+ */
 export interface TopTokenParticipantParams {
-  /** Calculates the ranking in the specified time span 24h, 3d or 7d. If not provided, default value is 24h
-   * @default 24h */
-  spanType?: string;
+  /** Time span for ranking calculation */
+  spanType?: StatsPeriod;
 }
 
-export type TopTokenParticipant = {
+/**
+ * Top token participant statistics
+ *
+ * @interface TopTokenParticipant
+ */
+export interface TopTokenParticipant {
+  /** Maximum timestamp in range */
   maxTime?: string;
+  /** List of top token participants */
   list?: Array<{
-    /** token address. */
+    /** Account address */
     address?: string;
-
-    /** token participant count. */
+    /** Participation count */
     transferCntr?: string;
   }>;
-};
-
-// Types for /statistics/token/holder
-export interface TokenHolderParams {
-  /** Contract address, it's like 0x672158893ce87d812befd2209bc1b7818fe48b2a */
-  contract: string;
-
-  /** Timestamp in seconds. */
-  minTimestamp?: number;
-
-  /** Timestamp in seconds. */
-  maxTimestamp?: number;
-
-  /** Sort in ASC or DESC order by timestamp
-   * @default DESC */
-  sort?: string;
-
-  /** The number of skipped records, usually it's pageSize * (pageNumber - 1).
-   * @default 0 */
-  skip?: number;
-
-  /** The number of records displayed on the page. Maximum 2000.
-   * @default 10 */
-  limit?: number;
 }
 
-export type TokenHolder = {
+/**
+ * Parameters for token holder statistics
+ *
+ * @interface TokenHolderParams
+ * @extends {PaginationParams}
+ * @extends {TimestampRangeParams}
+ */
+export interface TokenHolderParams extends PaginationParams, TimestampRangeParams {
+  /** Token contract address */
+  contract: string;
+}
+
+/**
+ * Token holder statistics
+ *
+ * @interface TokenHolder
+ */
+export interface TokenHolder {
+  /** Total number of records */
   total?: number | string;
-
+  /** List of holder statistics */
   list?: Array<{
-    /** Statistics time, UTC. */
+    /** Statistics timestamp (UTC) */
     statTime?: string;
-
-    /** daily holder count of token. */
+    /** Daily holder count */
     holderCount?: string;
   }>;
-};
-
-// Types for /statistics/token/unique/sender
-export interface UniqueSenderParams {
-  /** Contract address, it's like 0x672158893ce87d812befd2209bc1b7818fe48b2a */
-  contract: string;
-
-  /** Timestamp in seconds. */
-  minTimestamp?: number;
-
-  /** Timestamp in seconds. */
-  maxTimestamp?: number;
-
-  /** Sort in ASC or DESC order by timestamp
-   * @default DESC */
-  sort?: string;
-
-  /** The number of skipped records, usually it's pageSize * (pageNumber - 1).
-   * @default 0 */
-  skip?: number;
-
-  /** The number of records displayed on the page. Maximum 2000.
-   * @default 10 */
-  limit?: number;
 }
 
-export type UniqueSender = {
+/**
+ * Parameters for unique token sender statistics
+ *
+ * @interface UniqueSenderParams
+ * @extends {PaginationParams}
+ * @extends {TimestampRangeParams}
+ */
+export interface UniqueSenderParams extends PaginationParams, TimestampRangeParams {
+  /** Token contract address */
+  contract: string;
+}
+
+/**
+ * Unique token sender statistics
+ *
+ * @interface UniqueSender
+ */
+export interface UniqueSender {
+  /** Total number of records */
   total?: number | string;
-
+  /** List of sender statistics */
   list?: Array<{
-    /** Statistics time, UTC. */
+    /** Statistics timestamp (UTC) */
     statTime?: string;
-
-    /** daily unique sender count of token transfer. */
+    /** Daily unique sender count */
     uniqueSenderCount?: string;
   }>;
-};
-
-// Types for /statistics/token/unique/receiver
-export interface UniqueReceiverParams {
-  /** Contract address, it's like 0x672158893ce87d812befd2209bc1b7818fe48b2a */
-  contract: string;
-
-  /** Timestamp in seconds. */
-  minTimestamp?: number;
-
-  /** Timestamp in seconds. */
-  maxTimestamp?: number;
-
-  /** Sort in ASC or DESC order by timestamp
-   * @default DESC */
-  sort?: string;
-
-  /** The number of skipped records, usually it's pageSize * (pageNumber - 1).
-   * @default 0 */
-  skip?: number;
-
-  /** The number of records displayed on the page. Maximum 2000.
-   * @default 10 */
-  limit?: number;
 }
 
-export type UniqueReceiver = {
+/**
+ * Parameters for unique token receiver statistics
+ *
+ * @interface UniqueReceiverParams
+ * @extends {PaginationParams}
+ * @extends {TimestampRangeParams}
+ */
+export interface UniqueReceiverParams extends PaginationParams, TimestampRangeParams {
+  /** Token contract address */
+  contract: string;
+}
+
+/**
+ * Unique token receiver statistics
+ *
+ * @interface UniqueReceiver
+ */
+export interface UniqueReceiver {
+  /** Total number of records */
   total?: number | string;
-
+  /** List of receiver statistics */
   list?: Array<{
-    /** Statistics time, UTC. */
+    /** Statistics timestamp (UTC) */
     statTime?: string;
-
-    /** daily unique receiver count of token transfer. */
+    /** Daily unique receiver count */
     uniqueReceiverCount?: string;
   }>;
-};
-
-// Types for /statistics/token/unique/participant
-export interface UniqueParticipantParams {
-  /** Contract address, it's like 0x672158893ce87d812befd2209bc1b7818fe48b2a */
-  contract: string;
-
-  /** Timestamp in seconds. */
-  minTimestamp?: number;
-
-  /** Timestamp in seconds. */
-  maxTimestamp?: number;
-
-  /** Sort in ASC or DESC order by timestamp
-   * @default DESC */
-  sort?: string;
-
-  /** The number of skipped records, usually it's pageSize * (pageNumber - 1).
-   * @default 0 */
-  skip?: number;
-
-  /** The number of records displayed on the page. Maximum 2000.
-   * @default 10 */
-  limit?: number;
 }
 
-export type UniqueParticipant = {
+/**
+ * Parameters for unique token participant statistics
+ *
+ * @interface UniqueParticipantParams
+ * @extends {PaginationParams}
+ * @extends {TimestampRangeParams}
+ */
+export interface UniqueParticipantParams extends PaginationParams, TimestampRangeParams {
+  /** Token contract address */
+  contract: string;
+}
+
+/**
+ * Unique token participant statistics
+ *
+ * @interface UniqueParticipant
+ */
+export interface UniqueParticipant {
+  /** Total number of records */
   total?: number | string;
-
+  /** List of participant statistics */
   list?: Array<{
-    /** Statistics time, UTC. */
+    /** Statistics timestamp (UTC) */
     statTime?: string;
-
-    /** daily unique participant count of token transfer. */
+    /** Daily unique participant count */
     uniqueParticipantCount?: string;
   }>;
-};
-
-// Types for /statistics/block/base-fee
-export interface BlockBasefeeParams {
-  /** Timestamp in seconds. */
-  minTimestamp?: number;
-
-  /** Timestamp in seconds. */
-  maxTimestamp?: number;
-
-  /** Sort in ASC or DESC order by timestamp
-   * @default DESC */
-  sort?: string;
-
-  /** The number of skipped records, usually it's pageSize * (pageNumber - 1).
-   * @default 0 */
-  skip?: number;
-
-  /** The number of records displayed on the page. Maximum 2000.
-   * @default 10 */
-  limit?: number;
 }
 
-export type BlockBasefee = {
-  total?: number | string;
+/**
+ * Parameters for block base fee statistics
+ *
+ * @interface BlockBasefeeParams
+ * @extends {PaginationParams}
+ * @extends {TimestampRangeParams}
+ */
+export interface BlockBasefeeParams extends PaginationParams, TimestampRangeParams {}
 
+/**
+ * Block base fee statistics
+ *
+ * @interface BlockBasefee
+ */
+export interface BlockBasefee {
+  /** Total number of records */
+  total?: number | string;
+  /** List of base fee statistics */
   list?: Array<{
-    /** Base fee per gas. */
+    /** Base fee per gas */
     baseFee?: string;
-
-    /** Block Number. */
+    /** Block number */
     blockNumber?: number;
-
-    /** Block timestamp, UTC. */
+    /** Block timestamp (UTC) */
     timestamp?: number | string;
   }>;
-};
-
-// Types for /statistics/block/avg-priority-fee
-export interface BlockAvgpriorityfeeParams {
-  /** Timestamp in seconds. */
-  minTimestamp?: number;
-
-  /** Timestamp in seconds. */
-  maxTimestamp?: number;
-
-  /** Sort in ASC or DESC order by timestamp
-   * @default DESC */
-  sort?: string;
-
-  /** The number of skipped records, usually it's pageSize * (pageNumber - 1).
-   * @default 0 */
-  skip?: number;
-
-  /** The number of records displayed on the page. Maximum 2000.
-   * @default 10 */
-  limit?: number;
 }
 
-export type BlockAvgpriorityfee = {
-  total?: number | string;
+/**
+ * Parameters for block average priority fee statistics
+ *
+ * @interface BlockAvgpriorityfeeParams
+ * @extends {PaginationParams}
+ * @extends {TimestampRangeParams}
+ */
+export interface BlockAvgpriorityfeeParams extends PaginationParams, TimestampRangeParams {}
 
+/**
+ * Block average priority fee statistics
+ *
+ * @interface BlockAvgpriorityfee
+ */
+export interface BlockAvgpriorityfee {
+  /** Total number of records */
+  total?: number | string;
+  /** List of priority fee statistics */
   list?: Array<{
-    /** Average priority fee per gas. */
+    /** Average priority fee per gas */
     avgPriorityFee?: string;
-
-    /** Block Number. */
+    /** Block number */
     blockNumber?: number;
-
-    /** Block timestamp, UTC. */
+    /** Block timestamp (UTC) */
     timestamp?: number | string;
   }>;
-};
-
-// Types for /statistics/block/gas-used
-export interface BlockGasusedParams {
-  /** Timestamp in seconds. */
-  minTimestamp?: number;
-
-  /** Timestamp in seconds. */
-  maxTimestamp?: number;
-
-  /** Sort in ASC or DESC order by timestamp
-   * @default DESC */
-  sort?: string;
-
-  /** The number of skipped records, usually it's pageSize * (pageNumber - 1).
-   * @default 0 */
-  skip?: number;
-
-  /** The number of records displayed on the page. Maximum 2000.
-   * @default 10 */
-  limit?: number;
 }
 
-export type BlockGasused = {
-  total?: number | string;
+/**
+ * Parameters for block gas used statistics
+ *
+ * @interface BlockGasusedParams
+ * @extends {PaginationParams}
+ * @extends {TimestampRangeParams}
+ */
+export interface BlockGasusedParams extends PaginationParams, TimestampRangeParams {}
 
+/**
+ * Block gas used statistics
+ *
+ * @interface BlockGasused
+ */
+export interface BlockGasused {
+  /** Total number of records */
+  total?: number | string;
+  /** List of gas used statistics */
   list?: Array<{
-    /** Gas used. */
+    /** Gas used amount */
     gasUsed?: string;
-
-    /** Block Number. */
+    /** Block number */
     blockNumber?: number;
-
-    /** Block timestamp, UTC. */
+    /** Block timestamp (UTC) */
     timestamp?: number | string;
   }>;
-};
-
-// Types for /statistics/block/txs-by-type
-export interface BlockTxsbytypeParams {
-  /** Timestamp in seconds. */
-  minTimestamp?: number;
-
-  /** Timestamp in seconds. */
-  maxTimestamp?: number;
-
-  /** Sort in ASC or DESC order by timestamp
-   * @default DESC */
-  sort?: string;
-
-  /** The number of skipped records, usually it's pageSize * (pageNumber - 1).
-   * @default 0 */
-  skip?: number;
-
-  /** The number of records displayed on the page. Maximum 2000.
-   * @default 10 */
-  limit?: number;
 }
 
-export type BlockTxsbytype = {
+/**
+ * Parameters for block transactions by type statistics
+ *
+ * @interface BlockTxsbytypeParams
+ * @extends {PaginationParams}
+ * @extends {TimestampRangeParams}
+ */
+export interface BlockTxsbytypeParams extends PaginationParams, TimestampRangeParams {}
+
+/**
+ * Block transactions by type statistics
+ *
+ * @interface BlockTxsbytype
+ */
+export interface BlockTxsbytype {
+  /** Total number of records */
   total?: number | string;
-
+  /** List of transaction type statistics */
   list?: Array<{
-    /** Transactions by type. */
+    /** Transaction counts by type */
     txsByType?: {
-      /** Number of transactions of type legacy. */
+      /** Legacy transaction count */
       legacy?: number;
-
-      /** Number of transactions of type CIP2930. */
+      /** CIP2930 transaction count */
       cip2930?: number;
-
-      /** Number of transactions of type CIP1559. */
+      /** CIP1559 transaction count */
       cip1559?: number;
     };
-
-    /** Block Number. */
+    /** Block number */
     blockNumber?: number;
-
-    /** Block timestamp, UTC. */
+    /** Block timestamp (UTC) */
     timestamp?: number | string;
   }>;
-};
+}

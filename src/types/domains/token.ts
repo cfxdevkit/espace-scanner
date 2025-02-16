@@ -1,58 +1,69 @@
 /**
+ * @packageDocumentation
+ * Token-related type definitions for the Conflux eSpace Scanner SDK.
+ * Contains types for token balances, supplies, and historical data.
+ * @module types/domains/token
+ */
+
+/**
  * Parameters for token balance request
+ * Gets the current balance of a specific token for an account
+ *
+ * @interface TokenBalanceParams
  */
 export interface TokenBalanceParams {
-  /** Contract address */
+  /** Token contract address */
   contractaddress: string;
-  /** Account address */
+  /** Account address to check balance for */
   address: string;
 }
 
-/**
- * Response for token balance request
- */
+/** Token balance amount in smallest unit */
 export type TokenBalance = string;
 
 /**
  * Parameters for token supply request
+ * Gets the current total supply of a token
+ *
+ * @interface TokenSupplyParams
  */
 export interface TokenSupplyParams {
-  /** Contract address */
+  /** Token contract address */
   contractaddress: string;
 }
 
-/**
- * Response for token supply request
- */
+/** Token total supply amount in smallest unit */
 export type TokenSupply = string;
 
 /**
- * Parameters for historical token data
+ * Parameters for historical token supply data
+ * Gets the total supply of a token at a specific block
+ *
+ * @interface TokenSupplyHistoryParams
+ * @extends {TokenBalanceParams}
  */
 export interface TokenSupplyHistoryParams extends TokenBalanceParams {
-  /** Block number to query */
+  /** Block number to query supply at */
   blockno: number;
 }
 
-/**
- * Response for historical token data
- */
+/** Historical token supply amount in smallest unit */
 export type TokenSupplyHistory = string;
 
 /**
  * Parameters for token balance history
+ * Gets the balance of a token for an account at a specific block
+ *
+ * @interface TokenBalanceHistoryParams
  */
 export interface TokenBalanceHistoryParams {
-  /** the string representing the token contract address to check for balance */
+  /** Token contract address */
   contractaddress: string;
-  /** the string representing the address to check for balance */
+  /** Account address to check balance for */
   address: string;
-
-  /** the integer block number to check balance for eg. 12697906 */
+  /** Block number to query balance at */
   blockno: number;
 }
 
-/**
- * Response for token balance history
- */
+/** Historical token balance amount in smallest unit */
 export type TokenBalanceHistory = string;

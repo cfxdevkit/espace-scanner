@@ -1,16 +1,39 @@
+/**
+ * @fileoverview Statistics module for retrieving network and blockchain statistics from Conflux eSpace.
+ * Provides comprehensive functionality for querying various metrics, analytics, and statistics.
+ * @module core/modules/statistics
+ */
+
 import { ESpaceApi } from "../api";
 import { createLogger } from "../../utils/logger";
 import { ApiConfig } from "../../types";
 import { Statistics } from "../../types";
+
+/**
+ * Module for handling statistics and analytics operations on Conflux eSpace.
+ * Provides methods for querying network metrics, account statistics, transaction data,
+ * and various other blockchain analytics.
+ *
+ * @class StatisticsModule
+ * @extends {ESpaceApi}
+ */
 export class StatisticsModule extends ESpaceApi {
+  /** Logger instance for statistics operations */
   protected logger = createLogger("StatisticsModule");
 
+  /**
+   * Creates an instance of StatisticsModule.
+   * @param {ApiConfig} config - Configuration object for the statistics module
+   */
   constructor(config: ApiConfig) {
     super(config);
   }
 
   /**
-   * Get supply
+   * Get current network supply statistics.
+   * Retrieves information about the current CFX token supply.
+   *
+   * @returns {Promise<Statistics.Supply>} Current supply statistics
    */
   async getSupply(): Promise<Statistics.Supply> {
     this.logger.debug("Getting supply");
@@ -19,6 +42,19 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get mining statistics over time.
+   * Retrieves mining-related metrics for specified time intervals.
+   *
+   * @param {Statistics.MiningParams} params - Parameters for mining statistics query
+   * @param {string} [params.intervalType] - Time interval type for data aggregation
+   * @param {number} [params.minTimestamp] - Start timestamp for the query range
+   * @param {number} [params.maxTimestamp] - End timestamp for the query range
+   * @param {string} [params.sort] - Sort direction ('asc' or 'desc')
+   * @param {number} [params.skip] - Number of results to skip
+   * @param {number} [params.limit] - Maximum number of results to return
+   * @returns {Promise<Statistics.Mining>} Mining statistics
+   */
   async getMining(params: Statistics.MiningParams): Promise<Statistics.Mining> {
     this.logger.debug("Getting mining");
 
@@ -33,6 +69,19 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get transactions per second (TPS) statistics.
+   * Retrieves TPS metrics for specified time intervals.
+   *
+   * @param {Statistics.TpsParams} params - Parameters for TPS statistics query
+   * @param {string} [params.intervalType] - Time interval type for data aggregation
+   * @param {number} [params.minTimestamp] - Start timestamp for the query range
+   * @param {number} [params.maxTimestamp] - End timestamp for the query range
+   * @param {string} [params.sort] - Sort direction ('asc' or 'desc')
+   * @param {number} [params.skip] - Number of results to skip
+   * @param {number} [params.limit] - Maximum number of results to return
+   * @returns {Promise<Statistics.Tps>} TPS statistics
+   */
   async getTps(params: Statistics.TpsParams): Promise<Statistics.Tps> {
     this.logger.debug("Getting tps");
 
@@ -47,6 +96,18 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get contract deployment and interaction statistics.
+   * Retrieves metrics about smart contract usage on the network.
+   *
+   * @param {Statistics.ContractParams} params - Parameters for contract statistics query
+   * @param {number} [params.minTimestamp] - Start timestamp for the query range
+   * @param {number} [params.maxTimestamp] - End timestamp for the query range
+   * @param {string} [params.sort] - Sort direction ('asc' or 'desc')
+   * @param {number} [params.skip] - Number of results to skip
+   * @param {number} [params.limit] - Maximum number of results to return
+   * @returns {Promise<Statistics.Contract>} Contract statistics
+   */
   async getContract(params: Statistics.ContractParams): Promise<Statistics.Contract> {
     this.logger.debug("Getting contract");
 
@@ -60,6 +121,18 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get CFX token holder statistics.
+   * Retrieves information about CFX token holders and distribution.
+   *
+   * @param {Statistics.CfxHolderParams} params - Parameters for CFX holder statistics query
+   * @param {number} [params.minTimestamp] - Start timestamp for the query range
+   * @param {number} [params.maxTimestamp] - End timestamp for the query range
+   * @param {string} [params.sort] - Sort direction ('asc' or 'desc')
+   * @param {number} [params.skip] - Number of results to skip
+   * @param {number} [params.limit] - Maximum number of results to return
+   * @returns {Promise<Statistics.CfxHolder>} CFX holder statistics
+   */
   async getCfxHolder(params: Statistics.CfxHolderParams): Promise<Statistics.CfxHolder> {
     this.logger.debug("Getting cfx holder");
 
@@ -73,6 +146,18 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get account growth statistics.
+   * Retrieves metrics about new account creation and network growth.
+   *
+   * @param {Statistics.AccountGrowthParams} params - Parameters for account growth statistics query
+   * @param {number} [params.minTimestamp] - Start timestamp for the query range
+   * @param {number} [params.maxTimestamp] - End timestamp for the query range
+   * @param {string} [params.sort] - Sort direction ('asc' or 'desc')
+   * @param {number} [params.skip] - Number of results to skip
+   * @param {number} [params.limit] - Maximum number of results to return
+   * @returns {Promise<Statistics.AccountGrowth>} Account growth statistics
+   */
   async getAccountGrowth(
     params: Statistics.AccountGrowthParams
   ): Promise<Statistics.AccountGrowth> {
@@ -88,6 +173,18 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get active account statistics.
+   * Retrieves metrics about account activity on the network.
+   *
+   * @param {Statistics.AccountActiveParams} params - Parameters for active account statistics query
+   * @param {number} [params.minTimestamp] - Start timestamp for the query range
+   * @param {number} [params.maxTimestamp] - End timestamp for the query range
+   * @param {string} [params.sort] - Sort direction ('asc' or 'desc')
+   * @param {number} [params.skip] - Number of results to skip
+   * @param {number} [params.limit] - Maximum number of results to return
+   * @returns {Promise<Statistics.AccountActive>} Active account statistics
+   */
   async getAccountActive(
     params: Statistics.AccountActiveParams
   ): Promise<Statistics.AccountActive> {
@@ -103,6 +200,18 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get overall active account statistics.
+   * Retrieves comprehensive metrics about account activity across the network.
+   *
+   * @param {Statistics.ActiveOverallParams} params - Parameters for overall active account statistics query
+   * @param {number} [params.minTimestamp] - Start timestamp for the query range
+   * @param {number} [params.maxTimestamp] - End timestamp for the query range
+   * @param {string} [params.sort] - Sort direction ('asc' or 'desc')
+   * @param {number} [params.skip] - Number of results to skip
+   * @param {number} [params.limit] - Maximum number of results to return
+   * @returns {Promise<Statistics.ActiveOverall>} Overall active account statistics
+   */
   async getAccountActiveOverall(
     params: Statistics.ActiveOverallParams
   ): Promise<Statistics.ActiveOverall> {
@@ -121,6 +230,18 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get transaction statistics.
+   * Retrieves metrics about transaction activity on the network.
+   *
+   * @param {Statistics.TransactionParams} params - Parameters for transaction statistics query
+   * @param {number} [params.minTimestamp] - Start timestamp for the query range
+   * @param {number} [params.maxTimestamp] - End timestamp for the query range
+   * @param {string} [params.sort] - Sort direction ('asc' or 'desc')
+   * @param {number} [params.skip] - Number of results to skip
+   * @param {number} [params.limit] - Maximum number of results to return
+   * @returns {Promise<Statistics.Transaction>} Transaction statistics
+   */
   async getTransaction(params: Statistics.TransactionParams): Promise<Statistics.Transaction> {
     this.logger.debug("Getting transaction");
 
@@ -134,6 +255,18 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get CFX transfer statistics.
+   * Retrieves metrics about CFX token transfers on the network.
+   *
+   * @param {Statistics.CfxTransferParams} params - Parameters for CFX transfer statistics query
+   * @param {number} [params.minTimestamp] - Start timestamp for the query range
+   * @param {number} [params.maxTimestamp] - End timestamp for the query range
+   * @param {string} [params.sort] - Sort direction ('asc' or 'desc')
+   * @param {number} [params.skip] - Number of results to skip
+   * @param {number} [params.limit] - Maximum number of results to return
+   * @returns {Promise<Statistics.CfxTransfer>} CFX transfer statistics
+   */
   async getCfxTransfer(params: Statistics.CfxTransferParams): Promise<Statistics.CfxTransfer> {
     this.logger.debug("Getting cfx transfer");
 
@@ -147,6 +280,18 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get token transfer statistics.
+   * Retrieves metrics about token transfers (excluding CFX) on the network.
+   *
+   * @param {Statistics.TokenTransferParams} params - Parameters for token transfer statistics query
+   * @param {number} [params.minTimestamp] - Start timestamp for the query range
+   * @param {number} [params.maxTimestamp] - End timestamp for the query range
+   * @param {string} [params.sort] - Sort direction ('asc' or 'desc')
+   * @param {number} [params.skip] - Number of results to skip
+   * @param {number} [params.limit] - Maximum number of results to return
+   * @returns {Promise<Statistics.TokenTransfer>} Token transfer statistics
+   */
   async getTokenTransfer(
     params: Statistics.TokenTransferParams
   ): Promise<Statistics.TokenTransfer> {
@@ -162,6 +307,14 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get top gas users statistics.
+   * Retrieves statistics about accounts with highest gas consumption.
+   *
+   * @param {Statistics.TopGasUsedParams} params - Parameters for top gas users query
+   * @param {string} params.spanType - Time span type for the statistics
+   * @returns {Promise<Statistics.TopGasUsed>} Top gas users statistics
+   */
   async getTopGasUsed(params: Statistics.TopGasUsedParams): Promise<Statistics.TopGasUsed> {
     this.logger.debug("Getting top gas used");
 
@@ -171,6 +324,14 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get top miners statistics.
+   * Retrieves statistics about the most active miners on the network.
+   *
+   * @param {Statistics.TopMinerParams} params - Parameters for top miners query
+   * @param {string} params.spanType - Time span type for the statistics
+   * @returns {Promise<Statistics.TopMiner>} Top miners statistics
+   */
   async getTopMiner(params: Statistics.TopMinerParams): Promise<Statistics.TopMiner> {
     this.logger.debug("Getting top miner");
 
@@ -180,6 +341,14 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get top transaction senders statistics.
+   * Retrieves statistics about accounts that send the most transactions.
+   *
+   * @param {Statistics.TopTransactionSenderParams} params - Parameters for top senders query
+   * @param {string} params.spanType - Time span type for the statistics
+   * @returns {Promise<Statistics.TopTransactionSender>} Top transaction senders statistics
+   */
   async getTopTransactionSender(
     params: Statistics.TopTransactionSenderParams
   ): Promise<Statistics.TopTransactionSender> {
@@ -194,6 +363,14 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get top transaction receivers statistics.
+   * Retrieves statistics about accounts that receive the most transactions.
+   *
+   * @param {Statistics.TopTransactionReceiverParams} params - Parameters for top receivers query
+   * @param {string} params.spanType - Time span type for the statistics
+   * @returns {Promise<Statistics.TopTransactionReceiver>} Top transaction receivers statistics
+   */
   async getTopTransactionReceiver(
     params: Statistics.TopTransactionReceiverParams
   ): Promise<Statistics.TopTransactionReceiver> {
@@ -208,6 +385,14 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get top CFX senders statistics.
+   * Retrieves statistics about accounts that send the most CFX tokens.
+   *
+   * @param {Statistics.TopCfxSenderParams} params - Parameters for top CFX senders query
+   * @param {string} params.spanType - Time span type for the statistics
+   * @returns {Promise<Statistics.TopCfxSender>} Top CFX senders statistics
+   */
   async getTopCfxSender(params: Statistics.TopCfxSenderParams): Promise<Statistics.TopCfxSender> {
     this.logger.debug("Getting top cfx sender");
 
@@ -217,6 +402,14 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get top CFX receivers statistics.
+   * Retrieves statistics about accounts that receive the most CFX tokens.
+   *
+   * @param {Statistics.TopCfxReceiverParams} params - Parameters for top CFX receivers query
+   * @param {string} params.spanType - Time span type for the statistics
+   * @returns {Promise<Statistics.TopCfxReceiver>} Top CFX receivers statistics
+   */
   async getTopCfxReceiver(
     params: Statistics.TopCfxReceiverParams
   ): Promise<Statistics.TopCfxReceiver> {
@@ -231,6 +424,14 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get top token transfer statistics.
+   * Retrieves statistics about the most frequently transferred tokens.
+   *
+   * @param {Statistics.TopTokenTransferParams} params - Parameters for top token transfers query
+   * @param {string} params.spanType - Time span type for the statistics
+   * @returns {Promise<Statistics.TopTokenTransfer>} Top token transfer statistics
+   */
   async getTopTokenTransfer(
     params: Statistics.TopTokenTransferParams
   ): Promise<Statistics.TopTokenTransfer> {
@@ -245,6 +446,14 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get top token receivers statistics.
+   * Retrieves statistics about accounts that receive the most tokens.
+   *
+   * @param {Statistics.TopTokenReceiverParams} params - Parameters for top token receivers query
+   * @param {string} params.spanType - Time span type for the statistics
+   * @returns {Promise<Statistics.TopTokenReceiver>} Top token receivers statistics
+   */
   async getTopTokenReceiver(
     params: Statistics.TopTokenReceiverParams
   ): Promise<Statistics.TopTokenReceiver> {
@@ -259,6 +468,14 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get top token participant statistics.
+   * Retrieves statistics about the most active participants in token transfers.
+   *
+   * @param {Statistics.TopTokenParticipantParams} params - Parameters for top token participants query
+   * @param {string} params.spanType - Time span type for the statistics
+   * @returns {Promise<Statistics.TopTokenParticipant>} Top token participant statistics
+   */
   async getTopTokenParticipant(
     params: Statistics.TopTokenParticipantParams
   ): Promise<Statistics.TopTokenParticipant> {
@@ -273,6 +490,18 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get token holder statistics.
+   * Retrieves statistics about token holders and distribution.
+   *
+   * @param {Statistics.TokenHolderParams} params - Parameters for token holder statistics query
+   * @param {number} [params.minTimestamp] - Start timestamp for the query range
+   * @param {number} [params.maxTimestamp] - End timestamp for the query range
+   * @param {string} [params.sort] - Sort direction ('asc' or 'desc')
+   * @param {number} [params.skip] - Number of results to skip
+   * @param {number} [params.limit] - Maximum number of results to return
+   * @returns {Promise<Statistics.TokenHolder>} Token holder statistics
+   */
   async getTokenHolder(params: Statistics.TokenHolderParams): Promise<Statistics.TokenHolder> {
     this.logger.debug("Getting token holder");
 
@@ -287,6 +516,18 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get unique sender statistics.
+   * Retrieves statistics about unique transaction senders.
+   *
+   * @param {Statistics.UniqueSenderParams} params - Parameters for unique senders query
+   * @param {number} [params.minTimestamp] - Start timestamp for the query range
+   * @param {number} [params.maxTimestamp] - End timestamp for the query range
+   * @param {string} [params.sort] - Sort direction ('asc' or 'desc')
+   * @param {number} [params.skip] - Number of results to skip
+   * @param {number} [params.limit] - Maximum number of results to return
+   * @returns {Promise<Statistics.UniqueSender>} Unique sender statistics
+   */
   async getUniqueSender(params: Statistics.UniqueSenderParams): Promise<Statistics.UniqueSender> {
     this.logger.debug("Getting unique sender");
 
@@ -304,6 +545,18 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get unique receiver statistics.
+   * Retrieves statistics about unique transaction receivers.
+   *
+   * @param {Statistics.UniqueReceiverParams} params - Parameters for unique receivers query
+   * @param {number} [params.minTimestamp] - Start timestamp for the query range
+   * @param {number} [params.maxTimestamp] - End timestamp for the query range
+   * @param {string} [params.sort] - Sort direction ('asc' or 'desc')
+   * @param {number} [params.skip] - Number of results to skip
+   * @param {number} [params.limit] - Maximum number of results to return
+   * @returns {Promise<Statistics.UniqueReceiver>} Unique receiver statistics
+   */
   async getUniqueReceiver(
     params: Statistics.UniqueReceiverParams
   ): Promise<Statistics.UniqueReceiver> {
@@ -323,6 +576,18 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get unique participant statistics.
+   * Retrieves statistics about unique participants in transactions.
+   *
+   * @param {Statistics.UniqueParticipantParams} params - Parameters for unique participants query
+   * @param {number} [params.minTimestamp] - Start timestamp for the query range
+   * @param {number} [params.maxTimestamp] - End timestamp for the query range
+   * @param {string} [params.sort] - Sort direction ('asc' or 'desc')
+   * @param {number} [params.skip] - Number of results to skip
+   * @param {number} [params.limit] - Maximum number of results to return
+   * @returns {Promise<Statistics.UniqueParticipant>} Unique participant statistics
+   */
   async getUniqueParticipant(
     params: Statistics.UniqueParticipantParams
   ): Promise<Statistics.UniqueParticipant> {
@@ -342,6 +607,18 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get block base fee statistics.
+   * Retrieves statistics about block base fees over time.
+   *
+   * @param {Statistics.BlockBasefeeParams} params - Parameters for block base fee statistics query
+   * @param {number} [params.minTimestamp] - Start timestamp for the query range
+   * @param {number} [params.maxTimestamp] - End timestamp for the query range
+   * @param {string} [params.sort] - Sort direction ('asc' or 'desc')
+   * @param {number} [params.skip] - Number of results to skip
+   * @param {number} [params.limit] - Maximum number of results to return
+   * @returns {Promise<Statistics.BlockBasefee>} Block base fee statistics
+   */
   async getBlockBasefee(params: Statistics.BlockBasefeeParams): Promise<Statistics.BlockBasefee> {
     this.logger.debug("Getting block basefee");
 
@@ -355,6 +632,18 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get block average priority fee statistics.
+   * Retrieves statistics about average priority fees in blocks.
+   *
+   * @param {Statistics.BlockAvgpriorityfeeParams} params - Parameters for block priority fee statistics query
+   * @param {number} [params.minTimestamp] - Start timestamp for the query range
+   * @param {number} [params.maxTimestamp] - End timestamp for the query range
+   * @param {string} [params.sort] - Sort direction ('asc' or 'desc')
+   * @param {number} [params.skip] - Number of results to skip
+   * @param {number} [params.limit] - Maximum number of results to return
+   * @returns {Promise<Statistics.BlockAvgpriorityfee>} Block average priority fee statistics
+   */
   async getBlockAvgpriorityfee(
     params: Statistics.BlockAvgpriorityfeeParams
   ): Promise<Statistics.BlockAvgpriorityfee> {
@@ -373,6 +662,18 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get block gas used statistics.
+   * Retrieves statistics about gas usage in blocks.
+   *
+   * @param {Statistics.BlockGasusedParams} params - Parameters for block gas usage statistics query
+   * @param {number} [params.minTimestamp] - Start timestamp for the query range
+   * @param {number} [params.maxTimestamp] - End timestamp for the query range
+   * @param {string} [params.sort] - Sort direction ('asc' or 'desc')
+   * @param {number} [params.skip] - Number of results to skip
+   * @param {number} [params.limit] - Maximum number of results to return
+   * @returns {Promise<Statistics.BlockGasused>} Block gas usage statistics
+   */
   async getBlockGasused(params: Statistics.BlockGasusedParams): Promise<Statistics.BlockGasused> {
     this.logger.debug("Getting block gasused");
 
@@ -386,6 +687,18 @@ export class StatisticsModule extends ESpaceApi {
     return response.result;
   }
 
+  /**
+   * Get block transactions by type statistics.
+   * Retrieves statistics about different types of transactions in blocks.
+   *
+   * @param {Statistics.BlockTxsbytypeParams} params - Parameters for block transaction types statistics query
+   * @param {number} [params.minTimestamp] - Start timestamp for the query range
+   * @param {number} [params.maxTimestamp] - End timestamp for the query range
+   * @param {string} [params.sort] - Sort direction ('asc' or 'desc')
+   * @param {number} [params.skip] - Number of results to skip
+   * @param {number} [params.limit] - Maximum number of results to return
+   * @returns {Promise<Statistics.BlockTxsbytype>} Block transactions by type statistics
+   */
   async getBlockTxsbytype(
     params: Statistics.BlockTxsbytypeParams
   ): Promise<Statistics.BlockTxsbytype> {

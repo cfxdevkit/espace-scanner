@@ -298,7 +298,7 @@ describe("AccountWrapper", () => {
           from: mockAddress,
           to: "0x456",
           value: "1000000000000000000",
-          timeStamp: 1677649200,
+          timestamp: "1677649200",
           tokenDecimal: "18",
         },
       ];
@@ -311,7 +311,7 @@ describe("AccountWrapper", () => {
 
       const result = await wrapper.getTokenTransfers({ address: mockAddress });
       expect(result[0].value).toBe("1");
-      expect(result[0].timeStamp).toBe("2023-03-01 05:40:00");
+      expect(result[0].timestamp).toBe("2023-03-01 05:40:00");
     });
 
     it("should handle missing optional fields", async () => {
@@ -331,7 +331,7 @@ describe("AccountWrapper", () => {
 
       const result = await wrapper.getTokenTransfers({ address: mockAddress });
       expect(result[0].value).toBeUndefined();
-      expect(result[0].timeStamp).toBeUndefined();
+      expect(result[0].timestamp).toBeUndefined();
     });
 
     it("should handle invalid address", async () => {
@@ -353,7 +353,7 @@ describe("AccountWrapper", () => {
           from: mockAddress,
           to: "0x456",
           value: "1000000000000000000",
-          timeStamp: "1677649200",
+          timestamp: "1677649200",
           tokenDecimal: "18",
         },
       ];
@@ -461,7 +461,7 @@ describe("AccountWrapper", () => {
         } as Response)
       );
 
-      const result = await wrapper.getMinedBlocks({ address: mockAddress });
+      const result = await wrapper.getMinedBlocks({ address: mockAddress, blocktype: "blocks" });
       expect(result[0].blockReward).toBe("1");
       expect(result[0].timeStamp).toBe("2023-03-01 05:40:00");
     });
@@ -475,7 +475,7 @@ describe("AccountWrapper", () => {
         } as Response)
       );
 
-      const result = await wrapper.getMinedBlocks({ address: mockAddress });
+      const result = await wrapper.getMinedBlocks({ address: mockAddress, blocktype: "blocks" });
       expect(result).toEqual([]);
     });
 
@@ -492,15 +492,15 @@ describe("AccountWrapper", () => {
         } as Response)
       );
 
-      const result = await wrapper.getMinedBlocks({ address: mockAddress });
+      const result = await wrapper.getMinedBlocks({ address: mockAddress, blocktype: "blocks" });
       expect(result[0].blockReward).toBeUndefined();
       expect(result[0].timeStamp).toBeUndefined();
     });
 
     it("should handle invalid address", async () => {
-      await expect(wrapper.getMinedBlocks({ address: "invalid" })).rejects.toThrow(
-        "Invalid address"
-      );
+      await expect(
+        wrapper.getMinedBlocks({ address: "invalid", blocktype: "blocks" })
+      ).rejects.toThrow("Invalid address");
     });
 
     it("should return raw response when returnRaw is true", async () => {
@@ -518,7 +518,10 @@ describe("AccountWrapper", () => {
         } as Response)
       );
 
-      const result = await wrapper.getMinedBlocks({ address: mockAddress }, true);
+      const result = await wrapper.getMinedBlocks(
+        { address: mockAddress, blocktype: "blocks" },
+        true
+      );
       expect(result).toEqual(mockResponse);
     });
   });

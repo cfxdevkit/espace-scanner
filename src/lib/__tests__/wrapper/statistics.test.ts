@@ -1,3 +1,4 @@
+import { StatsPeriod } from "../../../types/common";
 import { StatisticsWrapper } from "../../../wrapper/modules/statistics";
 import { jest } from "@jest/globals";
 
@@ -100,7 +101,7 @@ describe("StatisticsWrapper", () => {
         minTimestamp: 1704067200,
         maxTimestamp: 1704153600,
         intervalType: "hour",
-        sort: "ASC",
+        sort: "asc",
         skip: 0,
         limit: 10,
       });
@@ -170,7 +171,7 @@ describe("StatisticsWrapper", () => {
       );
 
       await expect(
-        wrapper.getTopMiner({ spanType: "invalid" as unknown as string })
+        wrapper.getTopMiner({ spanType: "invalid" as unknown as StatsPeriod })
       ).rejects.toThrow();
     });
 
@@ -232,7 +233,7 @@ describe("StatisticsWrapper", () => {
       const result = await wrapper.getAccountGrowth({
         minTimestamp: 1677600000,
         maxTimestamp: 1677686400,
-        sort: "DESC",
+        sort: "desc",
         skip: 0,
         limit: 10,
       });
@@ -267,7 +268,7 @@ describe("StatisticsWrapper", () => {
       const result = await wrapper.getAccountActive({
         minTimestamp: 1677600000,
         maxTimestamp: 1677686400,
-        sort: "DESC",
+        sort: "desc",
         skip: 0,
         limit: 10,
       });
@@ -302,7 +303,7 @@ describe("StatisticsWrapper", () => {
       const result = await wrapper.getAccountActiveOverall({
         minTimestamp: 1677600000,
         maxTimestamp: 1677686400,
-        sort: "DESC",
+        sort: "desc",
         skip: 0,
         limit: 10,
       });
@@ -408,7 +409,7 @@ describe("StatisticsWrapper", () => {
       const result = await wrapper.getTransaction({
         minTimestamp: 1677600000,
         maxTimestamp: 1677686400,
-        sort: "DESC",
+        sort: "desc",
         skip: 0,
         limit: 10,
       });

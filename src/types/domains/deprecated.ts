@@ -1,3 +1,36 @@
+/**
+ * @packageDocumentation
+ * Deprecated type definitions for backward compatibility.
+ * Contains types that are maintained for legacy support.
+ * @module types/domains/deprecated
+ */
+
+/**
+ * Base token types supported by the API.
+ * @public
+ */
+export type BaseTokenType = "ERC20" | "ERC721" | "ERC1155" | "native";
+
+/**
+ * Helper type to create all possible combinations of token types.
+ * Used internally to generate the TokenType union type.
+ *
+ * @internal
+ */
+export type TokenTypeCombination =
+  | `${BaseTokenType}`
+  | `${BaseTokenType},${BaseTokenType}`
+  | `${BaseTokenType},${BaseTokenType},${BaseTokenType}`
+  | `${BaseTokenType},${BaseTokenType},${BaseTokenType},${BaseTokenType}`;
+
+/**
+ * Token types supported by the API.
+ * Defines the different token standards available.
+ *
+ * @public
+ */
+export type TokenType = BaseTokenType | TokenTypeCombination;
+
 // Types for /account/transactions
 export interface AccountTransactionsParams {
   /** Account address, it's like 0x672158893ce87d812befd2209bc1b7818fe48b2a */
@@ -187,7 +220,7 @@ export type CfxTransfers = {
         iconUrl?: string;
 
         /** Token type, ERC20、ERC721 or ERC1155 */
-        tokenType?: string;
+        tokenType?: TokenType;
       };
     };
   };
@@ -280,7 +313,7 @@ export type Erc20Transfers = {
         iconUrl?: string;
 
         /** Token type, ERC20、ERC721 or ERC1155 */
-        tokenType?: string;
+        tokenType?: TokenType;
       };
     };
   };
@@ -374,7 +407,7 @@ export type Erc721Transfers = {
         iconUrl?: string;
 
         /** Token type, ERC20、ERC721 or ERC1155 */
-        tokenType?: string;
+        tokenType?: TokenType;
       };
     };
   };
@@ -470,7 +503,7 @@ export type Erc1155Transfers = {
         iconUrl?: string;
 
         /** Token type, ERC20、ERC721 or ERC1155 */
-        tokenType?: string;
+        tokenType?: TokenType;
       };
     };
   };
@@ -577,7 +610,7 @@ export type Erc3525Transfers = {
         iconUrl?: string;
 
         /** Token type, ERC20、ERC721 or ERC1155 */
-        tokenType?: string;
+        tokenType?: TokenType;
       };
     };
   };
@@ -705,7 +738,7 @@ export type AccountTransfers = {
 
         iconUrl?: string;
 
-        tokenType?: string;
+        tokenType?: TokenType;
       };
     };
   };
@@ -719,7 +752,7 @@ export interface AccountApprovalsParams {
   /**
    * @default
    * @enum ERC20, ERC721, ERC1155 */
-  tokenType?: "ERC20" | "ERC721" | "ERC1155";
+  tokenType?: TokenType;
 
   /** Whether to query each NFT token id, only valid for ERC721.
    * @default false
@@ -770,7 +803,7 @@ export interface AccountTokensParams {
   account: string;
 
   /** Token type, includes ERC20、ERC721、ERC1155 or native. Multiple types separated by commas. If not set, all tokens will be returned. */
-  tokenType?: string;
+  tokenType?: TokenType;
 }
 
 export type AccountTokens = {

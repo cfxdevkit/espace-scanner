@@ -28,6 +28,121 @@ npm install @cfxdevkit/confluxscan-espace
 - ESLint and Prettier for code quality
 - Husky for git hooks
 
+## Project Structure
+
+```
+src/
+├── core/                 # Core API implementation
+│   ├── api.ts           # Base API class for HTTP requests
+│   ├── scanner.ts       # Main scanner implementation
+│   └── modules/         # API module implementations
+│       ├── account.ts   # Account-related operations
+│       ├── contract.ts  # Smart contract operations
+│       ├── nft.ts       # NFT-related operations
+│       ├── statistics.ts # Network statistics
+│       └── token.ts     # Token operations
+├── formatters/          # Data formatting utilities
+│   ├── dates.ts        # Date and timestamp formatting
+│   ├── numbers.ts      # Numeric and unit formatting
+│   └── responses.ts    # API response formatting
+├── wrapper/            # High-level wrapper with formatting
+│   ├── base.ts        # Base wrapper functionality
+│   ├── scanner.ts     # Main scanner wrapper
+│   └── modules/       # Formatted module implementations
+├── types/             # TypeScript type definitions
+│   └── domains/       # Domain-specific types
+└── utils/             # Utility functions
+    ├── logger.ts      # Logging configuration
+    └── validation.ts  # Address validation
+```
+
+## Core Modules
+
+### Account Module
+- Balance queries (single/multi-address)
+- Transaction history
+- Token transfer history
+- NFT transfer tracking
+- Mining history
+- Balance history
+
+### Contract Module
+- ABI retrieval
+- Source code access
+- Contract verification
+- Proxy contract support
+
+### NFT Module
+- NFT balances
+- Token metadata
+- Transfer history
+- Ownership tracking
+
+### Statistics Module
+- Network metrics
+- Account activity
+- Transaction analytics
+- Token statistics
+- Gas usage metrics
+- Mining statistics
+
+### Token Module
+- Token balances
+- Supply information
+- Transfer history
+- Historical data
+
+## Formatters
+
+### Date Formatter
+```typescript
+import { DateFormatter } from "@cfxdevkit/confluxscan-espace";
+
+// Format timestamps
+DateFormatter.formatDate(1707307200, "full"); // "2024-02-07 12:00:00"
+DateFormatter.formatDate(1707307200, "date"); // "2024-02-07"
+
+// Get relative timestamps
+DateFormatter.get24HoursAgo(); // timestamp from 24 hours ago
+DateFormatter.getTimeAgo(7); // timestamp from 7 days ago
+```
+
+### Number Formatter
+```typescript
+import { NumberFormatter } from "@cfxdevkit/confluxscan-espace";
+
+// Format numbers
+NumberFormatter.formatNumber(1234.5678); // "1,234.5678"
+NumberFormatter.formatPercentage(50.5678); // "50.57%"
+
+// Format blockchain values
+NumberFormatter.formatGas("1000000000"); // "1.0 Gdrip"
+NumberFormatter.formatCFX("1000000000000000000"); // "1 CFX"
+```
+
+## Utilities
+
+### Address Validation
+```typescript
+import { AddressValidator } from "@cfxdevkit/confluxscan-espace";
+
+// Validate single address
+AddressValidator.validateAddress("0x1234..."); // true/false
+
+// Validate multiple addresses
+AddressValidator.validateAddresses(["0x1234...", "0x5678..."]); // true/false
+```
+
+### Logging
+```typescript
+import { createLogger } from "@cfxdevkit/confluxscan-espace";
+
+// Create module-specific logger
+const logger = createLogger("MyModule");
+logger.info("Operation successful");
+logger.error({ error }, "Operation failed");
+```
+
 ## Usage
 
 ### Basic Setup
@@ -46,140 +161,111 @@ const scannerWithApiKey = new ESpaceScannerWrapper({
 });
 ```
 
-### Contract Methods
+### Account Operations
 
 ```typescript
-// Get contract ABI (both formatted and raw)
-const contractABI = await mainnetScanner.getContractABI("0x1234...");
-const rawContractABI = await mainnetScanner.getContractABI("0x1234...", true);
+// Get account balance
+const balance = await scanner.account.getBalance({
+    address: "0x1234...",
+    tag: "latest"
+});
 
-// Get contract source code
-const contractSource = await mainnetScanner.getContractSourceCode("0x1234...");
-const rawContractSource = await mainnetScanner.getContractSourceCode("0x1234...", true);
-```
+// Get transaction history
+const transactions = await scanner.account.getTransactionList({
+    address: "0x1234...",
+    startblock: 1000000,
+    endblock: 2000000,
+    page: 1,
+    offset: 10
+});
 
-### Token Methods
-
-```typescript
-// Get account tokens (ERC20/ERC721)
-const erc20Tokens = await mainnetScanner.getAccountTokens(walletAddress, "ERC20");
-const erc721Tokens = await mainnetScanner.getAccountTokens(walletAddress, "ERC721");
-
-// Raw data with pagination
-const rawTokens = await mainnetScanner.getAccountTokens(
-    walletAddress,
-    "ERC20",
-    0,  // skip
-    10, // limit
-    true // returnRaw
-);
-```
-
-### Statistics Methods
-
-```typescript
-// Common statistics parameters
-const statsParams = {
-    minTimestamp: Math.floor(Date.now() / 1000) - 7 * 24 * 60 * 60, // 7 days ago
-    maxTimestamp: Math.floor(Date.now() / 1000),
-    limit: 5
-};
-
-// Active accounts statistics
-const activeAccounts = await mainnetScanner.getActiveAccountStats(statsParams);
-
-// CFX holder statistics
-const cfxHolders = await mainnetScanner.getCfxHolderStats(statsParams);
-
-// Account growth statistics
-const accountGrowth = await mainnetScanner.getAccountGrowthStats(statsParams);
-
-// TPS (Transactions Per Second) statistics
-const tpsStats = await mainnetScanner.getTpsStats({ 
-    ...statsParams, 
-    intervalType: "hour" 
+// Get token transfers
+const transfers = await scanner.account.getTokenTransfers({
+    address: "0x1234...",
+    contractaddress: "0x5678..." // optional
 });
 ```
 
-### Top Statistics Methods
+### Contract Operations
 
 ```typescript
-// Available periods: "24h" | "7d"
-const periods = ["24h", "7d"];
+// Get contract ABI
+const abi = await scanner.contract.getABI({
+    address: "0x1234..."
+});
 
-// Top gas usage statistics
-const topGasUsed = await mainnetScanner.getTopGasUsed("24h");
+// Get contract source code
+const source = await scanner.contract.getSourceCode({
+    address: "0x1234..."
+});
 
-// Top transaction senders
-const topTxSenders = await mainnetScanner.getTopTransactionSenders("7d");
-
-// Top token statistics
-const topTokenTransfers = await mainnetScanner.getTopTokenTransfers("24h");
-const topTokenSenders = await mainnetScanner.getTopTokenSenders("24h");
-const topTokenReceivers = await mainnetScanner.getTopTokenReceivers("24h");
-const topTokenParticipants = await mainnetScanner.getTopTokenParticipants("24h");
+// Verify proxy contract
+const verification = await scanner.contract.verifyProxyContract({
+    address: "0x1234...",
+    expectedimplementation: "0x5678..."
+});
 ```
 
-### Token Statistics Methods
+### NFT Operations
 
 ```typescript
-// Token holder statistics
-const tokenHolderStats = await mainnetScanner.getTokenHolderStats(tokenAddress);
+// Get NFT balances
+const balances = await scanner.nft.getBalances({
+    owner: "0x1234..."
+});
 
-// Token sender/receiver statistics
-const tokenSenderStats = await mainnetScanner.getTokenUniqueSenderStats(tokenAddress);
-const tokenReceiverStats = await mainnetScanner.getTokenUniqueReceiverStats(tokenAddress);
+// Get NFT transfers
+const transfers = await scanner.nft.getTransfers({
+    contract: "0x1234...",
+    tokenId: "1"
+});
+
+// Get NFT metadata
+const metadata = await scanner.nft.getPreview({
+    contract: "0x1234...",
+    tokenId: "1",
+    withMetadata: true
+});
 ```
 
-### Block Statistics Methods
+### Statistics Operations
 
 ```typescript
-// Block base fee statistics
-const blockBaseFeeStats = await mainnetScanner.getBlockBaseFeeStats(statsParams);
+// Get network statistics
+const supply = await scanner.statistics.getSupply();
 
-// Block gas used statistics
-const blockGasUsedStats = await mainnetScanner.getBlockGasUsedStats(statsParams);
+// Get mining statistics
+const mining = await scanner.statistics.getMining({
+    intervalType: "day",
+    minTimestamp: 1234567890,
+    maxTimestamp: 2345678901
+});
 
-// Block average priority fee statistics
-const blockAvgPriorityFeeStats = await mainnetScanner.getBlockAvgPriorityFeeStats(statsParams);
-
-// Block transactions by type statistics
-const blockTxsByTypeStats = await mainnetScanner.getBlockTxsByTypeStats(statsParams);
-// Returns statistics for legacy, CIP-2930, and CIP-1559 transactions
+// Get top accounts
+const topSenders = await scanner.statistics.getTopTransactionSender({
+    spanType: "24h"
+});
 ```
 
-### Error Handling
-
-The library includes comprehensive error handling:
+### Token Operations
 
 ```typescript
-try {
-    // Invalid address
-    await scanner.getContractABI("0xinvalid");
-} catch (error) {
-    console.error("Invalid address error:", error.message);
-}
+// Get token balance
+const balance = await scanner.token.getTokenBalance({
+    address: "0x1234...",
+    contractaddress: "0x5678..."
+});
 
-try {
-    // Non-existent contract
-    await scanner.getContractABI("0x0000000000000000000000000000000000000000");
-} catch (error) {
-    console.error("Non-existent contract error:", error.message);
-}
-```
+// Get token supply
+const supply = await scanner.token.getTokenSupply({
+    contractaddress: "0x1234..."
+});
 
-For more comprehensive examples including error handling, statistics, and token operations, check out the [examples/usage.ts](examples/usage.ts) file.
-
-## Project Structure
-
-```
-├── src/
-│   ├── core/         # Core API implementation
-│   ├── formatters/   # Number and date formatting utilities
-│   ├── wrapper/      # High-level wrapper with formatting
-│   ├── types/        # TypeScript type definitions
-│   └── utils/        # Utility functions
-├── examples/         # Usage examples
+// Get historical data
+const history = await scanner.token.getTokenSupplyHistory({
+    contractaddress: "0x1234...",
+    blockno: 1000000
+});
 ```
 
 ## Development
@@ -198,70 +284,28 @@ npm run build
 # Run tests
 npm test
 
-# Run tests in watch mode
-npm run test:watch
-
 # Run tests with coverage
 npm run test:coverage
 
 # Generate documentation
 npm run docs
 
-# Lint code
+# Lint and format code
 npm run lint
-
-# Fix linting issues
-npm run lint:fix
-
-# Format code
 npm run format
-
-# Run example
-npm run example
-
-# Clean build artifacts
-npm run clean
-```
-
-## Testing
-
-The package includes a comprehensive test suite:
-
-```bash
-# Run all tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Generate coverage report
-npm run test:coverage
 ```
 
 ## Documentation
 
-API documentation is generated using TypeDoc:
+API documentation is generated using TypeDoc and is available in the `docs` directory:
 
 ```bash
-# Generate documentation
 npm run docs
 ```
 
-The documentation will be available in the `docs` directory.
-
 ## Contributing
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-Please ensure your PR:
-- Passes all tests
-- Has updated documentation
-- Follows the existing code style
-- Includes relevant tests
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
 
 ## License
 

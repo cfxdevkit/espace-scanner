@@ -1,301 +1,276 @@
-import { BlockTag } from "../common";
+/**
+ * @packageDocumentation
+ * Account-related type definitions for the Conflux eSpace Scanner SDK.
+ * Contains types for account balances, transactions, and token transfers.
+ * @module types/domains/account
+ */
+
+import { BlockTag, PaginationParams, TimestampRangeParams, BlockRangeParams } from "../common";
 
 /**
  * Parameters for fetching account balance
+ *
+ * @interface BalanceParams
  */
 export interface BalanceParams {
-  /** Account address */
+  /** Account address to check balance for */
   address: string;
-  /** Block tag */
+  /** Block tag to query balance at */
   tag?: BlockTag;
 }
 
+/** Account balance in Drip */
 export type Balance = string;
 
 /**
  * Parameters for fetching multiple account balances
+ *
+ * @interface BalanceMultiParams
  */
 export interface BalanceMultiParams {
-  /** Comma-separated account addresses */
+  /** Array of account addresses to check balances for */
   address: string[];
-  /** Block tag */
+  /** Block tag to query balances at */
   tag?: BlockTag;
 }
 
-/**
- * Single balance item in multi-balance response
- */
+/** Single balance item in multi-balance response [address, balance] */
 export type BalanceMultiItem = [string, string];
 
-/**
- * Response for multiple account balances
- */
+/** Response for multiple account balances */
 export type BalanceMulti = BalanceMultiItem[];
 
-export interface TxlistParams {
-  /** the string representing the address to check for balance */
+/**
+ * Parameters for getting transaction list
+ *
+ * @interface TxlistParams
+ * @extends {PaginationParams}
+ * @extends {TimestampRangeParams}
+ * @extends {BlockRangeParams}
+ */
+export interface TxlistParams extends PaginationParams, TimestampRangeParams, BlockRangeParams {
+  /** Account address to get transactions for */
   address: string;
-
-  /** the integer block number to start searching for transactions */
+  /** Start block number */
   startblock?: number;
-
-  /** the integer block number to stop searching for transactions */
+  /** End block number */
   endblock?: number;
-
-  /** the integer page number, if pagination is enabled
-   * @default 1 */
-  page?: number;
-
-  /** the number of transactions displayed per page
-   * @default 100 */
-  offset?: number;
-
-  /** the sorting preference, use asc to sort by ascending and desc to sort by descending
-   * @default desc */
-  sort?: string;
+  /** Transaction hash */
+  txhash?: string;
 }
 
+/**
+ * Transaction list response item
+ *
+ * @interface Txlist
+ */
 export interface Txlist {
-  blockNumber?: string;
-
-  timestamp?: string;
-
-  hash?: string;
-
-  nonce?: string;
-
+  /** Block hash */
   blockHash?: string;
-
+  /** Block number */
+  blockNumber?: string;
+  /** Timestamp of the transaction */
+  timestamp?: string;
+  /** Transaction hash */
+  hash?: string;
+  /** Transaction nonce */
+  nonce?: string;
+  /** Transaction index in block */
   transactionIndex?: string;
-
+  /** Sender address */
   from?: string;
-
+  /** Recipient address */
   to?: string;
-
+  /** Transaction value in Drip */
   value?: string;
-
+  /** Gas limit */
   gas?: string;
-
+  /** Gas price in Drip */
   gasPrice?: string;
-
-  isError?: string;
-
-  txreceipt_status?: string;
-
-  input?: string;
-
+  /** Contract address if created */
   contractAddress?: string;
-
-  cumulativeGasUsed?: string;
-
+  /** Input data */
+  input?: string;
+  /** Transaction type */
+  type?: string;
+  /** Max fee per gas */
+  maxFeePerGas?: string;
+  /** Max priority fee per gas */
+  maxPriorityFeePerGas?: string;
+  /** Transaction status (0 for failure, 1 for success) */
+  isError?: string;
+  /** Error message if failed */
+  errDescription?: string;
+  /** Gas used by the transaction */
   gasUsed?: string;
-
+  /** Cumulative gas used in the block */
+  cumulativeGasUsed?: string;
+  /** Transaction receipt status */
+  txreceipt_status?: string;
+  /** Number of confirmations */
   confirmations?: string;
 }
 
-export interface TxlistinternalParams {
-  /** the string representing the transaction hash to check for internal transactions */
-  txhash?: string;
-
-  /** the string representing the address to check for balance */
+/**
+ * Parameters for getting internal transaction list
+ *
+ * @interface TxlistinternalParams
+ * @extends {PaginationParams}
+ * @extends {TimestampRangeParams}
+ * @extends {BlockRangeParams}
+ */
+export interface TxlistinternalParams
+  extends PaginationParams,
+    TimestampRangeParams,
+    BlockRangeParams {
+  /** Account address to get internal transactions for */
   address: string;
-
-  /** the integer block number to start searching for transactions */
+  /** Start block number */
   startblock?: number;
-
-  /** the integer block number to stop searching for transactions */
+  /** End block number */
   endblock?: number;
-
-  /** the integer page number, if pagination is enabled
-   * @default 1 */
-  page?: number;
-
-  /** the number of transactions displayed per page
-   * @default 100 */
-  offset?: number;
-
-  /** the sorting preference, use asc to sort by ascending and desc to sort by descending
-   * @default desc */
-  sort?: string;
+  /** Transaction hash */
+  txhash?: string;
 }
 
+/**
+ * Internal transaction list response item
+ *
+ * @interface Txlistinternal
+ */
 export interface Txlistinternal {
+  /** Block number */
   blockNumber?: string;
-
+  /** Timestamp of the transaction */
   timestamp?: string;
-
+  /** Parent transaction hash */
   hash?: string;
-
+  /** Sender address */
   from?: string;
-
+  /** Recipient address */
   to?: string;
-
+  /** Transaction value in Drip */
   value?: string;
-
+  /** Contract address if created */
   contractAddress?: string;
-
+  /** Input data */
   input?: string;
-
+  /** Transaction type */
   type?: string;
-
-  traceId?: string;
-
-  isError?: string;
-
+  /** Gas limit */
+  gas?: string;
+  /** Error message if failed */
   errCode?: string;
 }
 
-export interface TokentxParams {
-  /** the string representing the token contract address to check for balance */
-  contractaddress?: string;
-
-  /** the string representing the address to check for balance */
+/**
+ * Parameters for getting token transaction list
+ *
+ * @interface TokentxParams
+ * @extends {PaginationParams}
+ * @extends {TimestampRangeParams}
+ * @extends {BlockRangeParams}
+ */
+export interface TokentxParams extends PaginationParams, TimestampRangeParams, BlockRangeParams {
+  /** Account address to get token transactions for */
   address: string;
-
-  /** the integer page number, if pagination is enabled
-   * @default 1 */
-  page?: number;
-
-  /** the number of transactions displayed per page
-   * @default 100 */
-  offset?: number;
-
-  /** the integer block number to start searching for transactions */
+  /** Contract address to filter transactions by */
+  contractaddress?: string;
+  /** Start block number */
   startblock?: number;
-
-  /** the integer block number to stop searching for transactions */
+  /** End block number */
   endblock?: number;
-
-  /** the sorting preference, use asc to sort by ascending and desc to sort by descending
-   * @default desc */
-  sort?: string;
 }
 
+/**
+ * Token transaction list response item
+ *
+ * @interface Tokentx
+ */
 export interface Tokentx {
+  /** Block number */
   blockNumber?: string;
-
-  timeStamp?: string;
-
-  hash?: string;
-
-  nonce?: string;
-
-  blockHash?: string;
-
-  from?: string;
-
-  contractAddress?: string;
-
-  to?: string;
-
-  value?: string;
-
-  tokenName?: string;
-
-  tokenSymbol?: string;
-
-  tokenDecimal?: string;
-
-  transactionIndex?: string;
-
-  gas?: string;
-
-  gasPrice?: string;
-
-  gasUsed?: string;
-
-  cumulativeGasUsed?: string;
-
-  /** deprecated */
-  input?: string;
-
-  confirmations?: string;
-}
-
-export interface TokenNFTtxParams {
-  /** the string representing the token contract address to check for balance */
-  contractaddress?: string;
-
-  /** the string representing the address to check for balance */
-  address: string;
-
-  /** the integer page number, if pagination is enabled
-   * @default 1 */
-  page?: number;
-
-  /** the number of transactions displayed per page
-   * @default 100 */
-  offset?: number;
-
-  /** the integer block number to start searching for transactions */
-  startblock?: number;
-
-  /** the integer block number to stop searching for transactions */
-  endblock?: number;
-
-  /** the sorting preference, use asc to sort by ascending and desc to sort by descending
-   * @default desc */
-  sort?: string;
-}
-
-export interface TokenNFTtx {
-  blockNumber?: string;
+  /** Timestamp of the transaction */
   timestamp?: string;
+  /** Transaction hash */
   hash?: string;
+  /** Transaction nonce */
   nonce?: string;
+  /** Block hash */
   blockHash?: string;
+  /** Sender address */
   from?: string;
-  contractAddress?: string;
+  /** Recipient address */
   to?: string;
-  value?: string;
+  /** Contract address */
+  contractAddress?: string;
+  /** Token ID (for NFTs) */
+  tokenID?: string;
+  /** Token name */
   tokenName?: string;
+  /** Token symbol */
   tokenSymbol?: string;
+  /** Token decimals */
   tokenDecimal?: string;
-  transactionIndex?: string;
+  /** Transaction value in token's smallest unit */
+  value?: string;
+  /** Token type */
+  tokenType?: string;
+  /** Gas used */
   gas?: string;
+  /** Gas price in Drip */
   gasPrice?: string;
-  gasUsed?: string;
-  cumulativeGasUsed?: string;
-  /** deprecated */
-  input?: string;
-  confirmations?: string;
+  /** Base fee per gas */
+  baseFeePerGas?: string;
+  /** Max fee per gas */
+  maxFeePerGas?: string;
+  /** Max priority fee per gas */
+  maxPriorityFeePerGas?: string;
+  /** Transaction status (0 for failure, 1 for success) */
+  status?: string;
 }
 
-export interface GetminedblocksParams {
-  /** the string representing the address to check for balance */
+// Re-export NFT transaction types from TokentxParams
+export type TokenNFTtxParams = TokentxParams;
+export type TokenNFTtx = Tokentx;
+
+/**
+ * Parameters for getting mined blocks
+ *
+ * @interface GetminedblocksParams
+ * @extends {PaginationParams}
+ */
+export interface GetminedblocksParams extends PaginationParams {
+  /** Miner address to get blocks for */
   address: string;
-
-  /** the string pre-defined block type, only support 'blocks' type
-   * @default blocks */
-  blocktype?: string;
-
-  /** the integer page number, if pagination is enabled
-   * @default 1 */
-  page?: number;
-
-  /** the number of transactions displayed per page
-   * @default 100 */
-  offset?: number;
+  blocktype: "blocks";
 }
 
-export type Getminedblocks = {
-  /** Block Number */
+/**
+ * Mined block details
+ *
+ * @interface Getminedblocks
+ */
+export interface Getminedblocks {
+  /** Block number */
   blockNumber?: string;
-
-  /** The timeStamp is represented in Unix timestamp */
+  /** Block timestamp */
   timeStamp?: string;
-
-  /** Block Reward */
+  /** Block reward in Drip */
   blockReward?: string;
-};
+}
 
-// Types for /api?module=account&action=balancehistory
+/**
+ * Parameters for fetching historical balance
+ *
+ * @interface BalancehistoryParams
+ */
 export interface BalancehistoryParams {
-  /** the string representing the address to check for balance */
+  /** Account address */
   address: string;
-
-  /** the integer block number to check balance for eg. 12697906 */
+  /** Block number to check balance at */
   blockno: number;
 }
 
+/** Historical balance in Drip */
 export type Balancehistory = string;

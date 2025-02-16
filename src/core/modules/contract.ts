@@ -1,17 +1,41 @@
+/**
+ * @fileoverview Contract module for interacting with smart contracts on Conflux eSpace.
+ * Provides functionality for retrieving contract information, verification, and source code management.
+ * @module core/modules/contract
+ */
+
 import { ESpaceApi } from "../api";
 import { AddressValidator } from "../../utils";
 import { createLogger } from "../../utils/logger";
 import { ApiConfig, Contract } from "../../types";
 
+/**
+ * Module for handling smart contract operations on Conflux eSpace.
+ * Provides methods for retrieving contract ABIs, source code, and managing contract verification.
+ *
+ * @class ContractModule
+ * @extends {ESpaceApi}
+ */
 export class ContractModule extends ESpaceApi {
+  /** Logger instance for contract operations */
   protected logger = createLogger("ContractModule");
 
+  /**
+   * Creates an instance of ContractModule.
+   * @param {ApiConfig} config - Configuration object for the contract module
+   */
   constructor(config: ApiConfig) {
     super(config);
   }
 
   /**
-   * Get ABI for a verified contract
+   * Get ABI for a verified contract.
+   * Retrieves the Application Binary Interface (ABI) for a verified smart contract.
+   *
+   * @param {Contract.ABIParams} params - Parameters for the ABI query
+   * @param {string} params.address - Contract address to get ABI for
+   * @returns {Promise<Contract.ABI>} The contract ABI
+   * @throws {Error} If the address is invalid or contract is not verified
    */
   async getABI(params: Contract.ABIParams): Promise<Contract.ABI> {
     this.logger.debug({ params }, "Getting contract ABI");
@@ -33,7 +57,13 @@ export class ContractModule extends ESpaceApi {
   }
 
   /**
-   * Get source code for a verified contract
+   * Get source code for a verified contract.
+   * Retrieves the source code and related information for a verified smart contract.
+   *
+   * @param {Contract.SourceParams} params - Parameters for the source code query
+   * @param {string} params.address - Contract address to get source code for
+   * @returns {Promise<Contract.Source>} The contract source code and metadata
+   * @throws {Error} If the address is invalid or contract is not verified
    */
   async getSourceCode(params: Contract.SourceParams): Promise<Contract.Source> {
     this.logger.debug({ params }, "Getting contract source code");
@@ -55,7 +85,13 @@ export class ContractModule extends ESpaceApi {
   }
 
   /**
-   * Check source code verification submission status
+   * Check source code verification submission status.
+   * Retrieves the status of a contract verification submission.
+   *
+   * @param {Contract.checkVerifyStatusParams} params - Parameters for checking verification status
+   * @param {string} params.guid - GUID of the verification submission
+   * @returns {Promise<Contract.checkVerifyStatus>} The verification status
+   * @throws {Error} If the GUID is not provided
    */
   async checkVerifyStatus(
     params: Contract.checkVerifyStatusParams
@@ -77,7 +113,14 @@ export class ContractModule extends ESpaceApi {
   }
 
   /**
-   * Verify a proxy contract
+   * Verify a proxy contract.
+   * Initiates the verification process for a proxy contract.
+   *
+   * @param {Contract.verifyProxyContractParams} params - Parameters for proxy contract verification
+   * @param {string} params.address - Address of the proxy contract to verify
+   * @param {string} [params.expectedimplementation] - Expected implementation contract address
+   * @returns {Promise<Contract.verifyProxyContract>} The verification submission result
+   * @throws {Error} If the addresses are invalid
    */
   async verifyProxyContract(
     params: Contract.verifyProxyContractParams
@@ -113,7 +156,13 @@ export class ContractModule extends ESpaceApi {
   }
 
   /**
-   * Check proxy contract verification submission status
+   * Check proxy contract verification submission status.
+   * Retrieves the status of a proxy contract verification submission.
+   *
+   * @param {Contract.checkProxyVerificationParams} params - Parameters for checking proxy verification status
+   * @param {string} params.guid - GUID of the proxy verification submission
+   * @returns {Promise<Contract.checkProxyVerification>} The proxy verification status
+   * @throws {Error} If the GUID is not provided
    */
   async checkProxyVerification(
     params: Contract.checkProxyVerificationParams

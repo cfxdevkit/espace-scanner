@@ -1,15 +1,33 @@
+/**
+ * @fileoverview Core API module for the Conflux eSpace Scanner SDK.
+ * This file contains the base API class that handles HTTP requests to the Conflux eSpace API.
+ * @module core/api
+ */
+
 import { ApiConfig, ApiResponse } from "../types";
 import { createLogger } from "../utils/logger";
 
 /**
  * Base API class for making HTTP requests to the Conflux eSpace API.
- * Provides common functionality for API endpoints.
+ * Provides common functionality for API endpoints including request handling and error management.
+ *
+ * @class ESpaceApi
  */
 export class ESpaceApi {
+  /** Base URL for the API endpoints */
   protected baseUrl: string;
+  /** Optional API key for authenticated requests */
   protected apiKey?: string;
+  /** Logger instance for debugging and error tracking */
   protected logger = createLogger("ESpaceApi");
 
+  /**
+   * Creates an instance of ESpaceApi.
+   * @param {ApiConfig} config - Configuration object for the API
+   * @param {string} [config.target="mainnet"] - Target network ("mainnet" or "testnet")
+   * @param {string} [config.apiKey] - Optional API key for authenticated requests
+   * @param {string} [config.host] - Optional custom host URL
+   */
   constructor({ target = "mainnet", apiKey, host }: ApiConfig = { target: "mainnet" }) {
     const defaultMainnetHost = "https://evmapi.confluxscan.io";
     const defaultTestnetHost = "https://evmapi-testnet.confluxscan.io";
@@ -20,10 +38,15 @@ export class ESpaceApi {
   }
 
   /**
-   * Make an API request with the given parameters
-   * @param endpoint API endpoint
-   * @param params Query parameters
-   * @returns API response
+   * Makes an API request with the given parameters.
+   * Handles parameter sanitization, API key inclusion, and error handling.
+   *
+   * @protected
+   * @template T - Type of the expected response data
+   * @param {string} endpoint - API endpoint to call
+   * @param {Record<string, string | number | boolean | null | undefined>} params - Query parameters
+   * @returns {Promise<ApiResponse<T>>} Promise resolving to the API response
+   * @throws {Error} When the API request fails or returns an error status
    */
   protected async fetchApi<T>(
     endpoint: string,

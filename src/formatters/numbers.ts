@@ -1,3 +1,10 @@
+/**
+ * @fileoverview Number formatting utilities for blockchain-specific values.
+ * Provides functionality for formatting numbers, percentages, gas values, and cryptocurrency amounts.
+ * Handles scientific notation, decimal places, and unit conversions.
+ * @module formatters/numbers
+ */
+
 import { formatEther, formatUnits } from "viem";
 import { createLogger } from "../utils/logger";
 
@@ -10,11 +17,19 @@ const logger = createLogger("NumberFormatter");
 export class NumberFormatter {
   /**
    * Formats a number with comma separators and up to 4 decimal places.
-   * @param value - The number to format (can be string or number)
-   * @returns Formatted string with comma separators and optional decimals
+   * Handles both string and number inputs, with fallback to "0" for invalid values.
+   *
+   * @param {string | number | undefined} value - The number to format
+   * @returns {string} Formatted string with comma separators and optional decimals
+   * @throws {Error} If the value cannot be parsed or formatted
+   *
    * @example
-   * formatNumber(1234.5678) // returns "1,234.5678"
-   * formatNumber(1000000) // returns "1,000,000"
+   * // Returns "1,234.5678"
+   * NumberFormatter.formatNumber(1234.5678)
+   * // Returns "1,000,000"
+   * NumberFormatter.formatNumber(1000000)
+   * // Returns "1,234.56"
+   * NumberFormatter.formatNumber("1234.56")
    */
   static formatNumber(value: string | number | undefined): string {
     if (value === undefined || value === null || value === "") return "0";
@@ -46,11 +61,18 @@ export class NumberFormatter {
 
   /**
    * Formats a number as a percentage with 2 decimal places.
-   * @param value - The value to format as percentage
-   * @returns Formatted percentage string with % symbol
+   * Always includes the % symbol and handles invalid inputs gracefully.
+   *
+   * @param {string | number} value - The value to format as percentage
+   * @returns {string} Formatted percentage string with % symbol
+   *
    * @example
-   * formatPercentage(50.5678) // returns "50.57%"
-   * formatPercentage(0) // returns "0.00%"
+   * // Returns "50.57%"
+   * NumberFormatter.formatPercentage(50.5678)
+   * // Returns "0.00%"
+   * NumberFormatter.formatPercentage(0)
+   * // Returns "100.00%"
+   * NumberFormatter.formatPercentage("100")
    */
   static formatPercentage(value: string | number): string {
     if (value === undefined || value === null || value === "") return "0%";
@@ -65,10 +87,18 @@ export class NumberFormatter {
 
   /**
    * Formats a gas value in Gwei (divides by 1e9).
-   * @param value - The gas value to format
-   * @returns Formatted gas value string
+   * Converts raw gas values to human-readable format with appropriate units.
+   *
+   * @param {string | number | undefined} value - The gas value to format
+   * @returns {string} Formatted gas value string with units
+   *
    * @example
-   * formatGas(1000000000) // returns "1.0 Gwei"
+   * // Returns "1.0 Gwei"
+   * NumberFormatter.formatGas(1000000000)
+   * // Returns "1.5 Gwei"
+   * NumberFormatter.formatGas("1500000000")
+   * // Returns "0 Gwei"
+   * NumberFormatter.formatGas(undefined)
    */
   static formatGas(value: string | number | undefined): string {
     if (!value) return "0 Gdrip";
@@ -84,11 +114,18 @@ export class NumberFormatter {
   /**
    * Formats a CFX value with proper decimals and unit.
    * Handles scientific notation and converts to human-readable format.
-   * @param value - The CFX value to format
-   * @returns Formatted CFX value string with unit
+   * Uses 18 decimal places as the standard for CFX tokens.
+   *
+   * @param {string | number | undefined} value - The CFX value to format (in wei)
+   * @returns {string} Formatted CFX value string
+   *
    * @example
-   * formatCFX("1000000000000000000") // returns "1 CFX"
-   * formatCFX(1.5e18) // returns "1.5 CFX"
+   * // Returns "1 CFX"
+   * NumberFormatter.formatCFX("1000000000000000000")
+   * // Returns "1.5 CFX"
+   * NumberFormatter.formatCFX("1500000000000000000")
+   * // Returns "0"
+   * NumberFormatter.formatCFX(undefined)
    */
   static formatCFX(value: string | number | undefined): string {
     if (!value) return "0";

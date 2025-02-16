@@ -81,7 +81,7 @@ export const PAGINATION = {
     limit: 5,
     page: 1,
     offset: 5,
-    sort: "desc",
+    sort: "desc" as "asc" | "desc",
   },
 };
 

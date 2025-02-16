@@ -1,18 +1,44 @@
+/**
+ * @fileoverview Token module for interacting with ERC20 tokens on Conflux eSpace.
+ * Provides functionality for querying token balances, supplies, and historical data.
+ * @module core/modules/token
+ */
+
 import { ESpaceApi } from "../api";
 import { AddressValidator } from "../../utils";
 import { createLogger } from "../../utils/logger";
 import { Token } from "../../types";
 import { ApiConfig } from "../../types";
 
+/**
+ * Module for handling ERC20 token-related operations on Conflux eSpace.
+ * Provides methods for querying token balances, supplies, and historical data.
+ *
+ * @class TokenModule
+ * @extends {ESpaceApi}
+ */
 export class TokenModule extends ESpaceApi {
+  /** Logger instance for token operations */
   protected logger = createLogger("TokenModule");
 
+  /**
+   * Creates an instance of TokenModule.
+   * @param {ApiConfig} config - Configuration object for the token module
+   * @param {string} [config.target="mainnet"] - Target network ("mainnet" or "testnet")
+   */
   constructor(config: ApiConfig = { target: "mainnet" }) {
     super(config);
   }
 
   /**
-   * Get ERC20 token balance for an address
+   * Get ERC20 token balance for an address.
+   * Retrieves the current balance of a specific ERC20 token for a given address.
+   *
+   * @param {Token.TokenBalanceParams} params - Parameters for the token balance query
+   * @param {string} params.address - Address to check the balance for
+   * @param {string} params.contractaddress - Contract address of the ERC20 token
+   * @returns {Promise<Token.TokenBalance>} The token balance
+   * @throws {Error} If the address or contract address is invalid
    */
   async getTokenBalance(params: Token.TokenBalanceParams): Promise<Token.TokenBalance> {
     this.logger.debug({ params }, "Getting token balance");
@@ -38,7 +64,13 @@ export class TokenModule extends ESpaceApi {
   }
 
   /**
-   * Get ERC20 token total supply
+   * Get ERC20 token total supply.
+   * Retrieves the current total supply of a specific ERC20 token.
+   *
+   * @param {Token.TokenSupplyParams} params - Parameters for the token supply query
+   * @param {string} params.contractaddress - Contract address of the ERC20 token
+   * @returns {Promise<Token.TokenSupply>} The token total supply
+   * @throws {Error} If the contract address is invalid
    */
   async getTokenSupply(params: Token.TokenSupplyParams): Promise<Token.TokenSupply> {
     this.logger.debug({ params }, "Getting token total supply");
@@ -58,7 +90,15 @@ export class TokenModule extends ESpaceApi {
   }
 
   /**
-   * Get historical ERC20 token total supply at a specific block
+   * Get historical ERC20 token total supply at a specific block.
+   * Retrieves the total supply of a specific ERC20 token at a given block number.
+   *
+   * @param {Token.TokenSupplyHistoryParams} params - Parameters for the historical token supply query
+   * @param {string} params.contractaddress - Contract address of the ERC20 token
+   * @param {string} params.address - Address to check the supply for
+   * @param {number} params.blockno - Block number to check the supply at
+   * @returns {Promise<Token.TokenSupplyHistory>} The historical token supply
+   * @throws {Error} If any of the parameters are invalid
    */
   async getTokenSupplyHistory(
     params: Token.TokenSupplyHistoryParams
@@ -94,7 +134,15 @@ export class TokenModule extends ESpaceApi {
   }
 
   /**
-   * Get historical ERC20 token balance for an account at a specific block number
+   * Get historical ERC20 token balance for an account at a specific block number.
+   * Retrieves the balance of a specific ERC20 token for a given address at a specific block.
+   *
+   * @param {Token.TokenBalanceHistoryParams} params - Parameters for the historical balance query
+   * @param {string} params.contractaddress - Contract address of the ERC20 token
+   * @param {string} params.address - Address to check the balance for
+   * @param {number} params.blockno - Block number to check the balance at
+   * @returns {Promise<Token.TokenBalanceHistory>} The historical token balance
+   * @throws {Error} If any of the parameters are invalid or missing
    */
   async getTokenBalanceHistory(
     params: Token.TokenBalanceHistoryParams

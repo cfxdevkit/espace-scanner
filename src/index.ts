@@ -46,6 +46,7 @@ export {
   Transaction,
   Utils,
   Deprecated,
+  Common,
 } from "./types";
 
 // Formatters

@@ -77,9 +77,11 @@ export class AccountWrapper extends BaseWrapper {
     if (returnRaw) return data;
     return data.map((tx) => ({
       ...tx,
-      timeStamp: tx.timeStamp ? this.formatTimestamp(tx.timeStamp) : tx.timeStamp,
+      timestamp: tx.timestamp ? this.formatTimestamp(Number(tx.timestamp)) : tx.timestamp,
       value:
         tx.value && tx.tokenDecimal ? this.formatUnit(tx.value, Number(tx.tokenDecimal)) : tx.value,
+      gas: tx.gas ? this.formatGas(tx.gas) : tx.gas,
+      gasPrice: tx.gasPrice ? this.formatGas(tx.gasPrice) : tx.gasPrice,
     }));
   }
 
