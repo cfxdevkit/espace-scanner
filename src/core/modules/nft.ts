@@ -1,14 +1,8 @@
 import { ESpaceApi } from "../api";
 import { AddressValidator } from "../../utils";
 import { createLogger } from "../../utils/logger";
-import {
-  NFTBalanceResponse,
-  NFTTokenResponse,
-  NFTPreviewResponse,
-  NFTFungibleTokenResponse,
-  NFTOwnerResponse,
-} from "../../types";
-import { ApiConfig } from "../../types/api";
+import { NFT } from "../../types";
+import { ApiConfig } from "../../types";
 
 export class NFTModule extends ESpaceApi {
   protected logger = createLogger("NFTModule");
@@ -20,19 +14,15 @@ export class NFTModule extends ESpaceApi {
   /**
    * Get NFT balances for an address
    */
-  async getNFTBalances(
-    address: string,
-    skip: number = 0,
-    limit: number = 10
-  ): Promise<NFTBalanceResponse> {
-    this.logger.debug({ address, skip, limit }, "Getting NFT balances");
-    if (!AddressValidator.validateAddress(address)) {
-      throw new Error(`Invalid address: ${address}`);
+  async getBalances(params: NFT.BalancesParams): Promise<NFT.Balances> {
+    this.logger.debug({ params }, "Getting NFT balances");
+    if (!AddressValidator.validateAddress(params.owner)) {
+      throw new Error(`Invalid address: ${params.owner}`);
     }
-    const response = await this.fetchApi<NFTBalanceResponse>("/nft/balances", {
-      account: address,
-      skip,
-      limit,
+    const response = await this.fetchApi<NFT.Balances>("/nft/balances", {
+      owner: params.owner,
+      skip: params.skip,
+      limit: params.limit,
     });
     return response.result;
   }
@@ -40,19 +30,22 @@ export class NFTModule extends ESpaceApi {
   /**
    * Get NFT tokens for a contract
    */
-  async getNFTTokens(
-    contractAddress: string,
-    skip: number = 0,
-    limit: number = 10
-  ): Promise<NFTTokenResponse> {
-    this.logger.debug({ contractAddress, skip, limit }, "Getting NFT tokens");
-    if (!AddressValidator.validateAddress(contractAddress)) {
-      throw new Error(`Invalid contract address: ${contractAddress}`);
+  async getTokens(params: NFT.TokensParams): Promise<NFT.Tokens> {
+    this.logger.debug({ params }, "Getting NFT tokens");
+    if (!AddressValidator.validateAddress(params.contract)) {
+      throw new Error(`Invalid contract address: ${params.contract}`);
     }
-    const response = await this.fetchApi<NFTTokenResponse>("/nft/tokens", {
-      contract: contractAddress,
-      skip,
-      limit,
+    const response = await this.fetchApi<NFT.Tokens>("/nft/tokens", {
+      contract: params.contract,
+      owner: params.owner,
+      sort: params.sort,
+      sortField: params.sortField,
+      cursor: params.cursor,
+      skip: params.skip,
+      limit: params.limit,
+      withBrief: params.withBrief,
+      withMetadata: params.withMetadata,
+      suppressMetadataError: params.suppressMetadataError,
     });
     return response.result;
   }
@@ -60,14 +53,15 @@ export class NFTModule extends ESpaceApi {
   /**
    * Get NFT preview data
    */
-  async getNFTPreview(contractAddress: string, tokenId: string): Promise<NFTPreviewResponse> {
-    this.logger.debug({ contractAddress, tokenId }, "Getting NFT preview");
-    if (!AddressValidator.validateAddress(contractAddress)) {
-      throw new Error(`Invalid contract address: ${contractAddress}`);
+  async getPreview(params: NFT.PreviewParams): Promise<NFT.Preview> {
+    this.logger.debug({ params }, "Getting NFT preview");
+    if (!AddressValidator.validateAddress(params.contract)) {
+      throw new Error(`Invalid contract address: ${params.contract}`);
     }
-    const response = await this.fetchApi<NFTPreviewResponse>("/nft/preview", {
-      contract: contractAddress,
-      tokenId,
+    const response = await this.fetchApi<NFT.Preview>("/nft/preview", {
+      contract: params.contract,
+      tokenId: params.tokenId,
+      withMetadata: params.withMetadata,
     });
     return response.result;
   }
@@ -75,19 +69,11 @@ export class NFTModule extends ESpaceApi {
   /**
    * Get NFT fungible tokens for a contract
    */
-  async getNFTFungibleTokens(
-    contractAddress: string,
-    skip: number = 0,
-    limit: number = 10
-  ): Promise<NFTFungibleTokenResponse> {
-    this.logger.debug({ contractAddress, skip, limit }, "Getting NFT fungible tokens");
-    if (!AddressValidator.validateAddress(contractAddress)) {
-      throw new Error(`Invalid contract address: ${contractAddress}`);
-    }
-    const response = await this.fetchApi<NFTFungibleTokenResponse>("/nft/fungible-tokens", {
-      contract: contractAddress,
-      skip,
-      limit,
+  async getFts(params: NFT.FtsParams): Promise<NFT.Fts> {
+    this.logger.debug({ params }, "Search the NFT by NFT name and/or contract address.");
+    const response = await this.fetchApi<NFT.Fts>("/nft/fts", {
+      contract: params.contract,
+      name: params.name,
     });
     return response.result;
   }
@@ -95,21 +81,40 @@ export class NFTModule extends ESpaceApi {
   /**
    * Get NFT owners for a specific token
    */
-  async getNFTOwners(
-    contractAddress: string,
-    tokenId: string,
-    skip: number = 0,
-    limit: number = 10
-  ): Promise<NFTOwnerResponse> {
-    this.logger.debug({ contractAddress, tokenId, skip, limit }, "Getting NFT owners");
-    if (!AddressValidator.validateAddress(contractAddress)) {
-      throw new Error(`Invalid contract address: ${contractAddress}`);
+  async getOwners(params: NFT.OwnersParams): Promise<NFT.Owners> {
+    this.logger.debug({ params }, "Getting NFT owners");
+    if (!AddressValidator.validateAddress(params.contract)) {
+      throw new Error(`Invalid contract address: ${params.contract}`);
     }
-    const response = await this.fetchApi<NFTOwnerResponse>("/nft/owners", {
-      contract: contractAddress,
-      tokenId,
-      skip,
-      limit,
+    const response = await this.fetchApi<NFT.Owners>("/nft/owners", {
+      contract: params.contract,
+      tokenId: params.tokenId,
+      cursor: params.cursor,
+      limit: params.limit,
+    });
+    return response.result;
+  }
+
+  /**
+   * Get NFT transfers for a specific token
+   */
+  async getTransfers(params: NFT.TransfersParams): Promise<NFT.Transfers> {
+    this.logger.debug({ params }, "Getting NFT transfers");
+    if (!AddressValidator.validateAddress(params.contract)) {
+      throw new Error(`Invalid contract address: ${params.contract}`);
+    }
+    const response = await this.fetchApi<NFT.Transfers>("/nft/transfers", {
+      contract: params.contract,
+      tokenId: params.tokenId,
+      cursor: params.cursor,
+      limit: params.limit,
+      from: params.from,
+      to: params.to,
+      startBlock: params.startBlock,
+      endBlock: params.endBlock,
+      minTimestamp: params.minTimestamp,
+      maxTimestamp: params.maxTimestamp,
+      sort: params.sort,
     });
     return response.result;
   }

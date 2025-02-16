@@ -1,31 +1,23 @@
 import { BaseWrapper } from "../base";
-import {
-  NFTBalanceResponse,
-  NFTTokenResponse,
-  NFTPreviewResponse,
-  NFTFungibleTokenResponse,
-  NFTOwnerResponse,
-  NFTTransferList,
-} from "../../types/responses";
-import { NFTTransferParams } from "../../types/params";
-
+import { ApiConfig, NFT } from "../../types";
+import { NFTModule } from "../../core/modules";
 export class NFTWrapper extends BaseWrapper {
   /**
    * Get NFT balances for an address
    */
-  async getNFTBalances(
-    address: string,
-    skip: number = 0,
-    limit: number = 10,
-    returnRaw: boolean = false
-  ): Promise<NFTBalanceResponse> {
-    const data = await this.scanner.nft.getNFTBalances(address, skip, limit);
+  private nft: NFTModule;
+  constructor(config: ApiConfig = { target: "mainnet" }) {
+    super();
+    this.nft = new NFTModule(config);
+  }
+  async getBalances(params: NFT.BalancesParams, returnRaw: boolean = false): Promise<NFT.Balances> {
+    const data = await this.nft.getBalances(params);
     if (returnRaw) return data;
     return {
       ...data,
-      list: data.list.map((item) => ({
+      list: data.list?.map((item) => ({
         ...item,
-        amount: this.formatNumber(item.amount),
+        balance: item.balance ? this.formatNumber(item.balance) : item.balance,
       })),
     };
   }
@@ -33,78 +25,54 @@ export class NFTWrapper extends BaseWrapper {
   /**
    * Get NFT tokens for a contract
    */
-  async getNFTTokens(
-    contractAddress: string,
-    skip: number = 0,
-    limit: number = 10,
-    _returnRaw: boolean = false
-  ): Promise<NFTTokenResponse> {
-    const data = await this.scanner.nft.getNFTTokens(contractAddress, skip, limit);
+  async getTokens(params: NFT.TokensParams, returnRaw: boolean = false): Promise<NFT.Tokens> {
+    const data = await this.nft.getTokens(params);
+    if (returnRaw) return data;
     return data;
   }
 
   /**
    * Get NFT preview data
    */
-  async getNFTPreview(
-    contractAddress: string,
-    tokenId: string,
-    _returnRaw: boolean = false
-  ): Promise<NFTPreviewResponse> {
-    const data = await this.scanner.nft.getNFTPreview(contractAddress, tokenId);
+  async getPreview(params: NFT.PreviewParams, returnRaw: boolean = false): Promise<NFT.Preview> {
+    const data = await this.nft.getPreview(params);
+    if (returnRaw) return data;
     return data;
   }
 
   /**
    * Get NFT fungible tokens for a contract
    */
-  async getNFTFungibleTokens(
-    contractAddress: string,
-    skip: number = 0,
-    limit: number = 10,
-    _returnRaw: boolean = false
-  ): Promise<NFTFungibleTokenResponse> {
-    const data = await this.scanner.nft.getNFTFungibleTokens(contractAddress, skip, limit);
+  async getFts(params: NFT.FtsParams, returnRaw: boolean = false): Promise<NFT.Fts> {
+    const data = await this.nft.getFts(params);
+    if (returnRaw) return data;
     return data;
   }
 
   /**
    * Get NFT owners for a specific token
    */
-  async getNFTOwners(
-    contractAddress: string,
-    tokenId: string,
-    skip: number = 0,
-    limit: number = 10,
-    returnRaw: boolean = false
-  ): Promise<NFTOwnerResponse> {
-    const data = await this.scanner.nft.getNFTOwners(contractAddress, tokenId, skip, limit);
+  async getOwners(params: NFT.OwnersParams, returnRaw: boolean = false): Promise<NFT.Owners> {
+    const data = await this.nft.getOwners(params);
     if (returnRaw) return data;
-    return {
-      ...data,
-      list: data.list.map((item) => ({
-        ...item,
-        quantity: this.formatNumber(item.quantity),
-      })),
-    };
+    return data;
   }
 
   /**
-   * Get a list of NFT token transfers with optional formatting
+   * Get NFT transfers for a specific token
    */
-  async getNFTTransfers(
-    params: NFTTransferParams = {},
+  async getTransfers(
+    params: NFT.TransfersParams,
     returnRaw: boolean = false
-  ): Promise<NFTTransferList> {
-    const data = await this.scanner.account.getNFTTransfers(params);
+  ): Promise<NFT.Transfers> {
+    const data = await this.nft.getTransfers(params);
     if (returnRaw) return data;
-    return data.map((tx) => ({
-      ...tx,
-      timeStamp: this.formatTimestamp(tx.timeStamp),
-      gas: this.formatGas(tx.gas),
-      gasPrice: this.formatGas(tx.gasPrice),
-      cumulativeGasUsed: this.formatGas(tx.cumulativeGasUsed),
-      gasUsed: this.formatGas(tx.gasUsed),
-    }));
+    return {
+      ...data,
+      list: data.list?.map((item) => ({
+        ...item,
+        timestamp: item.timestamp ? Number(this.formatTimestamp(item.timestamp)) : item.timestamp,
+      })),
+    };
   }
 }

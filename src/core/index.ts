@@ -12,7 +12,9 @@ export {
   BlockModule,
   ContractModule,
   NFTModule,
-  StatsModule,
+  StatisticsModule,
   TokenModule,
   TransactionModule,
+  UtilsModule,
+  DeprecatedModule,
 } from "./modules";

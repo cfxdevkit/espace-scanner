@@ -244,7 +244,8 @@ export function getApiEndpointInfo(
  */
 export function generateTypeDefinitions(
   endpointInfo: ApiEndpointInfo,
-  spec: OpenAPIV3.Document
+  spec: OpenAPIV3.Document,
+  typeName: string
 ): string {
   let typeDefinitions = "";
 
@@ -273,82 +274,107 @@ export function generateTypeDefinitions(
       }
       docs += " */";
 
+      // Special handling for contract property to ensure consistency
+      if (param.name === "contract") {
+        // If it's marked as required in the schema, keep it required
+        const contractOptional = param.required ? "" : "?";
+        return `  ${docs}\n  contract${contractOptional}: string;`;
+      }
+
       return `  ${docs}\n  ${param.name}${optional}: ${type};`;
     })
     .join("\n\n");
 
-  const interfaceName = capitalize(
-    endpointInfo.path
-      .split("/")
-      .pop()
-      ?.replace(/[^a-zA-Z0-9]/g, "") || "Request"
-  );
-
   // Add eslint-disable comment if the interface would be empty
-  const paramsComment = !parameterProps ? "// eslint-disable-next-line\n" : "";
-  typeDefinitions += `${paramsComment}export interface ${interfaceName}Params {\n${parameterProps}\n}\n\n`;
+  const paramsComment = !parameterProps
+    ? "// eslint-disable-next-line @typescript-eslint/no-empty-interface\n"
+    : "";
+  typeDefinitions += `${paramsComment}export interface ${typeName}Params {\n${parameterProps}\n}\n\n`;
 
   // Generate response interface if schema exists
   if (endpointInfo.responseSchema) {
-    // First generate the result type if it exists
-    let resultType = "";
-    if (endpointInfo.responseSchema.properties?.result) {
-      const resultSchema = endpointInfo.responseSchema.properties.result as OpenAPIV3.SchemaObject;
-      resultType = generateSchemaInterface(resultSchema, spec);
-    }
+    const resultSchema = endpointInfo.responseSchema.properties?.result as OpenAPIV3.SchemaObject;
+    if (resultSchema) {
+      let resultType = "";
 
-    // Then generate the main response interface
-    let responseProps = "";
-    for (const [propName, propSchema] of Object.entries(
-      endpointInfo.responseSchema.properties || {}
-    )) {
-      const resolvedSchema = resolveSchema(
-        propSchema as OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject,
-        spec
-      );
-      if (!resolvedSchema) {
-        responseProps += `\n  ${propName}?: any;\n`;
-        continue;
-      }
-
-      if (propName === "result") {
-        if (resolvedSchema.properties) {
-          // If result is an object with properties, generate an inline interface
-          responseProps += `\n  /** API response result */\n  result?: {\n`;
-          for (const [key, propValue] of Object.entries(resolvedSchema.properties)) {
-            const resolvedProp = resolveSchema(
-              propValue as OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject,
+      if (resultSchema.properties) {
+        // If result is an object with properties, generate an interface
+        const properties = Object.entries(resultSchema.properties)
+          .map(([propName, propSchema]) => {
+            const resolvedPropSchema = resolveSchema(
+              propSchema as OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject,
               spec
             );
-            if (!resolvedProp) continue;
+            if (!resolvedPropSchema) return null;
 
-            const propType =
-              resolvedProp.type === "integer" ? "number" : resolvedProp.type || "any";
-            const description = resolvedProp.description
-              ? `\n    /** ${resolvedProp.description} */\n`
-              : "\n";
-            responseProps += `${description}    ${key}?: ${propType};\n`;
-          }
-          responseProps += "  };\n";
+            return generatePropertyDefinition(propName, resolvedPropSchema, spec, "  ");
+          })
+          .filter(Boolean)
+          .join("\n");
+
+        resultType = `{\n${properties}\n}`;
+      } else if (resultSchema.type === "array" && resultSchema.items) {
+        // If result is an array
+        const itemSchema = resolveSchema(resultSchema.items, spec);
+        if (itemSchema && (itemSchema.type === "object" || itemSchema.properties)) {
+          resultType = `Array<{\n${generateSchemaInterface(itemSchema, spec)}\n}>`;
         } else {
-          // Otherwise use the generated result type
-          responseProps += `\n  /** API response result */\n  result?: ${resultType || "any"};\n`;
+          resultType = `Array<${itemSchema?.type === "integer" ? "number" : itemSchema?.type || "any"}>`;
         }
       } else {
-        const type = resolvedSchema.type === "integer" ? "number" : resolvedSchema.type || "any";
-        const description = resolvedSchema.description
-          ? `\n  /** ${resolvedSchema.description} */`
-          : "";
-        responseProps += `${description}\n  ${propName}?: ${type};\n`;
+        // For primitive types
+        resultType = resultSchema.type === "integer" ? "number" : resultSchema.type || "any";
       }
-    }
 
-    // Add eslint-disable comment if the interface would be empty
-    const responseComment = !responseProps ? "// eslint-disable-next-line\n" : "";
-    typeDefinitions += `${responseComment}export interface ${interfaceName}Response {${responseProps}}\n`;
+      typeDefinitions += `export type ${typeName}Response = ApiResponse<${resultType}>;\n`;
+    } else {
+      // If no result schema, use any
+      typeDefinitions += `export type ${typeName}Response = ApiResponse<any>;\n`;
+    }
   }
 
   return typeDefinitions;
+}
+
+function generatePropertyDefinition(
+  propName: string,
+  schema: OpenAPIV3.SchemaObject,
+  spec: OpenAPIV3.Document,
+  indent: string
+): string | null {
+  let type: string;
+
+  if (schema.type === "array" && schema.items) {
+    const itemSchema = resolveSchema(schema.items, spec);
+    if (!itemSchema) return `${propName}: Array<any>;`;
+
+    if (itemSchema.type === "object" || itemSchema.properties) {
+      type = `Array<{\n${generateSchemaInterface(itemSchema, spec, indent + "  ")}\n${indent}}>`;
+    } else {
+      const itemType = itemSchema.type === "integer" ? "number" : itemSchema.type || "any";
+      type = `Array<${itemType}>`;
+    }
+  } else if (schema.type === "object" || schema.properties) {
+    type = `{\n${generateSchemaInterface(schema, spec, indent + "  ")}\n${indent}}`;
+  } else if (schema.additionalProperties && typeof schema.additionalProperties === "object") {
+    const valueSchema = resolveSchema(schema.additionalProperties, spec);
+    if (!valueSchema) {
+      type = "{ [key: string]: any }";
+    } else if (valueSchema.type === "object" || valueSchema.properties) {
+      // Remove the extra braces, the outer braces will be added by the property definition
+      type = `{ [key: string]: {\n${generateSchemaInterface(valueSchema, spec, indent + "  ")}\n${indent}} }`;
+    } else {
+      const valueType = valueSchema.type === "integer" ? "number" : valueSchema.type || "any";
+      type = `{ [key: string]: ${valueType} }`;
+    }
+  } else {
+    type = schema.type === "integer" ? "number" : schema.type || "any";
+  }
+
+  const optional = schema.required ? "" : "?";
+  const description = schema.description ? `\n${indent}/** ${schema.description} */` : "";
+
+  return `${description}\n${indent}${propName}${optional}: ${type};`;
 }
 
 /**
@@ -366,22 +392,41 @@ function generateSchemaInterface(
     // Handle array types
     if (resolvedSchema.type === "array" && resolvedSchema.items) {
       const itemSchema = resolveSchema(resolvedSchema.items, spec);
-      if (!itemSchema) return "any[]";
+      if (!itemSchema) return "Array<object>";
 
       if (itemSchema.type === "object" || itemSchema.properties) {
         return `Array<{\n${generateSchemaInterface(itemSchema, spec, indent + "  ")}\n${indent}}>`;
       } else if (itemSchema.type === "array") {
         return `${generateSchemaInterface(itemSchema, spec, indent)}[]`;
       } else {
-        const type = itemSchema.type === "integer" ? "number" : itemSchema.type || "any";
-        return `${type}[]`;
+        const type = itemSchema.type === "integer" ? "number" : itemSchema.type || "object";
+        return `Array<${type}>`;
       }
     }
+
+    // Handle additionalProperties (for dictionary/map types)
+    if (
+      resolvedSchema.additionalProperties &&
+      typeof resolvedSchema.additionalProperties === "object"
+    ) {
+      const valueSchema = resolveSchema(resolvedSchema.additionalProperties, spec);
+      if (!valueSchema) return "{ [key: string]: any }";
+
+      if (valueSchema.type === "object" || valueSchema.properties) {
+        // Remove the extra braces, they will be added by the property definition
+        return `[key: string]: {\n${generateSchemaInterface(valueSchema, spec, indent + "  ")}\n${indent}}`;
+      } else {
+        const type = valueSchema.type === "integer" ? "number" : valueSchema.type || "any";
+        return `[key: string]: ${type}`;
+      }
+    }
+
     // Handle primitive types
     return resolvedSchema.type === "integer" ? "number" : resolvedSchema.type || "any";
   }
 
-  return Object.entries(resolvedSchema.properties)
+  // Process each property and handle nested structures
+  const properties = Object.entries(resolvedSchema.properties)
     .map(([propName, propSchema]) => {
       const resolvedPropSchema = resolveSchema(
         propSchema as OpenAPIV3.SchemaObject | OpenAPIV3.ReferenceObject,
@@ -393,18 +438,32 @@ function generateSchemaInterface(
 
       if (resolvedPropSchema.type === "array" && resolvedPropSchema.items) {
         const itemSchema = resolveSchema(resolvedPropSchema.items, spec);
-        if (!itemSchema) return `${propName}: any[];`;
+        if (!itemSchema) return `${propName}: Array<object>;`;
 
         if (itemSchema.type === "object" || itemSchema.properties) {
           type = `Array<{\n${generateSchemaInterface(itemSchema, spec, indent + "  ")}\n${indent}}>`;
         } else if (itemSchema.type === "array") {
           type = `${generateSchemaInterface(itemSchema, spec, indent)}[]`;
         } else {
-          const itemType = itemSchema.type === "integer" ? "number" : itemSchema.type || "any";
-          type = `${itemType}[]`;
+          const itemType = itemSchema.type === "integer" ? "number" : itemSchema.type || "object";
+          type = `Array<${itemType}>`;
         }
       } else if (resolvedPropSchema.type === "object" || resolvedPropSchema.properties) {
         type = `{\n${generateSchemaInterface(resolvedPropSchema, spec, indent + "  ")}\n${indent}}`;
+      } else if (
+        resolvedPropSchema.additionalProperties &&
+        typeof resolvedPropSchema.additionalProperties === "object"
+      ) {
+        const valueSchema = resolveSchema(resolvedPropSchema.additionalProperties, spec);
+        if (!valueSchema) {
+          type = "{ [key: string]: any }";
+        } else if (valueSchema.type === "object" || valueSchema.properties) {
+          // Remove the extra braces, they will be added by the property definition
+          type = `{ [key: string]: {\n${generateSchemaInterface(valueSchema, spec, indent + "  ")}\n${indent}} }`;
+        } else {
+          const valueType = valueSchema.type === "integer" ? "number" : valueSchema.type || "any";
+          type = `{ [key: string]: ${valueType} }`;
+        }
       } else {
         type = resolvedPropSchema.type === "integer" ? "number" : resolvedPropSchema.type || "any";
       }
@@ -417,6 +476,8 @@ function generateSchemaInterface(
       return `${description}\n${indent}${propName}${optional}: ${type};`;
     })
     .join("\n");
+
+  return properties;
 }
 
 function capitalize(str: string): string {

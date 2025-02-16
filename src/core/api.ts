@@ -1,4 +1,4 @@
-import { ApiConfig } from "../types/api";
+import { ApiConfig, ApiResponse } from "../types";
 import { createLogger } from "../utils/logger";
 
 /**
@@ -10,7 +10,7 @@ export class ESpaceApi {
   protected apiKey?: string;
   protected logger = createLogger("ESpaceApi");
 
-  constructor({ target = "mainnet", apiKey, host }: ApiConfig = {}) {
+  constructor({ target = "mainnet", apiKey, host }: ApiConfig = { target: "mainnet" }) {
     const defaultMainnetHost = "https://evmapi.confluxscan.io";
     const defaultTestnetHost = "https://evmapi-testnet.confluxscan.io";
     const defaultHost = target === "mainnet" ? defaultMainnetHost : defaultTestnetHost;
@@ -28,7 +28,7 @@ export class ESpaceApi {
   protected async fetchApi<T>(
     endpoint: string,
     params: Record<string, string | number | boolean | null | undefined> = {}
-  ): Promise<{ result: T }> {
+  ): Promise<ApiResponse<T>> {
     // Filter out undefined and null values
     const validParams = Object.fromEntries(
       Object.entries(params).filter(([_, value]) => value != null)
@@ -64,35 +64,17 @@ export class ESpaceApi {
     }
 
     const data = await response.json();
-    if (data.error) {
+    if (Number(data.status) !== 1) {
       this.logger.error(
         {
           endpoint,
           params: validParams,
-          error: data.error.message,
+          error: data.message,
         },
         "API returned error"
       );
-      throw new Error(`API error: ${data.error.message}`);
     }
-
     this.logger.debug({ endpoint, responseStatus: data.status }, "API request successful");
     return data;
-  }
-
-  /**
-   * Get current timestamp in seconds
-   * @returns Current timestamp
-   */
-  protected getCurrentTimestamp(): number {
-    return Math.floor(Date.now() / 1000);
-  }
-
-  /**
-   * Get timestamp from 24 hours ago
-   * @returns Timestamp from 24 hours ago
-   */
-  protected get24HoursAgo(): number {
-    return this.getCurrentTimestamp() - 24 * 60 * 60;
   }
 }

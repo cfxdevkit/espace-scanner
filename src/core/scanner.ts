@@ -9,11 +9,13 @@ import {
   BlockModule,
   ContractModule,
   NFTModule,
-  StatsModule,
+  StatisticsModule,
   TokenModule,
   TransactionModule,
+  UtilsModule,
+  DeprecatedModule,
 } from "./modules";
-import { ApiConfig } from "../types/api";
+import { ApiConfig } from "../types";
 
 export class ESpaceScanner extends ESpaceApi {
   protected logger = createLogger("ESpaceScanner");
@@ -22,18 +24,21 @@ export class ESpaceScanner extends ESpaceApi {
   public readonly block: BlockModule;
   public readonly contract: ContractModule;
   public readonly nft: NFTModule;
-  public readonly stats: StatsModule;
+  public readonly statistics: StatisticsModule;
   public readonly token: TokenModule;
   public readonly transaction: TransactionModule;
-
-  constructor(config: ApiConfig = {}) {
+  public readonly utils: UtilsModule;
+  public readonly deprecated: DeprecatedModule;
+  constructor(config: ApiConfig = { target: "mainnet" }) {
     super(config);
     this.account = new AccountModule(config);
     this.block = new BlockModule(config);
     this.contract = new ContractModule(config);
     this.nft = new NFTModule(config);
-    this.stats = new StatsModule(config);
+    this.statistics = new StatisticsModule(config);
     this.token = new TokenModule(config);
     this.transaction = new TransactionModule(config);
+    this.utils = new UtilsModule(config);
+    this.deprecated = new DeprecatedModule(config);
   }
 }

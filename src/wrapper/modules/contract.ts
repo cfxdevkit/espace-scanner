@@ -1,23 +1,29 @@
 import { BaseWrapper } from "../base";
-import { ContractSourceResponse } from "../../types/responses";
-
+import { ApiConfig, Contract } from "../../types";
+import { ContractModule } from "../../core/modules";
 export class ContractWrapper extends BaseWrapper {
   /**
-   * Get contract ABI with optional formatting
+   * Get contract ABI
    */
-  async getContractABI(address: string, _returnRaw: boolean = false): Promise<object> {
-    const data = await this.scanner.contract.getContractABI(address);
+  private contract: ContractModule;
+  constructor(config: ApiConfig = { target: "mainnet" }) {
+    super();
+    this.contract = new ContractModule(config);
+  }
+  async getABI(params: Contract.ABIParams, returnRaw: boolean = false): Promise<Contract.ABI> {
+    const data = await this.contract.getABI(params);
+    if (returnRaw) return data;
     return data;
   }
 
   /**
-   * Get contract source code with optional formatting
+   * Get contract source code
    */
-  async getContractSourceCode(
-    address: string,
+  async getSourceCode(
+    params: Contract.SourceParams,
     returnRaw: boolean = false
-  ): Promise<ContractSourceResponse> {
-    const data = await this.scanner.contract.getContractSourceCode(address);
+  ): Promise<Contract.Source> {
+    const data = await this.contract.getSourceCode(params);
     if (returnRaw) return data;
     return {
       ...data,
@@ -28,8 +34,12 @@ export class ContractWrapper extends BaseWrapper {
   /**
    * Check source code verification submission status
    */
-  async checkVerifyStatus(guid: string, _returnRaw: boolean = false): Promise<string> {
-    const data = await this.scanner.contract.checkVerifyStatus(guid);
+  async checkVerifyStatus(
+    params: Contract.checkVerifyStatusParams,
+    returnRaw: boolean = false
+  ): Promise<Contract.checkVerifyStatus> {
+    const data = await this.contract.checkVerifyStatus(params);
+    if (returnRaw) return data;
     return data;
   }
 
@@ -37,19 +47,23 @@ export class ContractWrapper extends BaseWrapper {
    * Verify a proxy contract
    */
   async verifyProxyContract(
-    address: string,
-    expectedImplementation?: string,
-    _returnRaw: boolean = false
-  ): Promise<string> {
-    const data = await this.scanner.contract.verifyProxyContract(address, expectedImplementation);
+    params: Contract.verifyProxyContractParams,
+    returnRaw: boolean = false
+  ): Promise<Contract.verifyProxyContract> {
+    const data = await this.contract.verifyProxyContract(params);
+    if (returnRaw) return data;
     return data;
   }
 
   /**
    * Check proxy contract verification submission status
    */
-  async checkProxyVerification(guid: string, _returnRaw: boolean = false): Promise<string> {
-    const data = await this.scanner.contract.checkProxyVerification(guid);
+  async checkProxyVerification(
+    params: Contract.checkProxyVerificationParams,
+    returnRaw: boolean = false
+  ): Promise<Contract.checkProxyVerification> {
+    const data = await this.contract.checkProxyVerification(params);
+    if (returnRaw) return data;
     return data;
   }
 }

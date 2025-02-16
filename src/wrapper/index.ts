@@ -4,15 +4,6 @@
  * @module wrapper
  */
 
-export { ESpaceScannerWrapper } from "./scanner";
-
-// Wrapper modules
-export {
-  AccountWrapper,
-  BlockWrapper,
-  ContractWrapper,
-  NFTWrapper,
-  StatsWrapper,
-  TokenWrapper,
-  TransactionWrapper,
-} from "./modules";
+export * from "./scanner";
+export * from "./modules";
+export * from "./base";
