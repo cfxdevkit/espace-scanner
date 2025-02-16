@@ -1,5 +1,6 @@
 /**
- * @fileoverview NFT module for interacting with NFTs on Conflux eSpace.
+ * @packageDocumentation
+ * NFT module for interacting with NFTs on Conflux eSpace.
  * Provides functionality for querying NFT balances, tokens, transfers, and ownership information.
  * @module core/modules/nft
  */

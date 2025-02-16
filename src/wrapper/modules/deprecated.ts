@@ -1,3 +1,11 @@
+/**
+ * @packageDocumentation
+ * Deprecated wrapper module for the Conflux eSpace Scanner SDK.
+ * Provides high-level methods for deprecated operations with data formatting.
+ * @module wrapper/modules/deprecated
+ * @category Wrappers
+ */
+
 import { BaseWrapper } from "../base";
 import { ApiConfig, Deprecated } from "../../types";
 import { DeprecatedModule } from "../../core/modules";

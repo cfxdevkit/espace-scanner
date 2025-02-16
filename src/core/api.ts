@@ -1,5 +1,6 @@
 /**
- * @fileoverview Core API module for the Conflux eSpace Scanner SDK.
+ * @packageDocumentation
+ * Core API module for the Conflux eSpace Scanner SDK.
  * This file contains the base API class that handles HTTP requests to the Conflux eSpace API.
  * @module core/api
  */

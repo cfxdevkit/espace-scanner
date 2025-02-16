@@ -1,5 +1,6 @@
 /**
- * @fileoverview Core Scanner implementation for the Conflux eSpace Scanner API.
+ * @packageDocumentation
+ * Core Scanner implementation for the Conflux eSpace Scanner API.
  * This file contains the main scanner class that provides access to all API modules.
  * @module core/scanner
  */

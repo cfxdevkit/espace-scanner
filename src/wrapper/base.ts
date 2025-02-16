@@ -1,14 +1,20 @@
 /**
- * @fileoverview Base wrapper module providing common formatting functionality.
+ * @packageDocumentation
+ * Base wrapper module providing common formatting functionality.
  * Contains the base wrapper class that all other wrapper modules extend.
  * @module wrapper/base
  */
 
 import { ResponseFormatter } from "../formatters";
+
 /**
  * Base wrapper class that provides common functionality for all wrapper modules.
  * Handles module instance creation and common formatting methods.
  *
+ * This class serves as the foundation for all wrapper modules in the SDK,
+ * providing shared formatting utilities for consistent data presentation.
+ *
+ * @public
  * @class BaseWrapper
  */
 export class BaseWrapper {

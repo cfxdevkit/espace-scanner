@@ -1,17 +1,17 @@
 /**
- * @fileoverview Base type definitions used across the Conflux eSpace Scanner SDK.
+ * @packageDocumentation
+ * Base type definitions used across the Conflux eSpace Scanner SDK.
  * Contains core types for API configuration and responses.
  * @module types/base
+ * @category Types
  */
 
 /**
  * Conflux network target types.
  * Specifies which network environment to interact with.
  *
- * @typedef {string} ConfluxTarget
- *
- * @property {"mainnet"} mainnet - Main network
- * @property {"testnet"} testnet - Test network
+ * @public
+ * @category Types
  */
 export type ConfluxTarget = "mainnet" | "testnet";
 
@@ -19,7 +19,8 @@ export type ConfluxTarget = "mainnet" | "testnet";
  * API configuration options.
  * Contains settings for connecting to the Conflux eSpace Scanner API.
  *
- * @interface ApiConfig
+ * @public
+ * @category Types
  */
 export interface ApiConfig {
   /** Target network environment */
@@ -34,8 +35,8 @@ export interface ApiConfig {
  * Generic API Response type used across all endpoints.
  * Wraps the response data with status information.
  *
- * @interface ApiResponse
- * @template T - The type of the response result data
+ * @public
+ * @category Types
  */
 export interface ApiResponse<T> {
   /** Response status code */

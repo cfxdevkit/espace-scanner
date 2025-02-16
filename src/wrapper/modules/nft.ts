@@ -1,3 +1,11 @@
+/**
+ * @packageDocumentation
+ * NFT-related wrapper module for the Conflux eSpace Scanner SDK.
+ * Provides high-level methods for NFT operations with data formatting.
+ * @module wrapper/modules/nft
+ * @category Wrappers
+ */
+
 import { BaseWrapper } from "../base";
 import { ApiConfig, NFT } from "../../types";
 import { NFTModule } from "../../core/modules";

@@ -1,6 +1,22 @@
+/**
+ * @packageDocumentation
+ * Account-related wrapper module for the Conflux eSpace Scanner SDK.
+ * Provides high-level methods for account operations with data formatting.
+ * @module wrapper/modules/account
+ * @category Wrappers
+ */
+
 import { BaseWrapper } from "../base";
 import { Account, ApiConfig } from "../../types";
 import { AccountModule } from "../../core/modules";
+
+/**
+ * Wrapper class for account-related operations.
+ * Extends BaseWrapper to provide formatted data responses.
+ *
+ * @public
+ * @category Wrappers
+ */
 export class AccountWrapper extends BaseWrapper {
   /**
    * Get CFX balance for a single address

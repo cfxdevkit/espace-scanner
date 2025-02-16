@@ -1,5 +1,6 @@
 /**
- * @fileoverview Contract module for interacting with smart contracts on Conflux eSpace.
+ * @packageDocumentation
+ * Contract module for interacting with smart contracts on Conflux eSpace.
  * Provides functionality for retrieving contract information, verification, and source code management.
  * @module core/modules/contract
  */

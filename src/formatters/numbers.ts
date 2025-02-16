@@ -1,5 +1,6 @@
 /**
- * @fileoverview Number formatting utilities for blockchain-specific values.
+ * @packageDocumentation
+ * Number formatting utilities for blockchain-specific values.
  * Provides functionality for formatting numbers, percentages, gas values, and cryptocurrency amounts.
  * Handles scientific notation, decimal places, and unit conversions.
  * @module formatters/numbers

@@ -1,5 +1,6 @@
 /**
- * @fileoverview Date and timestamp formatting utilities.
+ * @packageDocumentation
+ * Date and timestamp formatting utilities.
  * Provides functionality for consistent date formatting and timestamp calculations.
  * All timestamps are handled in UTC to ensure consistency across different timezones.
  * @module formatters/dates

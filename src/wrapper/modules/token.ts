@@ -1,3 +1,11 @@
+/**
+ * @packageDocumentation
+ * Token-related wrapper module for the Conflux eSpace Scanner SDK.
+ * Provides high-level methods for token operations with data formatting.
+ * @module wrapper/modules/token
+ * @category Wrappers
+ */
+
 import { BaseWrapper } from "../base";
 import { ApiConfig, Token } from "../../types";
 import { TokenModule } from "../../core/modules";

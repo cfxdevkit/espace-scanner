@@ -1,3 +1,11 @@
+/**
+ * @packageDocumentation
+ * Block-related wrapper module for the Conflux eSpace Scanner SDK.
+ * Provides high-level methods for block operations with data formatting.
+ * @module wrapper/modules/block
+ * @category Wrappers
+ */
+
 import { BaseWrapper } from "../base";
 import { ApiConfig, Block } from "../../types";
 import { BlockModule } from "../../core/modules";

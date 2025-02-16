@@ -1,5 +1,6 @@
 /**
- * @fileoverview Logging utility configuration and factory.
+ * @packageDocumentation
+ * Logging utility configuration and factory.
  * Provides a centralized logging setup using pino with pretty printing.
  * Supports module-specific child loggers and configurable log levels.
  * @module utils/logger

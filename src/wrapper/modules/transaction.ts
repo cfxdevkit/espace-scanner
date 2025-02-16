@@ -1,3 +1,11 @@
+/**
+ * @packageDocumentation
+ * Transaction-related wrapper module for the Conflux eSpace Scanner SDK.
+ * Provides high-level methods for transaction operations with data formatting.
+ * @module wrapper/modules/transaction
+ * @category Wrappers
+ */
+
 import { BaseWrapper } from "../base";
 import { ApiConfig, Transaction } from "../../types";
 import { TransactionModule } from "../../core/modules";

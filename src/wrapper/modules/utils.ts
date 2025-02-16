@@ -1,3 +1,11 @@
+/**
+ * @packageDocumentation
+ * Utility wrapper module for the Conflux eSpace Scanner SDK.
+ * Provides high-level methods for utility operations with data formatting.
+ * @module wrapper/modules/utils
+ * @category Wrappers
+ */
+
 import { BaseWrapper } from "../base";
 import { ApiConfig, Utils } from "../../types";
 import { UtilsModule } from "../../core/modules";

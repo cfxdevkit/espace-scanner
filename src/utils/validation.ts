@@ -1,5 +1,6 @@
 /**
- * @fileoverview Address validation utilities for Conflux eSpace.
+ * @packageDocumentation
+ * Address validation utilities for Conflux eSpace.
  * Provides functionality for validating single and multiple Ethereum-style addresses.
  * Uses viem's isAddress for validation and includes logging.
  * @module utils/validation

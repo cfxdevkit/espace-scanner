@@ -1,8 +1,10 @@
 {
-  "entryPoints": ["src/index.ts"],
+  "entryPoints": [
+    "src/index.ts",
+  ],
   "out": "docs",
-  "excludePrivate": true,
-  "excludeProtected": true,
+  "excludePrivate": false,
+  "excludeProtected": false,
   "excludeExternals": false,
   "includeVersion": true,
   "gitRemote": "origin",
@@ -13,7 +15,7 @@
   "excludeNotDocumented": false,
   "visibilityFilters": {
     "protected": true,
-    "private": false,
+    "private": true,
     "inherited": true,
     "external": true
   },
@@ -22,5 +24,13 @@
     "notExported": true,
     "invalidLink": true,
     "notDocumented": false
-  }
+  },
+  "categorizeByGroup": true,
+  "categoryOrder": ["Wrappers", "Core", "Types", "*"],
+  "navigationLinks": {
+    "GitHub": "https://github.com/cfxdevkit/espace-scanner"
+  },
+  "entryPointStrategy": "expand",
+  "sort": ["source-order"],
+  "theme": "default"
 } 

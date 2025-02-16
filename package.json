@@ -20,7 +20,7 @@
     "format:check": "prettier --check \"src/**/*.ts\" \"examples/**/*.ts\"",
     "prepare": "husky install",
     "prepublishOnly": "npm run build",
-    "docs": "typedoc --out docs src/index.ts",
+    "docs": "typedoc",
     "clean": "rimraf dist coverage docs",
     "example:scanner:account": "ts-node examples/scanner/account.ts",
     "example:scanner:block": "ts-node examples/scanner/block.ts",
@@ -89,6 +89,7 @@
     "ts-jest": "^29.1.0",
     "ts-node": "^10.9.0",
     "typedoc": "^0.27.0",
+    "typedoc-plugin-markdown": "^3.17.1",
     "typescript": "^5.0.0",
     "typescript-eslint": "^8.23.0"
   },

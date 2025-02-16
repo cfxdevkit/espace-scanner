@@ -1,5 +1,6 @@
 /**
- * @fileoverview Account module for interacting with account-related functionality on Conflux eSpace.
+ * @packageDocumentation
+ * Account module for interacting with account-related functionality on Conflux eSpace.
  * Provides functionality for querying account balances, transactions, and other account-related data.
  * @module core/modules/account
  */

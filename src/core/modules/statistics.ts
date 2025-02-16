@@ -1,5 +1,6 @@
 /**
- * @fileoverview Statistics module for retrieving network and blockchain statistics from Conflux eSpace.
+ * @packageDocumentation
+ * Statistics module for retrieving network and blockchain statistics from Conflux eSpace.
  * Provides comprehensive functionality for querying various metrics, analytics, and statistics.
  * @module core/modules/statistics
  */

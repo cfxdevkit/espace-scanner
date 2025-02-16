@@ -1,5 +1,6 @@
 /**
- * @fileoverview Token module for interacting with ERC20 tokens on Conflux eSpace.
+ * @packageDocumentation
+ * Token module for interacting with ERC20 tokens on Conflux eSpace.
  * Provides functionality for querying token balances, supplies, and historical data.
  * @module core/modules/token
  */
