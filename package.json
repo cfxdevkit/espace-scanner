@@ -1,6 +1,6 @@
 {
   "name": "@cfxdevkit/confluxscan-espace",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A TypeScript library for interacting with Conflux eSpace confluxscan API",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -22,7 +22,6 @@
     "prepublishOnly": "npm run build",
     "docs": "typedoc --out docs src/index.ts",
     "clean": "rimraf dist coverage docs",
-
     "example:scanner:account": "ts-node examples/scanner/account.ts",
     "example:scanner:block": "ts-node examples/scanner/block.ts",
     "example:scanner:contract": "ts-node examples/scanner/contract.ts",
@@ -32,7 +31,6 @@
     "example:scanner:token": "ts-node examples/scanner/token.ts",
     "example:scanner:transaction": "ts-node examples/scanner/transaction.ts",
     "example:scanner:utils": "ts-node examples/scanner/utils.ts",
-
     "example:wrapper:account": "ts-node examples/wrapper/account.ts",
     "example:wrapper:block": "ts-node examples/wrapper/block.ts",
     "example:wrapper:contract": "ts-node examples/wrapper/contract.ts",
@@ -43,7 +41,6 @@
     "example:wrapper:transaction": "ts-node examples/wrapper/transaction.ts",
     "example:wrapper:utils": "ts-node examples/wrapper/utils.ts",
     "example:api": "./examples/run-api-example.sh",
-    
     "bump:patch": "npm version patch -m \"chore(release): bump version to %s\"",
     "bump:minor": "npm version minor -m \"chore(release): bump version to %s\"",
     "bump:major": "npm version major -m \"chore(release): bump version to %s\"",
