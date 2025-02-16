@@ -58,7 +58,7 @@ export interface TxlistParams {
 export interface Txlist {
   blockNumber?: string;
 
-  timeStamp?: string;
+  timestamp?: string;
 
   hash?: string;
 
@@ -122,7 +122,7 @@ export interface TxlistinternalParams {
 export interface Txlistinternal {
   blockNumber?: string;
 
-  timeStamp?: string;
+  timestamp?: string;
 
   hash?: string;
 
@@ -241,7 +241,7 @@ export interface TokenNFTtxParams {
 export interface TokenNFTtx {
   blockNumber?: string;
 
-  timeStamp?: string;
+  timestamp?: string;
 
   hash?: string;
 

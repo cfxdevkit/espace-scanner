@@ -156,6 +156,12 @@ export type Preview = {
   /** The owner address. */
   owner?: string;
 
+  /** The creator address. */
+  creator?: string;
+
+  /** The timestamp of the NFT. */
+  mintTimestamp?: number | string;
+
   rawData?: {
     /** The function of contract which is called */
     funcCall?: string;
@@ -292,7 +298,7 @@ export type Transfers = {
     tokenId?: string;
 
     /** Timestamp in seconds */
-    timestamp?: number;
+    timestamp?: number | string;
   }>;
 
   addressInfo?: {

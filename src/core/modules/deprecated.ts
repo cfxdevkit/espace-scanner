@@ -32,7 +32,7 @@ export class DeprecatedModule extends ESpaceApi {
       endBlock: params.endBlock,
       minTimestamp: params.minTimestamp,
       maxTimestamp: params.maxTimestamp,
-      sort: params.sort,
+      sort: params.sort?.toUpperCase(),
     });
     return response.result;
   }
@@ -50,7 +50,7 @@ export class DeprecatedModule extends ESpaceApi {
       endBlock: params.endBlock,
       minTimestamp: params.minTimestamp,
       maxTimestamp: params.maxTimestamp,
-      sort: params.sort,
+      sort: params.sort?.toUpperCase(),
     });
     return response.result;
   }
@@ -70,7 +70,7 @@ export class DeprecatedModule extends ESpaceApi {
       endBlock: params.endBlock,
       minTimestamp: params.minTimestamp,
       maxTimestamp: params.maxTimestamp,
-      sort: params.sort,
+      sort: params.sort?.toUpperCase(),
     });
     return response.result;
   }
@@ -90,7 +90,7 @@ export class DeprecatedModule extends ESpaceApi {
       endBlock: params.endBlock,
       minTimestamp: params.minTimestamp,
       maxTimestamp: params.maxTimestamp,
-      sort: params.sort,
+      sort: params.sort?.toUpperCase(),
     });
     return response.result;
   }
@@ -112,7 +112,7 @@ export class DeprecatedModule extends ESpaceApi {
         endBlock: params.endBlock,
         minTimestamp: params.minTimestamp,
         maxTimestamp: params.maxTimestamp,
-        sort: params.sort,
+        sort: params.sort?.toUpperCase(),
       }
     );
     return response.result;
@@ -135,7 +135,7 @@ export class DeprecatedModule extends ESpaceApi {
         endBlock: params.endBlock,
         minTimestamp: params.minTimestamp,
         maxTimestamp: params.maxTimestamp,
-        sort: params.sort,
+        sort: params.sort?.toUpperCase(),
       }
     );
     return response.result;
@@ -156,7 +156,7 @@ export class DeprecatedModule extends ESpaceApi {
       endBlock: params.endBlock,
       minTimestamp: params.minTimestamp,
       maxTimestamp: params.maxTimestamp,
-      sort: params.sort,
+      sort: params.sort?.toUpperCase(),
       transferType: params.transferType,
     });
     return response.result;

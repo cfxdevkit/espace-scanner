@@ -25,11 +25,12 @@ export class TokenWrapper extends BaseWrapper {
    */
   async getTokenSupply(
     params: Token.TokenSupplyParams,
-    returnRaw: boolean = false
+    returnRaw: boolean = false,
+    decimals?: number
   ): Promise<string> {
     const data = await this.token.getTokenSupply(params);
     if (returnRaw) return data;
-    return this.formatNumber(data);
+    return this.formatNumber(this.formatUnit(data, decimals ?? 18));
   }
 
   /**
@@ -37,11 +38,12 @@ export class TokenWrapper extends BaseWrapper {
    */
   async getTokenSupplyHistory(
     params: Token.TokenSupplyHistoryParams,
-    returnRaw: boolean = false
+    returnRaw: boolean = false,
+    decimals?: number
   ): Promise<string> {
     const data = await this.token.getTokenSupplyHistory(params);
     if (returnRaw) return data;
-    return this.formatNumber(data);
+    return this.formatNumber(this.formatUnit(data, decimals ?? 18));
   }
 
   /**
@@ -49,10 +51,11 @@ export class TokenWrapper extends BaseWrapper {
    */
   async getTokenBalanceHistory(
     params: Token.TokenBalanceHistoryParams,
-    returnRaw: boolean = false
+    returnRaw: boolean = false,
+    decimals?: number
   ): Promise<string> {
     const data = await this.token.getTokenBalanceHistory(params);
     if (returnRaw) return data;
-    return this.formatNumber(data);
+    return this.formatUnit(data, decimals ?? 18);
   }
 }

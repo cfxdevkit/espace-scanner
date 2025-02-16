@@ -39,10 +39,14 @@ export class AccountWrapper extends BaseWrapper {
     if (returnRaw) return data;
     return data.map((tx) => ({
       ...tx,
-      timeStamp: tx.timeStamp ? this.formatTimestamp(tx.timeStamp) : tx.timeStamp,
+      timestamp: tx.timestamp ? this.formatTimestamp(Number(tx.timestamp)) : tx.timestamp,
       value: tx.value ? this.formatCFX(tx.value) : tx.value,
       gas: tx.gas ? this.formatGas(tx.gas) : tx.gas,
+      gasPrice: tx.gasPrice ? this.formatGas(tx.gasPrice) : tx.gasPrice,
       gasUsed: tx.gasUsed ? this.formatGas(tx.gasUsed) : tx.gasUsed,
+      cumulativeGasUsed: tx.cumulativeGasUsed
+        ? this.formatGas(tx.cumulativeGasUsed)
+        : tx.cumulativeGasUsed,
     }));
   }
 
@@ -57,7 +61,7 @@ export class AccountWrapper extends BaseWrapper {
     if (returnRaw) return data;
     return data.map((tx) => ({
       ...tx,
-      timeStamp: tx.timeStamp ? this.formatTimestamp(tx.timeStamp) : tx.timeStamp,
+      timestamp: tx.timestamp ? this.formatTimestamp(Number(tx.timestamp)) : tx.timestamp,
       value: tx.value ? this.formatCFX(tx.value) : tx.value,
     }));
   }
@@ -90,7 +94,7 @@ export class AccountWrapper extends BaseWrapper {
     if (returnRaw) return data;
     return data.map((tx) => ({
       ...tx,
-      timeStamp: tx.timeStamp ? this.formatTimestamp(tx.timeStamp) : tx.timeStamp,
+      timestamp: tx.timestamp ? this.formatTimestamp(Number(tx.timestamp)) : tx.timestamp,
     }));
   }
 

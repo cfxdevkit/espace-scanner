@@ -60,7 +60,7 @@ export type AccountTransactions = {
     gasFee?: string;
 
     /** Timestamp in seconds.  */
-    timestamp?: number;
+    timestamp?: number | string;
 
     status?: number;
 
@@ -155,7 +155,7 @@ export type CfxTransfers = {
 
     amount?: string;
 
-    timestamp?: number;
+    timestamp?: number | string;
   }>;
 
   addressInfo?: {
@@ -246,7 +246,9 @@ export type Erc20Transfers = {
 
     amount?: string;
 
-    timestamp?: number;
+    timestamp?: number | string;
+
+    contract?: string;
   }>;
 
   addressInfo?: {
@@ -340,7 +342,7 @@ export type Erc721Transfers = {
 
     tokenId?: string;
 
-    timestamp?: number;
+    timestamp?: number | string;
   }>;
 
   addressInfo?: {
@@ -436,7 +438,7 @@ export type Erc1155Transfers = {
 
     tokenId?: string;
 
-    timestamp?: number;
+    timestamp?: number | string;
   }>;
 
   addressInfo?: {
@@ -543,7 +545,7 @@ export type Erc3525Transfers = {
 
     slot?: string;
 
-    timestamp?: number;
+    timestamp?: number | string;
   }>;
 
   addressInfo?: {
@@ -663,7 +665,7 @@ export type AccountTransfers = {
 
     tokenId?: string;
 
-    timestamp?: number;
+    timestamp?: number | string;
 
     cursor?: string;
 
@@ -678,6 +680,8 @@ export type AccountTransfers = {
     gasFee?: string;
 
     methodId?: string;
+
+    contract?: string;
   }>;
 
   addressInfo?: {

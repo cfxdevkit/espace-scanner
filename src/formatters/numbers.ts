@@ -71,13 +71,13 @@ export class NumberFormatter {
    * formatGas(1000000000) // returns "1.0 Gwei"
    */
   static formatGas(value: string | number | undefined): string {
-    if (!value) return "0 Gwei";
+    if (!value) return "0 Gdrip";
     try {
       const formatted = formatUnits(BigInt(value), 9);
-      return `${this.formatNumber(formatted)} Gwei`;
+      return `${this.formatNumber(formatted)} Gdrip`;
     } catch (error) {
       logger.error("Error formatting gas value", { module: "NumberFormatter", value, error });
-      return "0 Gwei";
+      return "0 Gdrip";
     }
   }
 
@@ -91,13 +91,13 @@ export class NumberFormatter {
    * formatCFX(1.5e18) // returns "1.5 CFX"
    */
   static formatCFX(value: string | number | undefined): string {
-    if (!value) return "0 CFX";
+    if (!value) return "0";
     try {
       const formatted = formatEther(BigInt(value));
-      return `${formatted} CFX`;
+      return `${formatted}`;
     } catch (error) {
       logger.error("Error formatting CFX value", { module: "NumberFormatter", value, error });
-      return "0 CFX";
+      return "";
     }
   }
 }

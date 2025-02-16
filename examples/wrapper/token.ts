@@ -5,6 +5,7 @@ import {
   inspect,
   demonstrationWrapper,
   MODULE_OPTIONS,
+  getCurrentBlockNumber,
 } from "../common/utils";
 
 /**
@@ -32,12 +33,13 @@ async function demonstrateTokenWrapper() {
     });
     console.log("Token supply result:", inspect(supply));
 
+    const blockNo = await getCurrentBlockNumber();
     // Get historical token total supply
     console.log("\nTesting getTokenSupplyHistory...");
     const supplyHistory = await token.getTokenSupplyHistory({
       contractaddress: TEST_ADDRESSES.CONTRACT.TOKEN,
       address: TEST_ADDRESSES.ACCOUNT.SINGLE,
-      blockno: TEST_DATA.BLOCK.HISTORY,
+      blockno: blockNo,
     });
     console.log("Token supply history result:", inspect(supplyHistory));
 
@@ -46,7 +48,7 @@ async function demonstrateTokenWrapper() {
     const balanceHistory = await token.getTokenBalanceHistory({
       contractaddress: TEST_ADDRESSES.CONTRACT.TOKEN,
       address: TEST_ADDRESSES.ACCOUNT.SINGLE,
-      blockno: TEST_DATA.BLOCK.HISTORY,
+      blockno: blockNo,
     });
     console.log("Token balance history result:", inspect(balanceHistory));
   } catch (error) {

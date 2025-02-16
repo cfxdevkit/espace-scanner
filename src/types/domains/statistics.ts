@@ -1,24 +1,24 @@
 export type Supply = {
   /** Total issued balance in Drip */
-  totalIssued?: string;
+  totalIssued: string;
 
   /** Total circulating balance in Drip */
-  totalCirculating?: string;
+  totalCirculating: string;
 
   /** Total staking balance in Drip */
-  totalStaking?: string;
+  totalStaking: string;
 
   /** Total collateral balance in Drip */
-  totalCollateral?: string;
+  totalCollateral: string;
 
   /** Zero address's balance in Drip */
-  nullAddressBalance?: string;
+  nullAddressBalance: string;
 
   /** Two year unlock address's balance in Drip */
-  twoYearUnlockBalance?: string;
+  twoYearUnlockBalance: string;
 
   /** Four year unlock address's balance in `Drip` */
-  fourYearUnlockBalance?: string;
+  fourYearUnlockBalance: string;
 };
 
 // Types for /statistics/mining
@@ -89,7 +89,7 @@ export interface TpsParams {
 }
 
 export type Tps = {
-  total?: number;
+  total?: number | string;
 
   list?: Array<{
     tps?: string;
@@ -121,7 +121,7 @@ export interface ContractParams {
 }
 
 export type Contract = {
-  total?: number;
+  total?: number | string;
 
   list?: Array<{
     /** daily deployed contracts. */
@@ -157,7 +157,7 @@ export interface CfxHolderParams {
 }
 
 export type CfxHolder = {
-  total?: number;
+  total?: number | string;
 
   list?: Array<{
     /** total cfx holders count by daily */
@@ -190,7 +190,7 @@ export interface AccountGrowthParams {
 }
 
 export type AccountGrowth = {
-  total?: number;
+  total?: number | string;
 
   list?: Array<{
     /** daily account growth count. */
@@ -223,7 +223,7 @@ export interface AccountActiveParams {
 }
 
 export type AccountActive = {
-  total?: number;
+  total?: number | string;
 
   list?: Array<{
     /** daily active account count. */
@@ -256,7 +256,7 @@ export interface ActiveOverallParams {
 }
 
 export type ActiveOverall = {
-  total?: number;
+  total?: number | string;
 
   list?: Array<{
     /** daily active account count. */
@@ -289,7 +289,7 @@ export interface TransactionParams {
 }
 
 export type Transaction = {
-  total?: number;
+  total?: number | string;
 
   list?: Array<{
     /** daily transaction count. */
@@ -322,7 +322,7 @@ export interface CfxTransferParams {
 }
 
 export type CfxTransfer = {
-  total?: number;
+  total?: number | string;
 
   list?: Array<{
     /** daily cfx transfer count. */
@@ -364,7 +364,7 @@ export interface TokenTransferParams {
 }
 
 export type TokenTransfer = {
-  total?: number;
+  total?: number | string;
 
   list?: Array<{
     /** daily token transfer count. */
@@ -386,7 +386,7 @@ export interface TopGasUsedParams {
 }
 
 export type TopGasUsed = {
-  totalGas?: string;
+  gasTotal?: string;
 
   list?: Array<{
     /** account address. */
@@ -534,7 +534,7 @@ export type TopTokenTransfer = {
     address?: string;
 
     /** token transfer count. */
-    value?: string;
+    transferCntr?: string;
   }>;
 };
 
@@ -563,12 +563,13 @@ export interface TopTokenReceiverParams {
 }
 
 export type TopTokenReceiver = {
+  maxTime?: string;
   list?: Array<{
     /** token address. */
     address?: string;
 
     /** token receiver count. */
-    value?: string;
+    transferCntr?: string;
   }>;
 };
 
@@ -580,12 +581,13 @@ export interface TopTokenParticipantParams {
 }
 
 export type TopTokenParticipant = {
+  maxTime?: string;
   list?: Array<{
     /** token address. */
     address?: string;
 
     /** token participant count. */
-    value?: string;
+    transferCntr?: string;
   }>;
 };
 
@@ -614,7 +616,7 @@ export interface TokenHolderParams {
 }
 
 export type TokenHolder = {
-  total?: number;
+  total?: number | string;
 
   list?: Array<{
     /** Statistics time, UTC. */
@@ -650,14 +652,14 @@ export interface UniqueSenderParams {
 }
 
 export type UniqueSender = {
-  total?: number;
+  total?: number | string;
 
   list?: Array<{
     /** Statistics time, UTC. */
     statTime?: string;
 
     /** daily unique sender count of token transfer. */
-    uniqueSender?: string;
+    uniqueSenderCount?: string;
   }>;
 };
 
@@ -686,14 +688,14 @@ export interface UniqueReceiverParams {
 }
 
 export type UniqueReceiver = {
-  total?: number;
+  total?: number | string;
 
   list?: Array<{
     /** Statistics time, UTC. */
     statTime?: string;
 
     /** daily unique receiver count of token transfer. */
-    uniqueReceiver?: string;
+    uniqueReceiverCount?: string;
   }>;
 };
 
@@ -722,14 +724,14 @@ export interface UniqueParticipantParams {
 }
 
 export type UniqueParticipant = {
-  total?: number;
+  total?: number | string;
 
   list?: Array<{
     /** Statistics time, UTC. */
     statTime?: string;
 
     /** daily unique participant count of token transfer. */
-    uniqueParticipant?: string;
+    uniqueParticipantCount?: string;
   }>;
 };
 
@@ -755,7 +757,7 @@ export interface BlockBasefeeParams {
 }
 
 export type BlockBasefee = {
-  total?: number;
+  total?: number | string;
 
   list?: Array<{
     /** Base fee per gas. */
@@ -765,7 +767,7 @@ export type BlockBasefee = {
     blockNumber?: number;
 
     /** Block timestamp, UTC. */
-    timestamp?: number;
+    timestamp?: number | string;
   }>;
 };
 
@@ -791,7 +793,7 @@ export interface BlockAvgpriorityfeeParams {
 }
 
 export type BlockAvgpriorityfee = {
-  total?: number;
+  total?: number | string;
 
   list?: Array<{
     /** Average priority fee per gas. */
@@ -801,7 +803,7 @@ export type BlockAvgpriorityfee = {
     blockNumber?: number;
 
     /** Block timestamp, UTC. */
-    timestamp?: number;
+    timestamp?: number | string;
   }>;
 };
 
@@ -827,7 +829,7 @@ export interface BlockGasusedParams {
 }
 
 export type BlockGasused = {
-  total?: number;
+  total?: number | string;
 
   list?: Array<{
     /** Gas used. */
@@ -837,7 +839,7 @@ export type BlockGasused = {
     blockNumber?: number;
 
     /** Block timestamp, UTC. */
-    timestamp?: number;
+    timestamp?: number | string;
   }>;
 };
 
@@ -863,7 +865,7 @@ export interface BlockTxsbytypeParams {
 }
 
 export type BlockTxsbytype = {
-  total?: number;
+  total?: number | string;
 
   list?: Array<{
     /** Transactions by type. */
@@ -882,6 +884,6 @@ export type BlockTxsbytype = {
     blockNumber?: number;
 
     /** Block timestamp, UTC. */
-    timestamp?: number;
+    timestamp?: number | string;
   }>;
 };

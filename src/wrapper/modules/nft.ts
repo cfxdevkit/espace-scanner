@@ -37,6 +37,9 @@ export class NFTWrapper extends BaseWrapper {
   async getPreview(params: NFT.PreviewParams, returnRaw: boolean = false): Promise<NFT.Preview> {
     const data = await this.nft.getPreview(params);
     if (returnRaw) return data;
+    data.mintTimestamp = data.mintTimestamp
+      ? this.formatTimestamp(Number(data.mintTimestamp))
+      : data.mintTimestamp;
     return data;
   }
 
@@ -71,7 +74,7 @@ export class NFTWrapper extends BaseWrapper {
       ...data,
       list: data.list?.map((item) => ({
         ...item,
-        timestamp: item.timestamp ? Number(this.formatTimestamp(item.timestamp)) : item.timestamp,
+        timestamp: item.timestamp ? this.formatTimestamp(Number(item.timestamp)) : item.timestamp,
       })),
     };
   }

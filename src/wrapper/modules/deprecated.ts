@@ -16,6 +16,13 @@ export class DeprecatedWrapper extends BaseWrapper {
   ): Promise<Deprecated.AccountTransactions> {
     const data = await this.deprecated.AccountTransactions(params);
     if (returnRaw) return data;
+    data.list = data.list?.map((tx) => ({
+      ...tx,
+      timestamp: tx.timestamp ? this.formatTimestamp(Number(tx.timestamp)) : tx.timestamp,
+      gasPrice: tx.gasPrice ? this.formatGas(tx.gasPrice) : tx.gasPrice,
+      gasFee: tx.gasFee ? this.formatGas(tx.gasFee) : tx.gasFee,
+      value: tx.value ? this.formatCFX(tx.value) : tx.value,
+    }));
     return data;
   }
 
@@ -28,6 +35,11 @@ export class DeprecatedWrapper extends BaseWrapper {
   ): Promise<Deprecated.CfxTransfers> {
     const data = await this.deprecated.CfxTransfers(params);
     if (returnRaw) return data;
+    data.list = data.list?.map((tx) => ({
+      ...tx,
+      timestamp: tx.timestamp ? this.formatTimestamp(Number(tx.timestamp)) : tx.timestamp,
+      amount: tx.amount ? this.formatCFX(tx.amount) : tx.amount,
+    }));
     return data;
   }
 
@@ -40,6 +52,16 @@ export class DeprecatedWrapper extends BaseWrapper {
   ): Promise<Deprecated.Erc20Transfers> {
     const data = await this.deprecated.Erc20Transfers(params);
     if (returnRaw) return data;
+    data.list = data.list?.map((tx) => ({
+      ...tx,
+      timestamp: tx.timestamp ? this.formatTimestamp(Number(tx.timestamp)) : tx.timestamp,
+      amount: tx.amount
+        ? this.formatUnit(
+            tx.amount,
+            tx.contract ? (data.addressInfo?.[tx.contract]?.token?.decimals ?? 18) : 18
+          )
+        : tx.amount,
+    }));
     return data;
   }
 
@@ -52,6 +74,10 @@ export class DeprecatedWrapper extends BaseWrapper {
   ): Promise<Deprecated.Erc721Transfers> {
     const data = await this.deprecated.Erc721Transfers(params);
     if (returnRaw) return data;
+    data.list = data.list?.map((tx) => ({
+      ...tx,
+      timestamp: tx.timestamp ? this.formatTimestamp(Number(tx.timestamp)) : tx.timestamp,
+    }));
     return data;
   }
 
@@ -64,6 +90,10 @@ export class DeprecatedWrapper extends BaseWrapper {
   ): Promise<Deprecated.Erc1155Transfers> {
     const data = await this.deprecated.Erc1155Transfers(params);
     if (returnRaw) return data;
+    data.list = data.list?.map((tx) => ({
+      ...tx,
+      timestamp: tx.timestamp ? this.formatTimestamp(Number(tx.timestamp)) : tx.timestamp,
+    }));
     return data;
   }
 
@@ -76,6 +106,10 @@ export class DeprecatedWrapper extends BaseWrapper {
   ): Promise<Deprecated.Erc3525Transfers> {
     const data = await this.deprecated.Erc3525Transfers(params);
     if (returnRaw) return data;
+    data.list = data.list?.map((tx) => ({
+      ...tx,
+      timestamp: tx.timestamp ? this.formatTimestamp(Number(tx.timestamp)) : tx.timestamp,
+    }));
     return data;
   }
 
@@ -88,6 +122,16 @@ export class DeprecatedWrapper extends BaseWrapper {
   ): Promise<Deprecated.AccountTransfers> {
     const data = await this.deprecated.AccountTransfers(params);
     if (returnRaw) return data;
+    data.list = data.list?.map((tx) => ({
+      ...tx,
+      timestamp: tx.timestamp ? this.formatTimestamp(Number(tx.timestamp)) : tx.timestamp,
+      amount: tx.amount
+        ? this.formatUnit(
+            tx.amount,
+            tx.contract ? (data.addressInfo?.[tx.contract]?.token?.decimals ?? 18) : 18
+          )
+        : tx.amount,
+    }));
     return data;
   }
 
@@ -112,6 +156,10 @@ export class DeprecatedWrapper extends BaseWrapper {
   ): Promise<Deprecated.AccountTokens> {
     const data = await this.deprecated.AccountTokens(params);
     if (returnRaw) return data;
+    data.list = data.list?.map((tx) => ({
+      ...tx,
+      amount: tx.amount ? this.formatUnit(tx.amount, tx.decimals ?? 18) : tx.amount,
+    }));
     return data;
   }
 

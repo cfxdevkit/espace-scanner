@@ -50,7 +50,7 @@ async function demonstrateDeprecatedWrapper() {
     // Get ERC721 transfers (deprecated)
     console.log("\nTesting Erc721Transfers...");
     const erc721Transfers = await deprecated.Erc721Transfers({
-      account: TEST_ADDRESSES.ACCOUNT.SINGLE,
+      account: TEST_ADDRESSES.ACCOUNT.OWNER,
       skip: PAGINATION.DEFAULT.skip,
       limit: PAGINATION.DEFAULT.limit,
       sort: PAGINATION.DEFAULT.sort,

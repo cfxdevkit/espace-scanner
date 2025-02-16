@@ -1,9 +1,9 @@
 import { AccountWrapper } from "../../src";
 import {
   TEST_ADDRESSES,
+  TEST_DATA,
   BLOCK_RANGE,
   PAGINATION,
-  TEST_DATA,
   inspect,
   demonstrationWrapper,
   MODULE_OPTIONS,
@@ -11,62 +11,96 @@ import {
 } from "../common/utils";
 
 /**
- * Demonstrates all methods available in the Account wrapper module
+ * Demonstrates all methods available in the Account module
  */
 async function demonstrateAccountWrapper() {
-  // Initialize wrapper for mainnet
+  // Initialize scanner for mainnet
   const account = new AccountWrapper(MODULE_OPTIONS.MAINNET);
 
   try {
-    console.log("=== Account Wrapper Module Demonstration ===");
+    console.log("=== Account Wrapper Demonstration ===");
 
-    // Get single account balance with formatting
-    console.log("\nTesting getBalance with formatting...");
-    const balanceFormatted = await account.getBalance({
-      address: TEST_ADDRESSES.ACCOUNT.SINGLE,
+    // Get single account balance
+    console.log("\nTesting getBalance...");
+    const balance = await account.getBalance({
+      address: TEST_ADDRESSES.ACCOUNT.OWNER,
       tag: "latest_state",
     });
-    console.log("Balance (formatted) result:", inspect(balanceFormatted));
+    console.log("Balance result:", inspect(balance));
 
-    // Get multiple account balances with formatting
-    console.log("\nTesting getBalanceMulti with formatting...");
-    const multiBalanceFormatted = await account.getBalanceMulti({
+    // Get multiple account balances
+    console.log("\nTesting getBalanceMulti...");
+    const multiBalance = await account.getBalanceMulti({
       address: TEST_ADDRESSES.ACCOUNT.MULTI,
       tag: "latest_state",
     });
-    console.log("Multi-balance (formatted) result:", inspect(multiBalanceFormatted));
+    console.log("Multi-balance result:", inspect(multiBalance));
 
-    // Get transaction list with formatting
-    console.log("\nTesting getTransactionList with formatting...");
-    const txListFormatted = await account.getTransactionList({
-      address: TEST_ADDRESSES.ACCOUNT.SINGLE,
+    // Get transaction list
+    console.log("\nTesting getTransactionList...");
+    const txList = await account.getTransactionList({
+      address: TEST_ADDRESSES.ACCOUNT.OWNER,
       ...BLOCK_RANGE.DEFAULT,
       page: PAGINATION.DEFAULT.page,
       offset: PAGINATION.DEFAULT.offset,
+      sort: PAGINATION.DEFAULT.sort,
     });
-    console.log("Transaction list (formatted) result:", inspect(txListFormatted));
+    console.log("Transaction list result:", inspect(txList));
 
-    // Get internal transaction list with formatting
-    console.log("\nTesting getInternalTransactionList with formatting...");
-    const internalTxListFormatted = await account.getInternalTransactionList({
-      address: TEST_ADDRESSES.ACCOUNT.SINGLE,
+    // Get internal transaction list
+    console.log("\nTesting getInternalTransactionList...");
+    const internalTxList = await account.getInternalTransactionList({
+      address: TEST_ADDRESSES.ACCOUNT.OWNER,
       ...BLOCK_RANGE.DEFAULT,
       page: PAGINATION.DEFAULT.page,
       offset: PAGINATION.DEFAULT.offset,
+      sort: PAGINATION.DEFAULT.sort,
     });
-    console.log("Internal transaction list (formatted) result:", inspect(internalTxListFormatted));
+    console.log("Internal transaction list result:", inspect(internalTxList));
 
-    // Get balance history with formatting
-    console.log("\nTesting getBalanceHistory with formatting...");
+    // Get token transfers
+    console.log("\nTesting getTokenTransfers...");
+    const tokenTransfers = await account.getTokenTransfers({
+      address: TEST_ADDRESSES.ACCOUNT.OWNER,
+      ...BLOCK_RANGE.DEFAULT,
+      page: PAGINATION.DEFAULT.page,
+      offset: PAGINATION.DEFAULT.offset,
+      sort: PAGINATION.DEFAULT.sort,
+    });
+    console.log("Token transfers result:", inspect(tokenTransfers));
+
+    // Get NFT token transfers
+    console.log("\nTesting getNFTTransfers...");
+    const nftTransfers = await account.getNFTTransfers({
+      address: TEST_ADDRESSES.ACCOUNT.OWNER,
+      ...BLOCK_RANGE.DEFAULT,
+      page: PAGINATION.DEFAULT.page,
+      offset: PAGINATION.DEFAULT.offset,
+      sort: PAGINATION.DEFAULT.sort,
+    });
+    console.log("NFT transfers result:", inspect(nftTransfers));
+
+    // Get mined blocks
+    console.log("\nTesting getMinedBlocks...");
+    const minedBlocks = await account.getMinedBlocks({
+      address: TEST_ADDRESSES.ACCOUNT.OWNER,
+      blocktype: "blocks",
+      page: PAGINATION.DEFAULT.page,
+      offset: PAGINATION.DEFAULT.offset,
+    });
+    console.log("Mined blocks result:", inspect(minedBlocks));
+
+    // Get balance history
+    console.log("\nTesting getBalanceHistory...");
     const currentBlock = await getCurrentBlockNumber();
-    const balanceHistoryFormatted = await account.getBalanceHistory({
-      address: TEST_ADDRESSES.ACCOUNT.SINGLE,
+    const balanceHistory = await account.getBalanceHistory({
+      address: TEST_ADDRESSES.ACCOUNT.OWNER,
       blockno: currentBlock,
     });
-    console.log("Balance history (formatted) result:", inspect(balanceHistoryFormatted));
+    console.log("Balance history result:", inspect(balanceHistory));
   } catch (error) {
     console.error(
-      "Error during Account wrapper module demonstration:",
+      "Error during Account module demonstration:",
       error instanceof Error ? error.message : String(error)
     );
   }
@@ -74,5 +108,5 @@ async function demonstrateAccountWrapper() {
 
 // Run the demonstration if this file is executed directly
 if (require.main === module) {
-  demonstrationWrapper("Account wrapper module", demonstrateAccountWrapper);
+  demonstrationWrapper("Account wrapper", demonstrateAccountWrapper);
 }

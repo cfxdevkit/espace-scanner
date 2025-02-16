@@ -16,6 +16,6 @@ export class BlockWrapper extends BaseWrapper {
   ): Promise<string> {
     const data = await this.block.getBlockNumberByTime(params);
     if (returnRaw) return data;
-    return this.formatNumber(data);
+    return data;
   }
 }
