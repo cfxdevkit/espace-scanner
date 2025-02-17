@@ -39,7 +39,9 @@ export class AccountModule extends ESpaceApi {
    * @returns {Promise<Account.Balance>} The account balance
    * @throws {Error} If the address is invalid
    */
-  async getBalance(params: Account.BalanceParams): Promise<Account.Balance> {
+  async getBalance(
+    params: Account.BalanceParams = { address: "", tag: "latest_state" }
+  ): Promise<Account.Balance> {
     this.logger.debug({ params }, "Getting account balance");
     if (!AddressValidator.validateAddress(params.address)) {
       this.logger.error({ params }, "Invalid address provided for balance check");
@@ -64,7 +66,9 @@ export class AccountModule extends ESpaceApi {
    * @returns {Promise<Account.BalanceMulti>} The account balances
    * @throws {Error} If any of the addresses are invalid
    */
-  async getBalanceMulti(params: Account.BalanceMultiParams): Promise<Account.BalanceMulti> {
+  async getBalanceMulti(
+    params: Account.BalanceMultiParams = { address: [""], tag: "latest_state" }
+  ): Promise<Account.BalanceMulti> {
     this.logger.debug({ params }, "Getting multiple account balances");
     if (!AddressValidator.validateAddresses(params.address)) {
       this.logger.error({ params }, "Invalid addresses provided for balance check");
@@ -284,6 +288,12 @@ export class AccountModule extends ESpaceApi {
       this.logger.error({ params }, "Invalid address provided for balance history");
       throw new Error(`Invalid address: ${params.address}`);
     }
+
+    if (!!params.blockno && typeof params.blockno !== "number") {
+      this.logger.error({ params }, "Block number is required for balance history");
+      throw new Error("Block number is required");
+    }
+
     const data = await this.fetchApi<Account.Balancehistory>("/api", {
       module: "account",
       action: "balancehistory",

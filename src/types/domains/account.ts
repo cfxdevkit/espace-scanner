@@ -3,59 +3,121 @@
  * Account-related type definitions for the Conflux eSpace Scanner SDK.
  * Contains types for account balances, transactions, and token transfers.
  * @module types/domains/account
+ * @category Types
  */
 
 import { BlockTag, PaginationParams, TimestampRangeParams, BlockRangeParams } from "../common";
 
 /**
- * Parameters for fetching account balance
+ * Parameters for fetching account balance.
+ * Used to query the CFX balance of a specific address at a given block.
+ *
+ * @example
+ * ```typescript
+ * const params: BalanceParams = {
+ *   address: '0x1234...',
+ *   tag: 'latest_state'
+ * };
+ * ```
  *
  * @interface BalanceParams
+ * @category Types
  */
 export interface BalanceParams {
-  /** Account address to check balance for */
+  /** Account address to check balance for (in hex format) */
   address: string;
-  /** Block tag to query balance at */
+  /** Block tag to query balance at (e.g. 'latest_state', 'latest_confirmed') */
   tag?: BlockTag;
 }
 
-/** Account balance in Drip */
+/**
+ * Account balance in Drip (smallest unit of CFX).
+ * The value is returned as a string to handle large numbers accurately.
+ *
+ * @example
+ * "1000000000000000000" // 1 CFX
+ *
+ * @category Types
+ */
 export type Balance = string;
 
 /**
- * Parameters for fetching multiple account balances
+ * Parameters for fetching multiple account balances.
+ * Allows querying CFX balances for multiple addresses in a single call.
+ *
+ * @example
+ * ```typescript
+ * const params: BalanceMultiParams = {
+ *   address: ['0x1234...', '0x5678...'],
+ *   tag: 'latest_state'
+ * };
+ * ```
  *
  * @interface BalanceMultiParams
+ * @category Types
  */
 export interface BalanceMultiParams {
-  /** Array of account addresses to check balances for */
+  /** Array of account addresses to check balances for (in hex format) */
   address: string[];
-  /** Block tag to query balances at */
+  /** Block tag to query balances at (e.g. 'latest_state', 'latest_confirmed') */
   tag?: BlockTag;
 }
 
-/** Single balance item in multi-balance response [address, balance] */
+/**
+ * Single balance item in multi-balance response.
+ * A tuple containing the address and its balance.
+ *
+ * @example
+ * ['0x1234...', '1000000000000000000']
+ *
+ * @category Types
+ */
 export type BalanceMultiItem = [string, string];
 
-/** Response for multiple account balances */
+/**
+ * Response for multiple account balances.
+ * An array of address-balance pairs.
+ *
+ * @example
+ * [
+ *   ['0x1234...', '1000000000000000000'],
+ *   ['0x5678...', '2000000000000000000']
+ * ]
+ *
+ * @category Types
+ */
 export type BalanceMulti = BalanceMultiItem[];
 
 /**
- * Parameters for getting transaction list
+ * Parameters for getting transaction list.
+ * Used to query normal (non-internal) transactions for an address.
+ *
+ * @example
+ * ```typescript
+ * const params: TxlistParams = {
+ *   address: '0x1234...',
+ *   startblock: 1000000,
+ *   endblock: 2000000,
+ *   page: 1,
+ *   offset: 10,
+ *   sort: 'desc'
+ * };
+ * ```
  *
  * @interface TxlistParams
  * @extends {PaginationParams}
  * @extends {TimestampRangeParams}
  * @extends {BlockRangeParams}
+ * @category Types
  */
 export interface TxlistParams extends PaginationParams, TimestampRangeParams, BlockRangeParams {
-  /** Account address to get transactions for */
+  /** Account address to get transactions for (in hex format) */
   address: string;
   /** Start block number */
   startblock?: number;
   /** End block number */
   endblock?: number;
-  /** Transaction hash */
+  /** Transaction hash to filter by */
   txhash?: string;
 }
 
@@ -63,6 +125,7 @@ export interface TxlistParams extends PaginationParams, TimestampRangeParams, Bl
  * Transaction list response item
  *
  * @interface Txlist
+ * @category Types
  */
 export interface Txlist {
   /** Block hash */
@@ -118,6 +181,7 @@ export interface Txlist {
  * @extends {PaginationParams}
  * @extends {TimestampRangeParams}
  * @extends {BlockRangeParams}
+ * @category Types
  */
 export interface TxlistinternalParams
   extends PaginationParams,
@@ -137,6 +201,7 @@ export interface TxlistinternalParams
  * Internal transaction list response item
  *
  * @interface Txlistinternal
+ * @category Types
  */
 export interface Txlistinternal {
   /** Block number */
@@ -170,6 +235,7 @@ export interface Txlistinternal {
  * @extends {PaginationParams}
  * @extends {TimestampRangeParams}
  * @extends {BlockRangeParams}
+ * @category Types
  */
 export interface TokentxParams extends PaginationParams, TimestampRangeParams, BlockRangeParams {
   /** Account address to get token transactions for */
@@ -186,6 +252,7 @@ export interface TokentxParams extends PaginationParams, TimestampRangeParams, B
  * Token transaction list response item
  *
  * @interface Tokentx
+ * @category Types
  */
 export interface Tokentx {
   /** Block number */
@@ -230,8 +297,16 @@ export interface Tokentx {
   status?: string;
 }
 
-// Re-export NFT transaction types from TokentxParams
+/**
+ * Parameters for getting NFT token transactions
+ * @category Types
+ */
 export type TokenNFTtxParams = TokentxParams;
+
+/**
+ * NFT token transaction response item
+ * @category Types
+ */
 export type TokenNFTtx = Tokentx;
 
 /**
@@ -239,6 +314,7 @@ export type TokenNFTtx = Tokentx;
  *
  * @interface GetminedblocksParams
  * @extends {PaginationParams}
+ * @category Types
  */
 export interface GetminedblocksParams extends PaginationParams {
   /** Miner address to get blocks for */
@@ -247,9 +323,10 @@ export interface GetminedblocksParams extends PaginationParams {
 }
 
 /**
- * Mined block details
+ * Mined blocks response item
  *
  * @interface Getminedblocks
+ * @category Types
  */
 export interface Getminedblocks {
   /** Block number */
@@ -261,9 +338,10 @@ export interface Getminedblocks {
 }
 
 /**
- * Parameters for fetching historical balance
+ * Parameters for getting balance history
  *
  * @interface BalancehistoryParams
+ * @category Types
  */
 export interface BalancehistoryParams {
   /** Account address */
@@ -272,5 +350,8 @@ export interface BalancehistoryParams {
   blockno: number;
 }
 
-/** Historical balance in Drip */
+/**
+ * Balance history response
+ * @category Types
+ */
 export type Balancehistory = string;
