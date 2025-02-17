@@ -132,7 +132,7 @@ export class NumberFormatter {
     if (!value) return "0";
     try {
       const formatted = formatEther(BigInt(value));
-      return `${formatted}`;
+      return `${this.formatNumber(formatted)}`;
     } catch (error) {
       logger.error("Error formatting CFX value", { module: "NumberFormatter", value, error });
       return "";

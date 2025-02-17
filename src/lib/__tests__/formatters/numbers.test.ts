@@ -116,7 +116,7 @@ describe("NumberFormatter", () => {
     });
 
     it("should handle large CFX values", () => {
-      expect(NumberFormatter.formatCFX("1000000000000000000000")).toBe("1000");
+      expect(NumberFormatter.formatCFX("1000000000000000000000")).toBe("1,000");
     });
   });
 });

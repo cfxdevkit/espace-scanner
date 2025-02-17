@@ -70,7 +70,7 @@ describe("BaseWrapper", () => {
       const result = (wrapper as unknown as { formatCFX(value: string): string }).formatCFX(
         "1000000000000000000000"
       ); // 1000 CFX
-      expect(result).toBe("1000");
+      expect(result).toBe("1,000");
       expect(ResponseFormatter.formatCFX).toHaveBeenCalledWith("1000000000000000000000");
     });
 
