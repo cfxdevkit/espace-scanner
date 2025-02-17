@@ -159,7 +159,7 @@ describe("DeprecatedModule", () => {
     });
   });
 
-  describe("TokenTokeninfos", () => {
+  describe("Tokeninfos", () => {
     it("should handle multiple contract addresses", async () => {
       const mockResponse = { status: "1", result: { total: 0, list: [] } };
       (global.fetch as jest.Mock) = jest.fn(() =>
@@ -174,7 +174,7 @@ describe("DeprecatedModule", () => {
         "0x2234567890123456789012345678901234567890",
       ].join(",");
 
-      await module.TokenTokeninfos({ contracts });
+      await module.Tokeninfos({ contracts });
 
       const calls = (global.fetch as jest.Mock).mock.calls;
       const urlString = calls[0][0] as string;

@@ -104,8 +104,8 @@ async function demonstrateDeprecatedWrapper() {
     console.log("Account tokens result:", inspect(accountTokens));
 
     // Get token info (deprecated)
-    console.log("\nTesting TokenTokeninfos...");
-    const tokenInfos = await deprecated.TokenTokeninfos({
+    console.log("\nTesting Tokeninfos...");
+    const tokenInfos = await deprecated.Tokeninfos({
       contracts: TEST_ADDRESSES.CONTRACT.TOKEN,
     });
     console.log("Token info result:", inspect(tokenInfos));

@@ -185,12 +185,10 @@ export class DeprecatedModule extends ESpaceApi {
     return response.result;
   }
 
-  async TokenTokeninfos(
-    params: Deprecated.TokenTokeninfosParams
-  ): Promise<Deprecated.TokenTokeninfos> {
+  async Tokeninfos(params: Deprecated.TokeninfosParams): Promise<Deprecated.Tokeninfos> {
     this.logger.debug({ params }, "Getting token tokeninfos");
 
-    const response = await this.fetchApi<Deprecated.TokenTokeninfos>("/token/tokeninfos", {
+    const response = await this.fetchApi<Deprecated.Tokeninfos>("/token/tokeninfos", {
       contracts: params.contracts,
     });
     return response.result;

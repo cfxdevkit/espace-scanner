@@ -527,7 +527,7 @@ describe("DeprecatedWrapper", () => {
     });
   });
 
-  describe("TokenTokeninfos", () => {
+  describe("Tokeninfos", () => {
     it("should get token tokeninfos correctly", async () => {
       const mockResponse = {
         total: 100,
@@ -547,7 +547,7 @@ describe("DeprecatedWrapper", () => {
         } as Response)
       );
 
-      const result = await wrapper.TokenTokeninfos({ contracts: "0x123" });
+      const result = await wrapper.Tokeninfos({ contracts: "0x123" });
       expect(result).toEqual(mockResponse);
     });
   });

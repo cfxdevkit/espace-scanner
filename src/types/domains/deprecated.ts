@@ -838,13 +838,13 @@ export type AccountTokens = {
 };
 
 // Types for /token/tokeninfos
-export interface TokenTokeninfosParams {
+export interface TokeninfosParams {
   /** Contract addresses, separated by comma,
 eg. it's like 0x672158893ce87d812befd2209bc1b7818fe48b2a,0xfd2209bc1b7818fe48b2a672158893ce87d812be */
   contracts: string;
 }
 
-export type TokenTokeninfos = {
+export type Tokeninfos = {
   list?: Array<{
     /** Contract address of the token. */
     contract?: string;

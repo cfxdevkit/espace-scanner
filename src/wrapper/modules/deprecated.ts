@@ -174,11 +174,11 @@ export class DeprecatedWrapper extends BaseWrapper {
   /**
    * Get token tokeninfos
    */
-  async TokenTokeninfos(
-    params: Deprecated.TokenTokeninfosParams,
+  async Tokeninfos(
+    params: Deprecated.TokeninfosParams,
     returnRaw: boolean = false
-  ): Promise<Deprecated.TokenTokeninfos> {
-    const data = await this.deprecated.TokenTokeninfos(params);
+  ): Promise<Deprecated.Tokeninfos> {
+    const data = await this.deprecated.Tokeninfos(params);
     if (returnRaw) return data;
     return data;
   }
