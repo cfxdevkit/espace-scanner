@@ -30,8 +30,8 @@ export class ESpaceApi {
    * @param {string} [config.host] - Optional custom host URL
    */
   constructor({ target = "mainnet", apiKey, host }: ApiConfig = { target: "mainnet" }) {
-    const defaultMainnetHost = "https://evmapi.confluxscan.io";
-    const defaultTestnetHost = "https://evmapi-testnet.confluxscan.io";
+    const defaultMainnetHost = "https://evmapi.confluxscan.org";
+    const defaultTestnetHost = "https://evmapi-testnet.confluxscan.org";
     const defaultHost = target === "mainnet" ? defaultMainnetHost : defaultTestnetHost;
     this.baseUrl = host || defaultHost;
     this.apiKey = apiKey;
