@@ -184,9 +184,7 @@ export interface Txlist {
  * @category Types
  */
 export interface TxlistinternalParams
-  extends PaginationParams,
-    TimestampRangeParams,
-    BlockRangeParams {
+  extends PaginationParams, TimestampRangeParams, BlockRangeParams {
   /** Account address to get internal transactions for */
   address: string;
   /** Start block number */
